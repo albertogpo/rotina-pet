@@ -154,16 +154,20 @@ Sem navegação desnecessária.
 
 ## ✅ Linguagem
 
-Evitar termos como:
+Evitar termos administrativos ou ambíguos, como:
 
-- administrada
+- administrada;
+- registrar consumo, quando usado como ação principal sem contexto.
 
-Preferir:
+Preferir estados e ações concretas:
 
-- Concluída
-- Pendente
-- Atrasada
-- Não realizada
+- Pendente;
+- Atrasada;
+- Comeu tudo;
+- Não comeu tudo;
+- Não foi servida.
+
+Ícones de estado nunca devem aparecer sozinhos: precisam estar acompanhados por uma label textual.
 
 ---
 
@@ -194,17 +198,26 @@ Sem alterar a quantidade diária prescrita.
 
 ---
 
-## 🧪 Hipótese
+## ✅ Registro de consumo sem etapa obrigatória
 
-Registrar consumo parcial.
+O registro principal oferece três ações mutuamente claras:
 
-Possíveis abordagens:
+- **Comeu tudo**;
+- **Não comeu tudo**;
+- **Não foi servida**.
 
-- porcentagem;
-- quantidade em gramas;
-- níveis aproximados de consumo.
+Tocar em **Comeu tudo** encerra o registro imediatamente, sem pergunta adicional.
 
-Precisamos validar com veterinários.
+Tocar em **Não comeu tudo** abre uma escolha aproximada:
+
+- Quase tudo;
+- Metade;
+- Pouco;
+- Nada.
+
+**Nada** significa que a comida foi oferecida, mas o animal não comeu. **Não foi servida** significa que a refeição não chegou a ser oferecida. Essa diferença deve permanecer preservada nos dados e na interface.
+
+A escala é deliberadamente descritiva e humana. Percentuais ou quantidades exatas continuam como possibilidades futuras para validação com veterinários.
 
 ---
 
@@ -389,6 +402,57 @@ Não será criado um menu intermediário sem necessidade real.
 
 ---
 
+
+
+## ✅ A tela Hoje privilegia a leitura rápida dos horários
+
+O card de resumo apresenta uma faixa horizontal rolável com todos os horários do dia.
+
+Regras:
+
+- cada horário funciona como atalho para o grupo correspondente na lista;
+- os horários têm espaçamento suficiente para serem diferenciados;
+- o horário é o título visual do grupo, sem a frase “Refeição das…”;
+- cada grupo informa quantas refeições já foram registradas.
+
+As refeições de um mesmo horário aparecem como linhas compactas em acordeão:
+
+- ícone do animal;
+- nome do animal;
+- ícone de estado acompanhado por label;
+- controle de expandir ou recolher.
+
+Ao expandir, são exibidos alimentos, quantidades e ações de registro. Apenas uma refeição fica aberta por vez dentro de cada horário. Após registrar uma ação, o card se fecha automaticamente.
+
+---
+
+## ✅ Configurações não exibe seletor de animais sem função
+
+Os chips de animais são ocultados na tela Configurações. Um seletor não deve aparecer em uma tela na qual não altera nenhum conteúdo ou comportamento.
+
+---
+
+## ✅ Registros do dia medem informação preenchida
+
+Com a existência da opção **Não foi servida**, o progresso diário passa a contar refeições **registradas**, e não apenas refeições consumidas ou concluídas.
+
+Uma refeição está registrada quando o tutor informa qualquer resultado válido. Estados pendentes e atrasados ainda não entram no progresso.
+
+---
+
+## ✅ Compatibilidade móvel não deve impedir acessibilidade
+
+Para reduzir ocorrências de zoom ou corte indevido no PWA do iPhone:
+
+- a viewport usa a área segura do aparelho;
+- a aplicação impede overflow horizontal acidental;
+- campos de formulário mantêm fonte mínima de 16 px;
+- o ajuste automático do tamanho do texto é estabilizado.
+
+Não será desabilitado o zoom manual do usuário, pois isso prejudicaria acessibilidade.
+
+---
+
 # 13. Estado de implementação do protótipo
 
 | Capacidade | Status |
@@ -402,14 +466,18 @@ Não será criado um menu intermediário sem necessidade real.
 | Divisão automática da quantidade diária | ✅ Implementado |
 | Visão Hoje com todos os animais | ✅ Implementado |
 | Agrupamento das refeições por horário | ✅ Implementado |
+| Atalhos de horários no resumo do dia | ✅ Implementado |
+| Cards compactos em acordeão | ✅ Implementado |
+| Ícones de estado com labels | ✅ Implementado |
 | Filtro por um ou vários animais | ✅ Implementado |
-| Registro de refeição concluída | ✅ Implementado |
-| Registro de refeição não realizada | ✅ Implementado |
+| Registro “Comeu tudo” | ✅ Implementado |
+| Fluxo “Não comeu tudo” | ✅ Implementado |
+| Registro “Não foi servida” | ✅ Implementado |
 | Registro e histórico de peso | ✅ Implementado |
 | Sincronização pelo Supabase | ✅ Implementado |
 | PWA instalável | ✅ Implementado |
 | Lembretes com o app ativo | ✅ Implementado com limitação |
 | Notificações em segundo plano | 📅 Capacidade futura |
-| Consumo parcial | 🧪 Hipótese |
+| Consumo aproximado (quase tudo, metade, pouco ou nada) | ✅ Implementado |
 | Onboarding sem login obrigatório | 🧪 Hipótese |
 | Produto profissional para veterinários | 📅 Capacidade futura |

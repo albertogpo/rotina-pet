@@ -3,7 +3,7 @@ import type {Session} from "@supabase/supabase-js";
 import {hasSupabaseConfig,supabase} from "./lib/supabase";
 import {todayLocal} from "./lib/format";
 import * as api from "./services/api";
-import type {Food,FoodUnit,MealOccurrence,Pet,PlanFoodInput,Species,WeightEntry} from "./types";
+import type {Food,FoodUnit,MealOccurrence,MealOutcome,Pet,PlanFoodInput,Species,WeightEntry} from "./types";
 import {SetupScreen} from "./components/SetupScreen";
 import {AuthScreen} from "./components/AuthScreen";
 import {TodayPage} from "./components/TodayPage";
@@ -203,14 +203,17 @@ function App(){
     setTab("today");
   }
 
-  async function toggleMeal(meal:MealOccurrence){
-    await api.setMealStatus(meal.id,meal.status==="completed"?"pending":"completed");
-    await loadTodayData();
-  }
-
-  async function skipMeal(meal:MealOccurrence){
-    await api.setMealStatus(meal.id,meal.status==="skipped"?"pending":"skipped");
-    await loadTodayData();
+  async function setMealOutcome(meal:MealOccurrence,outcome:MealOutcome){
+    setError("");
+    try{
+      if(outcome==="pending")await api.setMealOutcome(meal.id,"pending",null);
+      else if(outcome==="not_served")await api.setMealOutcome(meal.id,"skipped",null);
+      else await api.setMealOutcome(meal.id,"completed",outcome);
+      await loadTodayData();
+    }catch(e){
+      setError(e instanceof Error?e.message:"Não foi possível registrar a refeição.");
+      throw e;
+    }
   }
 
   function toggleTodayPetFilter(id:string){
@@ -252,13 +255,13 @@ function App(){
       <button className="avatar-button" onClick={()=>setTab("settings")} title="Conta e configurações" aria-label="Abrir conta e configurações">{accountInitial}</button>
     </header>
 
-    <section className="pet-switcher" aria-label={isToday?"Filtrar refeições por animal":"Selecionar animal"}>
+    {tab!=="settings"&&<section className="pet-switcher" aria-label={isToday?"Filtrar refeições por animal":"Selecionar animal"}>
       {pets.map(item=>{
         const active=isToday?todayPetIds.includes(item.id):pet?.id===item.id;
         return <button key={item.id} className={`pet-chip ${active?"active":""}`} aria-pressed={active} onClick={()=>isToday?toggleTodayPetFilter(item.id):setSelectedPetId(item.id)}><span className="pet-chip-icon">{item.icon}</span><span>{item.name}</span></button>;
       })}
       <button className="pet-chip add-pet" onClick={openPetCreation} aria-label="Adicionar novo animal" title="Adicionar novo animal">＋</button>
-    </section>
+    </section>}
 
     {isToday&&pets.length>1&&<p className="filter-hint">Todos começam selecionados. Toque em um animal para ver apenas ele; depois, adicione outros ao filtro.</p>}
     {error&&<p className="error-box global-error">{error}</p>}
@@ -268,7 +271,7 @@ function App(){
     </nav>
 
     <div className="page-content">
-      {tab==="today"&&<TodayPage pets={pets} meals={meals} selectedPetIds={todayPetIds} loading={loadingToday||loadingBase} onToggle={toggleMeal} onSkip={skipMeal} onOpenPlan={openPlanForPet} onOpenPets={()=>setTab("pets")}/>} 
+      {tab==="today"&&<TodayPage pets={pets} meals={meals} selectedPetIds={todayPetIds} loading={loadingToday||loadingBase} onSetOutcome={setMealOutcome} onOpenPlan={openPlanForPet} onOpenPets={()=>setTab("pets")}/>} 
       {tab==="weight"&&(pet?<WeightPage pet={pet} entries={weights} loading={loadingPet} onAdd={addWeight} onDelete={deleteWeight}/>:<section className="empty-card"><h2>Nenhum animal ativo</h2><p>Restaure um perfil arquivado ou cadastre um novo animal.</p><button className="primary-button" onClick={()=>setTab("pets")}>Abrir animais</button></section>)}
       {tab==="foods"&&<FoodsPage foods={foods} onCreate={createFood} onUpdate={updateFood} onArchive={archiveFood}/>} 
       {tab==="plan"&&(pet?<PlanPage pet={pet} foods={foods} activePlan={activePlan} onSave={savePlan} onCreateFood={createFood}/>:<section className="empty-card"><h2>Nenhum animal ativo</h2><p>Cadastre ou restaure um animal antes de criar um plano.</p><button className="primary-button" onClick={()=>setTab("pets")}>Abrir animais</button></section>)}
