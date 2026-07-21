@@ -1,27 +1,35 @@
-import type { Session } from "@supabase/supabase-js";
-import { supabase } from "../lib/supabase";
-import { toLocalScheduledIso } from "../lib/format";
-import type { Food, FoodUnit, MealOccurrence, Pet, PlanFoodInput, Species, WeightEntry } from "../types";
+import type {Session} from "@supabase/supabase-js";
+import {supabase} from "../lib/supabase";
+import {toLocalScheduledIso} from "../lib/format";
+import type {Food,FoodUnit,MealOccurrence,Pet,PlanFoodInput,Species,WeightEntry} from "../types";
 
-function client(){if(!supabase)throw new Error("Supabase ainda não configurado.");return supabase}
-export async function getSession():Promise<Session|null>{const{data,error}=await client().auth.getSession();if(error)throw error;return data.session}
-export async function signIn(email:string,password:string){const{error}=await client().auth.signInWithPassword({email,password});if(error)throw error}
-export async function signUp(email:string,password:string){const{data,error}=await client().auth.signUp({email,password});if(error)throw error;return data}
-export async function sendPasswordReset(email:string){const{error}=await client().auth.resetPasswordForEmail(email,{redirectTo:window.location.origin+window.location.pathname});if(error)throw error}
-export async function signOut(){const{error}=await client().auth.signOut();if(error)throw error}
-export async function listPets():Promise<Pet[]>{const{data,error}=await client().from("pets").select("*").eq("active",true).order("created_at");if(error)throw error;return data as Pet[]}
-export async function createPet(userId:string,input:{name:string;species:Species;icon:string}){const{data,error}=await client().from("pets").insert({user_id:userId,...input}).select().single();if(error)throw error;return data as Pet}
-export async function updatePet(id:string,input:{name:string;species:Species;icon:string}){const{data,error}=await client().from("pets").update(input).eq("id",id).select().single();if(error)throw error;return data as Pet}
-export async function archivePet(id:string){const{error}=await client().from("pets").update({active:false}).eq("id",id);if(error)throw error}
-export async function listWeights(petId:string):Promise<WeightEntry[]>{const{data,error}=await client().from("weight_entries").select("*").eq("pet_id",petId).order("recorded_at",{ascending:false});if(error)throw error;return data as WeightEntry[]}
-export async function addWeight(userId:string,petId:string,recordedAt:string,weightKg:number,notes:string){const{data,error}=await client().from("weight_entries").insert({user_id:userId,pet_id:petId,recorded_at:recordedAt,weight_kg:weightKg,notes:notes.trim()||null}).select().single();if(error)throw error;return data as WeightEntry}
-export async function deleteWeight(id:string){const{error}=await client().from("weight_entries").delete().eq("id",id);if(error)throw error}
-export async function listFoods():Promise<Food[]>{const{data,error}=await client().from("foods").select("*").eq("active",true).order("name");if(error)throw error;return data as Food[]}
-export async function createFood(userId:string,name:string,defaultUnit:FoodUnit){const{data,error}=await client().from("foods").insert({user_id:userId,name:name.trim(),default_unit:defaultUnit}).select().single();if(error)throw error;return data as Food}
-export async function updateFood(id:string,name:string,defaultUnit:FoodUnit){const{data,error}=await client().from("foods").update({name:name.trim(),default_unit:defaultUnit}).eq("id",id).select().single();if(error)throw error;return data as Food}
-export async function archiveFood(id:string){const{error}=await client().from("foods").update({active:false}).eq("id",id);if(error)throw error}
-export async function savePlan(input:{petId:string;name:string;startsOn:string;mealTimes:string[];foods:PlanFoodInput[]}){const payload=input.foods.map(f=>({food_id:f.foodId,daily_quantity:Number(f.dailyQuantity.replace(",",".")),unit:f.unit,meal_sequences:f.mealSequences}));const{data,error}=await client().rpc("save_diet_plan",{p_pet_id:input.petId,p_name:input.name,p_starts_on:input.startsOn,p_meal_times:input.mealTimes,p_foods:payload});if(error)throw error;return data as string}
-export async function getActivePlan(petId:string,date:string){const{data,error}=await client().from("diet_plans").select(`id,name,starts_on,ends_on,active,created_at,meal_templates(id,scheduled_time,sequence,meal_components(id,quantity,unit,foods(name))),plan_foods(id,daily_quantity,unit,meal_sequences,foods(id,name))`).eq("pet_id",petId).lte("starts_on",date).or(`ends_on.is.null,ends_on.gte.${date}`).order("starts_on",{ascending:false}).order("created_at",{ascending:false}).limit(1).maybeSingle();if(error)throw error;return data}
-export async function ensureTodayMeals(userId:string,petId:string,date:string){const plan=await getActivePlan(petId,date);if(!plan)return[] as MealOccurrence[];const templates=[...(plan.meal_templates??[])].sort((a,b)=>a.sequence-b.sequence);if(templates.length){const rows=templates.map(t=>({user_id:userId,pet_id:petId,meal_template_id:t.id,local_date:date,scheduled_at:toLocalScheduledIso(date,t.scheduled_time)}));const{error}=await client().from("meal_occurrences").upsert(rows,{onConflict:"meal_template_id,local_date",ignoreDuplicates:true});if(error)throw error}return listMeals(petId,date)}
-export async function listMeals(petId:string,date:string):Promise<MealOccurrence[]>{const{data,error}=await client().from("meal_occurrences").select(`*,meal_templates(id,scheduled_time,sequence,meal_components(id,quantity,unit,foods(name)))`).eq("pet_id",petId).eq("local_date",date).order("scheduled_at");if(error)throw error;return data as unknown as MealOccurrence[]}
-export async function setMealStatus(id:string,status:"pending"|"completed"|"skipped"){const{error}=await client().from("meal_occurrences").update({status,completed_at:status==="completed"?new Date().toISOString():null}).eq("id",id);if(error)throw error}
+function client(){if(!supabase)throw new Error("Supabase ainda não configurado.");return supabase;}
+function appRedirectUrl(){return new URL(import.meta.env.BASE_URL,window.location.href).toString();}
+
+export async function getSession():Promise<Session|null>{const{data,error}=await client().auth.getSession();if(error)throw error;return data.session;}
+export async function signIn(email:string,password:string){const{error}=await client().auth.signInWithPassword({email,password});if(error)throw error;}
+export async function signUp(email:string,password:string){const{data,error}=await client().auth.signUp({email,password,options:{emailRedirectTo:appRedirectUrl()}});if(error)throw error;return data;}
+export async function sendPasswordReset(email:string){const{error}=await client().auth.resetPasswordForEmail(email,{redirectTo:appRedirectUrl()});if(error)throw error;}
+export async function signOut(){const{error}=await client().auth.signOut();if(error)throw error;}
+
+export async function listPets():Promise<Pet[]>{const{data,error}=await client().from("pets").select("*").eq("active",true).order("created_at");if(error)throw error;return data as Pet[];}
+export async function listArchivedPets():Promise<Pet[]>{const{data,error}=await client().from("pets").select("*").eq("active",false).order("created_at",{ascending:false});if(error)throw error;return data as Pet[];}
+export async function createPet(userId:string,input:{name:string;species:Species;icon:string}){const{data,error}=await client().from("pets").insert({user_id:userId,...input}).select().single();if(error)throw error;return data as Pet;}
+export async function updatePet(id:string,input:{name:string;species:Species;icon:string}){const{data,error}=await client().from("pets").update(input).eq("id",id).select().single();if(error)throw error;return data as Pet;}
+export async function archivePet(id:string){const{error}=await client().from("pets").update({active:false}).eq("id",id);if(error)throw error;}
+export async function restorePet(id:string){const{error}=await client().from("pets").update({active:true}).eq("id",id);if(error)throw error;}
+
+export async function listWeights(petId:string):Promise<WeightEntry[]>{const{data,error}=await client().from("weight_entries").select("*").eq("pet_id",petId).order("recorded_at",{ascending:false});if(error)throw error;return data as WeightEntry[];}
+export async function addWeight(userId:string,petId:string,recordedAt:string,weightKg:number,notes:string){const{data,error}=await client().from("weight_entries").insert({user_id:userId,pet_id:petId,recorded_at:recordedAt,weight_kg:weightKg,notes:notes.trim()||null}).select().single();if(error)throw error;return data as WeightEntry;}
+export async function deleteWeight(id:string){const{error}=await client().from("weight_entries").delete().eq("id",id);if(error)throw error;}
+
+export async function listFoods():Promise<Food[]>{const{data,error}=await client().from("foods").select("*").eq("active",true).order("name");if(error)throw error;return data as Food[];}
+export async function createFood(userId:string,name:string,defaultUnit:FoodUnit){const{data,error}=await client().from("foods").insert({user_id:userId,name:name.trim(),default_unit:defaultUnit}).select().single();if(error)throw error;return data as Food;}
+export async function updateFood(id:string,name:string,defaultUnit:FoodUnit){const{data,error}=await client().from("foods").update({name:name.trim(),default_unit:defaultUnit}).eq("id",id).select().single();if(error)throw error;return data as Food;}
+export async function archiveFood(id:string){const{error}=await client().from("foods").update({active:false}).eq("id",id);if(error)throw error;}
+
+export async function savePlan(input:{petId:string;name:string;startsOn:string;mealTimes:string[];foods:PlanFoodInput[]}){const payload=input.foods.map(food=>({food_id:food.foodId,daily_quantity:Number(food.dailyQuantity.replace(",",".")),unit:food.unit,meal_sequences:food.mealSequences}));const{data,error}=await client().rpc("save_diet_plan",{p_pet_id:input.petId,p_name:input.name,p_starts_on:input.startsOn,p_meal_times:input.mealTimes,p_foods:payload});if(error)throw error;return data as string;}
+export async function getActivePlan(petId:string,date:string){const{data,error}=await client().from("diet_plans").select(`id,name,starts_on,ends_on,active,created_at,meal_templates(id,scheduled_time,sequence,meal_components(id,quantity,unit,foods(name))),plan_foods(id,daily_quantity,unit,meal_sequences,foods(id,name))`).eq("pet_id",petId).lte("starts_on",date).or(`ends_on.is.null,ends_on.gte.${date}`).order("starts_on",{ascending:false}).order("created_at",{ascending:false}).limit(1).maybeSingle();if(error)throw error;return data;}
+export async function ensureTodayMeals(userId:string,petId:string,date:string){const plan=await getActivePlan(petId,date);if(!plan)return[] as MealOccurrence[];const templates=[...(plan.meal_templates??[])].sort((a,b)=>a.sequence-b.sequence);if(templates.length){const rows=templates.map(template=>({user_id:userId,pet_id:petId,meal_template_id:template.id,local_date:date,scheduled_at:toLocalScheduledIso(date,template.scheduled_time)}));const{error}=await client().from("meal_occurrences").upsert(rows,{onConflict:"meal_template_id,local_date",ignoreDuplicates:true});if(error)throw error;}return listMeals(petId,date);}
+export async function listMeals(petId:string,date:string):Promise<MealOccurrence[]>{const{data,error}=await client().from("meal_occurrences").select(`*,meal_templates(id,scheduled_time,sequence,meal_components(id,quantity,unit,foods(name)))`).eq("pet_id",petId).eq("local_date",date).order("scheduled_at");if(error)throw error;return data as unknown as MealOccurrence[];}
+export async function setMealStatus(id:string,status:"pending"|"completed"|"skipped"){const{error}=await client().from("meal_occurrences").update({status,completed_at:status==="completed"?new Date().toISOString():null}).eq("id",id);if(error)throw error;}

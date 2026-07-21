@@ -337,3 +337,79 @@ Sempre que uma conversa gerar:
 este documento deverá ser atualizado antes da implementação.
 
 Este documento é a fonte oficial de verdade do produto.
+
+---
+
+# 12. Definições consolidadas durante os testes do protótipo
+
+## ✅ A visão Hoje reúne todos os animais
+
+A visão principal não deve ser separada por pet.
+
+As refeições de todos os animais ativos aparecem juntas e agrupadas por horário. O tutor pode filtrar por um ou vários animais por meio das pílulas de seleção.
+
+Regras do filtro:
+
+- todos os animais começam selecionados;
+- quando todos estão selecionados, tocar em um animal passa a mostrar apenas ele;
+- depois disso, outros animais podem ser adicionados ao filtro;
+- o filtro não deve permanecer vazio.
+
+---
+
+## ✅ Cada refeição deve identificar claramente o animal
+
+O card mostra o ícone e o nome do animal, além dos alimentos e respectivas quantidades.
+
+Quando há mais de um alimento na mesma refeição, cada item deve possuir separação visual suficiente para não parecer uma única linha de conteúdo.
+
+---
+
+## ✅ O cadastro de alimento não interrompe a criação do plano
+
+Durante a criação de um plano, o tutor pode cadastrar um alimento que ainda não existe.
+
+O formulário do plano permanece preenchido e, após o cadastro, o novo alimento é adicionado automaticamente à composição diária.
+
+---
+
+## ✅ Arquivamento é reversível
+
+Arquivar um animal não apaga pesos, planos, refeições ou demais dados históricos.
+
+Animais arquivados devem permanecer acessíveis em uma área própria e podem ser restaurados.
+
+---
+
+## ✅ A conta é acessada diretamente pelas iniciais do usuário
+
+Enquanto existir apenas um destino de conta e configurações, tocar nas iniciais do usuário abre diretamente essa tela.
+
+Não será criado um menu intermediário sem necessidade real.
+
+---
+
+# 13. Estado de implementação do protótipo
+
+| Capacidade | Status |
+|---|---|
+| Cadastro de animais | ✅ Implementado |
+| Edição de animais | ✅ Implementado |
+| Arquivamento reversível de animais | ✅ Implementado |
+| Cadastro de alimentos | ✅ Implementado |
+| Cadastro de alimento dentro do plano | ✅ Implementado |
+| Plano com múltiplos alimentos | ✅ Implementado |
+| Divisão automática da quantidade diária | ✅ Implementado |
+| Visão Hoje com todos os animais | ✅ Implementado |
+| Agrupamento das refeições por horário | ✅ Implementado |
+| Filtro por um ou vários animais | ✅ Implementado |
+| Registro de refeição concluída | ✅ Implementado |
+| Registro de refeição não realizada | ✅ Implementado |
+| Registro e histórico de peso | ✅ Implementado |
+| Sincronização pelo Supabase | ✅ Implementado |
+| PWA instalável | ✅ Implementado |
+| Lembretes com o app ativo | ✅ Implementado com limitação |
+| Notificações em segundo plano | 📅 Capacidade futura |
+| Consumo parcial | 🧪 Hipótese |
+| Onboarding sem login obrigatório | 🧪 Hipótese |
+| Produto profissional para veterinários | 📅 Capacidade futura |
