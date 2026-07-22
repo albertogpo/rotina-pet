@@ -1,7 +1,7 @@
 import {useCallback,useEffect,useMemo,useRef,useState} from "react";
 import type {Session} from "@supabase/supabase-js";
 import {hasSupabaseConfig,supabase} from "./lib/supabase";
-import {todayLocal} from "./lib/format";
+import {shiftLocalDate,todayLocal} from "./lib/format";
 import * as api from "./services/api";
 import type {Food,FoodUnit,MealOccurrence,MealOutcome,Pet,PlanFoodInput,Species,WeightEntry} from "./types";
 import {SetupScreen} from "./components/SetupScreen";
@@ -43,10 +43,12 @@ function App(){
   const[error,setError]=useState("");
   const[onboardingBusy,setOnboardingBusy]=useState(false);
   const[autoCreatePet,setAutoCreatePet]=useState(false);
-  const notified=useRef(new Set<string>(JSON.parse(localStorage.getItem("rotinaPetNotified")||"[]")));
+  const[displayDate,setDisplayDate]=useState(todayLocal());
+  const retryTimer=useRef<number|undefined>(undefined);
+  const lastAutoRetryAt=useRef(0);
 
   const pet=pets.find(x=>x.id===selectedPetId)??pets[0];
-  const petById=useMemo(()=>new Map(pets.map(item=>[item.id,item])),[pets]);
+  const today=todayLocal();
 
   useEffect(()=>{
     if(!supabase){setAuthLoading(false);return;}
@@ -65,7 +67,10 @@ function App(){
       setArchivedPets(archived);
       setFoods(foodList);
       setSelectedPetId(current=>active.some(item=>item.id===current)?current:active[0]?.id??"");
-      setTodayPetIds(active.map(item=>item.id));
+      setTodayPetIds(current=>{
+        const next=current.filter(id=>active.some(item=>item.id===id));
+        return next.length?next:active.map(item=>item.id);
+      });
       if(!active.length&&archived.length)setTab("pets");
     }catch(e){
       setError(e instanceof Error?e.message:"Erro ao carregar os dados.");
@@ -81,8 +86,7 @@ function App(){
     setLoadingPet(true);
     setError("");
     try{
-      const date=todayLocal();
-      const[weightList,plan]=await Promise.all([api.listWeights(pet.id),api.getActivePlan(pet.id,date)]);
+      const[weightList,plan]=await Promise.all([api.listWeights(pet.id),api.getActivePlan(pet.id,today)]);
       setWeights(weightList);
       setActivePlan(plan);
     }catch(e){
@@ -90,51 +94,52 @@ function App(){
     }finally{
       setLoadingPet(false);
     }
-  },[session,pet?.id]);
+  },[session,pet?.id,today]);
 
   useEffect(()=>{void loadSelectedPetData();},[loadSelectedPetData]);
 
-  const loadTodayData=useCallback(async()=>{
+  const loadDisplayedMeals=useCallback(async()=>{
     if(!session||!pets.length){setMeals([]);return;}
     setLoadingToday(true);
     setError("");
     try{
-      const date=todayLocal();
-      const results=await Promise.all(pets.map(item=>api.ensureTodayMeals(session.user.id,item.id,date)));
+      const results=await Promise.all(pets.map(item=>api.ensureMealsForDate(session.user.id,item.id,displayDate)));
       setMeals(results.flat().sort((a,b)=>new Date(a.scheduled_at).getTime()-new Date(b.scheduled_at).getTime()));
     }catch(e){
-      setError(e instanceof Error?e.message:"Erro ao carregar as refeições de hoje.");
+      setError(e instanceof Error?e.message:`Erro ao carregar as refeições de ${displayDate}.`);
     }finally{
       setLoadingToday(false);
     }
-  },[session,pets]);
+  },[session,pets,displayDate]);
 
-  useEffect(()=>{void loadTodayData();},[loadTodayData]);
+  useEffect(()=>{void loadDisplayedMeals();},[loadDisplayedMeals]);
+
+  const retryAllData=useCallback(async()=>{
+    clearTimeout(retryTimer.current);
+    await Promise.all([loadBase(),loadSelectedPetData(),loadDisplayedMeals()]);
+  },[loadBase,loadSelectedPetData,loadDisplayedMeals]);
 
   useEffect(()=>{
-    if(!("Notification" in window)||Notification.permission!=="granted")return;
-    const check=()=>{
-      const now=Date.now();
-      for(const meal of meals){
-        if(meal.status!=="pending"||notified.current.has(meal.id))continue;
-        const due=new Date(meal.scheduled_at).getTime();
-        if(now>=due&&now-due<90000){
-          const mealPet=petById.get(meal.pet_id);
-          const text=meal.meal_templates?.meal_components.map(component=>component.foods?.name).filter(Boolean).join(" + ")||"Refeição programada";
-          new Notification(`Refeição de ${mealPet?.name??"seu pet"}`,{body:text,icon:"./icons/icon-192.png"});
-          notified.current.add(meal.id);
-          localStorage.setItem("rotinaPetNotified",JSON.stringify([...notified.current]));
-        }
-      }
-    };
-    check();
-    const timer=window.setInterval(check,30000);
-    return()=>clearInterval(timer);
-  },[meals,petById]);
+    if(!error||loadingBase||loadingPet||loadingToday)return;
+    const now=Date.now();
+    if(now-lastAutoRetryAt.current<15000)return;
+    lastAutoRetryAt.current=now;
+    clearTimeout(retryTimer.current);
+    retryTimer.current=window.setTimeout(()=>{void retryAllData();},1800);
+    return()=>clearTimeout(retryTimer.current);
+  },[error,loadingBase,loadingPet,loadingToday,retryAllData]);
 
-  if(!hasSupabaseConfig)return <SetupScreen/>;
-  if(authLoading)return <main className="center-page"><div className="spinner large"/></main>;
-  if(!session)return <AuthScreen/>;
+  useEffect(()=>{
+    const handleVisible=()=>{
+      if(document.visibilityState==="visible"&&error){void retryAllData();}
+    };
+    document.addEventListener("visibilitychange",handleVisible);
+    return()=>document.removeEventListener("visibilitychange",handleVisible);
+  },[error,retryAllData]);
+
+  useEffect(()=>{
+    if(displayDate>today)setDisplayDate(today);
+  },[displayDate,today]);
 
   async function createPet(input:{name:string;species:Species;icon:string}){
     setOnboardingBusy(true);
@@ -199,7 +204,15 @@ function App(){
   async function savePlan(input:{name:string;startsOn:string;mealTimes:string[];foods:PlanFoodInput[]}){
     if(!pet)return;
     await api.savePlan({petId:pet.id,...input});
-    await Promise.all([loadSelectedPetData(),loadTodayData()]);
+    await Promise.all([loadSelectedPetData(),loadDisplayedMeals()]);
+    setDisplayDate(todayLocal());
+    setTab("today");
+  }
+
+  async function updatePlanSchedule(planId:string,startsOn:string,mealTimes:string[]){
+    await api.updatePlanSchedule(planId,startsOn,mealTimes);
+    await Promise.all([loadSelectedPetData(),loadDisplayedMeals()]);
+    setDisplayDate(todayLocal());
     setTab("today");
   }
 
@@ -209,7 +222,7 @@ function App(){
       if(outcome==="pending")await api.setMealOutcome(meal.id,"pending",null);
       else if(outcome==="not_served")await api.setMealOutcome(meal.id,"skipped",null);
       else await api.setMealOutcome(meal.id,"completed",outcome);
-      await loadTodayData();
+      await loadDisplayedMeals();
     }catch(e){
       setError(e instanceof Error?e.message:"Não foi possível registrar a refeição.");
       throw e;
@@ -242,12 +255,25 @@ function App(){
     setTab("plan");
   }
 
+  function showPreviousDay(){
+    setDisplayDate(current=>shiftLocalDate(current,-1));
+  }
+
+  function showNextDay(){
+    setDisplayDate(current=>current<today?shiftLocalDate(current,1):current);
+  }
+
+  function returnToToday(){
+    setDisplayDate(today);
+  }
+
   if(!pets.length&&!archivedPets.length&&!loadingBase){
-    return <main className="center-page"><section className="auth-card"><div className="brand-mark">🐾</div><p className="eyebrow">Primeiro passo</p><h1>Cadastre seu primeiro animal</h1><p className="muted">Depois você poderá adicionar os demais perfis.</p><PetForm onSave={createPet} busy={onboardingBusy}/>{error&&<p className="error-box">{error}</p>}</section></main>;
+    return <main className="center-page"><section className="auth-card"><div className="brand-mark">🐾</div><p className="eyebrow">Primeiro passo</p><h1>Cadastre seu primeiro animal</h1><p className="muted">Depois você poderá adicionar os demais perfis.</p><PetForm onSave={createPet} busy={onboardingBusy}/>{error&&<div className="error-box error-with-action"><span>{error}</span><button className="secondary-button compact" onClick={()=>void retryAllData()}>Tentar novamente</button></div>}</section></main>;
   }
 
   const accountInitial=(session.user.email?.trim().charAt(0)||"U").toUpperCase();
-  const isToday=tab==="today";
+  const isTodayTab=tab==="today";
+  const showGlobalRetry=Boolean(error&&!loadingBase&&!loadingPet&&!loadingToday);
 
   return <main className="app-shell">
     <header className="topbar">
@@ -255,28 +281,42 @@ function App(){
       <button className="avatar-button" onClick={()=>setTab("settings")} title="Conta e configurações" aria-label="Abrir conta e configurações">{accountInitial}</button>
     </header>
 
-    {tab!=="settings"&&<section className="pet-switcher" aria-label={isToday?"Filtrar refeições por animal":"Selecionar animal"}>
+    {tab!=="settings"&&<section className="pet-switcher" aria-label={isTodayTab?"Filtrar refeições por animal":"Selecionar animal"}>
       {pets.map(item=>{
-        const active=isToday?todayPetIds.includes(item.id):pet?.id===item.id;
-        return <button key={item.id} className={`pet-chip ${active?"active":""}`} aria-pressed={active} onClick={()=>isToday?toggleTodayPetFilter(item.id):setSelectedPetId(item.id)}><span className="pet-chip-icon">{item.icon}</span><span>{item.name}</span></button>;
+        const active=isTodayTab?todayPetIds.includes(item.id):pet?.id===item.id;
+        return <button key={item.id} className={`pet-chip ${active?"active":""}`} aria-pressed={active} onClick={()=>isTodayTab?toggleTodayPetFilter(item.id):setSelectedPetId(item.id)}><span className="pet-chip-icon">{item.icon}</span><span>{item.name}</span></button>;
       })}
       <button className="pet-chip add-pet" onClick={openPetCreation} aria-label="Adicionar novo animal" title="Adicionar novo animal">＋</button>
     </section>}
 
-    {isToday&&pets.length>1&&<p className="filter-hint">Todos começam selecionados. Toque em um animal para ver apenas ele; depois, adicione outros ao filtro.</p>}
-    {error&&<p className="error-box global-error">{error}</p>}
+    {isTodayTab&&pets.length>1&&<p className="filter-hint">Todos começam selecionados. Toque em um animal para ver apenas ele; depois, adicione outros ao filtro.</p>}
+    {showGlobalRetry&&<div className="error-box global-error error-with-action"><span>{error}</span><button className="secondary-button compact" onClick={()=>void retryAllData()}>Tentar novamente</button></div>}
 
     <nav className="main-nav" aria-label="Navegação principal">
       {navItems.map(item=><button key={item.id} className={tab===item.id?"active":""} onClick={()=>setTab(item.id)}><AppIcon name={item.icon}/><span>{item.label}</span></button>)}
     </nav>
 
     <div className="page-content">
-      {tab==="today"&&<TodayPage pets={pets} meals={meals} selectedPetIds={todayPetIds} loading={loadingToday||loadingBase} onSetOutcome={setMealOutcome} onOpenPlan={openPlanForPet} onOpenPets={()=>setTab("pets")}/>} 
+      {tab==="today"&&<TodayPage
+        pets={pets}
+        meals={meals}
+        selectedPetIds={todayPetIds}
+        loading={loadingToday||loadingBase}
+        onSetOutcome={setMealOutcome}
+        onOpenPlan={openPlanForPet}
+        onOpenPets={()=>setTab("pets")}
+        displayDate={displayDate}
+        isToday={displayDate===today}
+        canGoForward={displayDate<today}
+        onPreviousDay={showPreviousDay}
+        onNextDay={showNextDay}
+        onGoToToday={returnToToday}
+      />}
       {tab==="weight"&&(pet?<WeightPage pet={pet} entries={weights} loading={loadingPet} onAdd={addWeight} onDelete={deleteWeight}/>:<section className="empty-card"><h2>Nenhum animal ativo</h2><p>Restaure um perfil arquivado ou cadastre um novo animal.</p><button className="primary-button" onClick={()=>setTab("pets")}>Abrir animais</button></section>)}
-      {tab==="foods"&&<FoodsPage foods={foods} onCreate={createFood} onUpdate={updateFood} onArchive={archiveFood}/>} 
-      {tab==="plan"&&(pet?<PlanPage pet={pet} foods={foods} activePlan={activePlan} onSave={savePlan} onCreateFood={createFood}/>:<section className="empty-card"><h2>Nenhum animal ativo</h2><p>Cadastre ou restaure um animal antes de criar um plano.</p><button className="primary-button" onClick={()=>setTab("pets")}>Abrir animais</button></section>)}
-      {tab==="pets"&&<PetsPage pets={pets} archivedPets={archivedPets} onCreate={createPet} onUpdate={updatePet} onArchive={archivePet} onRestore={restorePet} autoStartCreate={autoCreatePet} onAutoStartHandled={()=>setAutoCreatePet(false)}/>} 
-      {tab==="settings"&&<SettingsPage email={session.user.email??"Conta"} onSignOut={api.signOut}/>} 
+      {tab==="foods"&&<FoodsPage foods={foods} onCreate={createFood} onUpdate={updateFood} onArchive={archiveFood}/>}
+      {tab==="plan"&&(pet?<PlanPage pet={pet} foods={foods} activePlan={activePlan} onSave={savePlan} onUpdateSchedule={updatePlanSchedule} onCreateFood={createFood}/>:<section className="empty-card"><h2>Nenhum animal ativo</h2><p>Cadastre ou restaure um animal antes de criar um plano.</p><button className="primary-button" onClick={()=>setTab("pets")}>Abrir animais</button></section>)}
+      {tab==="pets"&&<PetsPage pets={pets} archivedPets={archivedPets} onCreate={createPet} onUpdate={updatePet} onArchive={archivePet} onRestore={restorePet} autoStartCreate={autoCreatePet} onAutoStartHandled={()=>setAutoCreatePet(false)}/>}
+      {tab==="settings"&&<SettingsPage email={session.user.email??"Conta"} onSignOut={api.signOut} userId={session.user.id}/>}
     </div>
 
     <footer><span>Rotina Pet</span><span>•</span><span>versão de testes</span></footer>

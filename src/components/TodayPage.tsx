@@ -1,6 +1,6 @@
 import {useMemo,useState} from "react";
 import type {MealConsumptionLevel,MealOccurrence,MealOutcome,Pet} from "../types";
-import {numberPt,timePt,unitLabels} from "../lib/format";
+import {formatLocalDateLong,numberPt,timePt,unitLabels} from "../lib/format";
 
 type StatusIconName="check"|"clock"|"pending"|"close";
 
@@ -19,9 +19,9 @@ const consumptionLabels:Record<MealConsumptionLevel,string>={
 };
 
 const partialOptions:{value:Exclude<MealConsumptionLevel,"full">;label:string;description:string}[]=[
-  {value:"almost",label:"Quase tudo",description:"Sobrou apenas um pouco"},
+  {value:"almost",label:"Quase tudo",description:"Sobrou só um pouco"},
   {value:"half",label:"Metade",description:"Comeu aproximadamente metade"},
-  {value:"little",label:"Pouco",description:"Comeu uma pequena parte"},
+  {value:"little",label:"Pouco",description:"Comeu só uma pequena parte"},
   {value:"none",label:"Nada",description:"A comida foi oferecida, mas não comeu"},
 ];
 
@@ -52,7 +52,21 @@ function registeredLabel(count:number,total:number){
   return `${count} de ${total} registradas`;
 }
 
-export function TodayPage({pets,meals,selectedPetIds,loading,onSetOutcome,onOpenPlan,onOpenPets}:{
+export function TodayPage({
+  pets,
+  meals,
+  selectedPetIds,
+  loading,
+  onSetOutcome,
+  onOpenPlan,
+  onOpenPets,
+  displayDate,
+  isToday,
+  canGoForward,
+  onPreviousDay,
+  onNextDay,
+  onGoToToday,
+}:{
   pets:Pet[];
   meals:MealOccurrence[];
   selectedPetIds:string[];
@@ -60,6 +74,12 @@ export function TodayPage({pets,meals,selectedPetIds,loading,onSetOutcome,onOpen
   onSetOutcome:(meal:MealOccurrence,outcome:MealOutcome)=>Promise<void>;
   onOpenPlan:(petId?:string)=>void;
   onOpenPets:()=>void;
+  displayDate:string;
+  isToday:boolean;
+  canGoForward:boolean;
+  onPreviousDay:()=>void;
+  onNextDay:()=>void;
+  onGoToToday:()=>void;
 }){
   const[openMealByTime,setOpenMealByTime]=useState<Record<string,string|undefined>>({});
   const[consumptionPickerId,setConsumptionPickerId]=useState<string|null>(null);
@@ -77,8 +97,7 @@ export function TodayPage({pets,meals,selectedPetIds,loading,onSetOutcome,onOpen
   const registered=filteredMeals.filter(meal=>meal.status!=="pending").length;
   const progress=filteredMeals.length?Math.round(registered/filteredMeals.length*100):0;
   const selectedPets=pets.filter(pet=>selectedPetIds.includes(pet.id));
-  const dateLabel=new Intl.DateTimeFormat("pt-BR",{weekday:"long",day:"numeric",month:"long"}).format(new Date());
-  const normalizedDate=dateLabel.charAt(0).toUpperCase()+dateLabel.slice(1);
+  const normalizedDate=formatLocalDateLong(displayDate);
 
   function toggleMeal(time:string,mealId:string){
     setOpenMealByTime(current=>({...current,[time]:current[time]===mealId?undefined:mealId}));
@@ -100,21 +119,38 @@ export function TodayPage({pets,meals,selectedPetIds,loading,onSetOutcome,onOpen
     }
   }
 
-  if(loading)return <section className="empty-card"><div className="spinner"/><p>Organizando as refeições de hoje…</p></section>;
+  if(loading)return <section className="empty-card"><div className="spinner"/><p>{isToday?"Organizando as refeições de hoje…":`Buscando o histórico de ${normalizedDate.toLowerCase()}…`}</p></section>;
   if(!pets.length)return <section className="empty-card"><span className="empty-symbol">◇</span><h2>Nenhum animal ativo</h2><p>Restaure um perfil arquivado ou cadastre um novo animal para montar a rotina.</p><button className="primary-button" onClick={onOpenPets}>Abrir animais</button></section>;
   if(!filteredMeals.length){
     const onlyPet=selectedPets.length===1?selectedPets[0]:undefined;
-    return <section className="empty-card"><span className="empty-symbol">○</span><h2>Nenhuma refeição programada</h2><p>{onlyPet?`Crie o plano alimentar de ${onlyPet.name} para gerar o cronograma diário.`:"Os animais selecionados ainda não têm refeições para hoje."}</p><button className="primary-button" onClick={()=>onOpenPlan(onlyPet?.id??selectedPets[0]?.id)}>Criar plano</button></section>;
+    const emptyMessage=isToday
+      ?(onlyPet?`Crie o plano alimentar de ${onlyPet.name} para gerar o cronograma diário.`:"Os animais selecionados ainda não têm refeições para hoje.")
+      :(onlyPet?`${onlyPet.name} não tinha refeições registradas nessa data.`:"Os animais selecionados não têm refeições registradas nessa data.");
+    return <section className="empty-card"><span className="empty-symbol">○</span><h2>{isToday?"Nenhuma refeição programada":"Nenhum registro nessa data"}</h2><p>{emptyMessage}</p>{isToday?<button className="primary-button" onClick={()=>onOpenPlan(onlyPet?.id??selectedPets[0]?.id)}>Criar plano</button>:<button className="secondary-button" onClick={onGoToToday}>Voltar para hoje</button>}</section>;
   }
 
   return <section className="today-page">
     <article className="today-overview">
       <div className="today-overview-top">
-        <div><p className="eyebrow">{normalizedDate}</p><h2>{registered} de {filteredMeals.length} refeições registradas</h2><p className="muted">Veja os horários do dia e abra apenas a refeição que precisa consultar.</p></div>
+        <div>
+          <p className="eyebrow">{isToday?"Hoje":"Histórico"}</p>
+          <h2>{registered} de {filteredMeals.length} refeições registradas</h2>
+          <p className="muted">Veja os horários do dia e abra apenas a refeição que precisa consultar.</p>
+        </div>
         <div className="progress-summary" aria-label={`${progress}% registrado`}><strong>{progress}%</strong><span><i style={{width:`${progress}%`}}/></span></div>
       </div>
+
+      <div className="date-navigator" aria-label="Alterar dia exibido">
+        <button className="secondary-button compact icon-button" onClick={onPreviousDay} aria-label="Ver dia anterior">‹</button>
+        <div className="date-navigator-summary"><strong>{normalizedDate}</strong><span>{isToday?"Acompanhamento de hoje":"Refeições e registros deste dia"}</span></div>
+        <div className="date-navigator-actions">
+          {!isToday&&<button className="secondary-button compact" onClick={onGoToToday}>Voltar para hoje</button>}
+          <button className="secondary-button compact icon-button" onClick={onNextDay} disabled={!canGoForward} aria-label="Ver dia seguinte">›</button>
+        </div>
+      </div>
+
       <div className="today-time-summary">
-        <p className="eyebrow">Horários de hoje</p>
+        <p className="eyebrow">Horários do dia</p>
         <nav className="today-time-nav" aria-label="Ir para um horário de refeição">
           {groups.map(([time,groupMeals])=>{
             const groupRegistered=groupMeals.filter(meal=>meal.status!=="pending").length;
@@ -150,7 +186,7 @@ export function TodayPage({pets,meals,selectedPetIds,loading,onSetOutcome,onOpen
                     {components.map(component=><div className="meal-component-row" key={component.id}><div><span className="component-label">Alimento</span><strong>{component.foods?.name??"Alimento"}</strong></div><span className="component-quantity">{numberPt(component.quantity)} {unitLabels[component.unit]}</span></div>)}
                   </div>
 
-                  <div className="meal-record-summary">
+                  <div className="meal-record-summary plain-text-summary">
                     {meal.status==="completed"&&<p><strong>{consumption?consumptionLabels[consumption]:"Comeu tudo"}</strong>{meal.completed_at?` · registrado às ${timePt(meal.completed_at)}`:""}</p>}
                     {meal.status==="skipped"&&<p><strong>Não foi servida.</strong> A refeição ficou registrada como não oferecida.</p>}
                     {meal.status==="pending"&&<p>{state.className==="late"?"O horário já passou e ainda não há registro.":"Escolha o que aconteceu quando a refeição for oferecida."}</p>}

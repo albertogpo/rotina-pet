@@ -3,12 +3,38 @@ import {generateEvenTimes,numberPt,todayLocal,unitLabels} from "../lib/format";
 import type {Food,FoodUnit,Pet,PlanFoodInput} from "../types";
 
 const units=Object.keys(unitLabels) as FoodUnit[];
+type TimeMode="window"|"manual";
 
-export function PlanPage({pet,foods,activePlan,onSave,onCreateFood}:{pet:Pet;foods:Food[];activePlan:any;onSave:(input:{name:string;startsOn:string;mealTimes:string[];foods:PlanFoodInput[]})=>Promise<void>;onCreateFood:(name:string,unit:FoodUnit)=>Promise<Food>}){
+function normalizeTime(value:string){
+  return value.slice(0,5);
+}
+
+function minutesOf(time:string){
+  const[hours,minutes]=time.split(":").map(Number);
+  return hours*60+minutes;
+}
+
+function validateTimes(times:string[]){
+  if(!times.length||times.some(time=>!time))return "Revise os horários.";
+  if(new Set(times).size!==times.length)return "Os horários não podem se repetir.";
+  for(let index=1;index<times.length;index++){
+    if(minutesOf(times[index])<=minutesOf(times[index-1]))return "Os horários precisam estar em ordem, do mais cedo para o mais tarde.";
+  }
+  return "";
+}
+
+export function PlanPage({pet,foods,activePlan,onSave,onUpdateSchedule,onCreateFood}:{
+  pet:Pet;
+  foods:Food[];
+  activePlan:any;
+  onSave:(input:{name:string;startsOn:string;mealTimes:string[];foods:PlanFoodInput[]})=>Promise<void>;
+  onUpdateSchedule:(planId:string,startsOn:string,mealTimes:string[])=>Promise<void>;
+  onCreateFood:(name:string,unit:FoodUnit)=>Promise<Food>;
+}){
   const[name,setName]=useState("Plano alimentar");
   const[startsOn,setStartsOn]=useState(todayLocal());
   const[count,setCount]=useState(4);
-  const[mode,setMode]=useState<"window"|"manual">("window");
+  const[mode,setMode]=useState<TimeMode>("window");
   const[windowStart,setWindowStart]=useState("07:00");
   const[windowEnd,setWindowEnd]=useState("22:00");
   const[manualTimes,setManualTimes]=useState(["07:00","12:00","17:00","22:00"]);
@@ -22,6 +48,31 @@ export function PlanPage({pet,foods,activePlan,onSave,onCreateFood}:{pet:Pet;foo
   const[foodBusy,setFoodBusy]=useState(false);
   const[foodError,setFoodError]=useState("");
 
+  const[editingSchedule,setEditingSchedule]=useState(false);
+  const[scheduleStartsOn,setScheduleStartsOn]=useState(todayLocal());
+  const[scheduleMode,setScheduleMode]=useState<TimeMode>("manual");
+  const[scheduleWindowStart,setScheduleWindowStart]=useState("07:00");
+  const[scheduleWindowEnd,setScheduleWindowEnd]=useState("22:00");
+  const[scheduleManualTimes,setScheduleManualTimes]=useState<string[]>([]);
+  const[scheduleBusy,setScheduleBusy]=useState(false);
+  const[scheduleError,setScheduleError]=useState("");
+
+  const currentPlanTimes=useMemo(()=>{
+    return [...(activePlan?.meal_templates??[])]
+      .sort((a:any,b:any)=>a.sequence-b.sequence)
+      .map((template:any)=>normalizeTime(template.scheduled_time));
+  },[activePlan]);
+
+  const currentPlanFoods=useMemo(()=>{
+    return [...(activePlan?.plan_foods??[])].map((planFood:any)=>({
+      id:planFood.id,
+      name:planFood.foods?.name??"Alimento",
+      quantity:Number(planFood.daily_quantity),
+      unit:planFood.unit as FoodUnit,
+      meals:Array.isArray(planFood.meal_sequences)?planFood.meal_sequences.length:0,
+    }));
+  },[activePlan]);
+
   useEffect(()=>{
     setManualTimes(current=>Array.from({length:count},(_,index)=>current[index]??"12:00"));
     setRows(current=>current.map(row=>{
@@ -30,8 +81,35 @@ export function PlanPage({pet,foods,activePlan,onSave,onCreateFood}:{pet:Pet;foo
     }));
   },[count]);
 
+  useEffect(()=>{
+    if(!activePlan)return;
+    const times=currentPlanTimes;
+    setScheduleStartsOn(todayLocal());
+    setScheduleMode("manual");
+    setScheduleManualTimes(times);
+    setScheduleWindowStart(times[0]??"07:00");
+    setScheduleWindowEnd(times.at(-1)??"22:00");
+    setScheduleError("");
+    setEditingSchedule(false);
+  },[activePlan?.id,currentPlanTimes.join("|")]);
+
   const suggested=useMemo(()=>{try{return generateEvenTimes(windowStart,windowEnd,count);}catch{return[];}},[windowStart,windowEnd,count]);
   const times=mode==="window"?suggested:manualTimes;
+  const scheduleCount=currentPlanTimes.length;
+  const scheduleSuggested=useMemo(()=>{
+    try{return generateEvenTimes(scheduleWindowStart,scheduleWindowEnd,scheduleCount);}catch{return[];}
+  },[scheduleWindowStart,scheduleWindowEnd,scheduleCount]);
+  const scheduleTimes=scheduleMode==="window"?scheduleSuggested:scheduleManualTimes;
+
+  function openScheduleEditor(){
+    setScheduleStartsOn(todayLocal());
+    setScheduleMode("manual");
+    setScheduleManualTimes(currentPlanTimes);
+    setScheduleWindowStart(currentPlanTimes[0]??"07:00");
+    setScheduleWindowEnd(currentPlanTimes.at(-1)??"22:00");
+    setScheduleError("");
+    setEditingSchedule(true);
+  }
 
   function appendFood(food:Food){
     setRows(current=>current.some(row=>row.foodId===food.id)?current:[...current,{foodId:food.id,dailyQuantity:"",unit:food.default_unit,mealSequences:Array.from({length:count},(_,index)=>index+1)}]);
@@ -69,11 +147,28 @@ export function PlanPage({pet,foods,activePlan,onSave,onCreateFood}:{pet:Pet;foo
     }
   }
 
+  async function submitSchedule(event:React.FormEvent){
+    event.preventDefault();
+    setScheduleError("");
+    if(!activePlan)return;
+    const timeError=validateTimes(scheduleTimes);
+    if(timeError){setScheduleError(timeError);return;}
+    setScheduleBusy(true);
+    try{
+      await onUpdateSchedule(activePlan.id,scheduleStartsOn,scheduleTimes);
+    }catch(err){
+      setScheduleError(err instanceof Error?err.message:"Não foi possível atualizar os horários.");
+    }finally{
+      setScheduleBusy(false);
+    }
+  }
+
   async function submit(event:React.FormEvent){
     event.preventDefault();
     setError("");
     setSaved("");
-    if(!times.length||times.some(time=>!time)){setError("Revise os horários.");return;}
+    const timeError=validateTimes(times);
+    if(timeError){setError(timeError);return;}
     if(!rows.length){setError("Adicione ao menos um alimento.");return;}
     for(const row of rows){
       const quantity=Number(row.dailyQuantity.replace(",","."));
@@ -92,12 +187,42 @@ export function PlanPage({pet,foods,activePlan,onSave,onCreateFood}:{pet:Pet;foo
   }
 
   return <section className="page-grid">
-    {activePlan&&<article className="current-plan"><div><p className="eyebrow">Plano atual de {pet.name}</p><h2>{activePlan.name}</h2><p>Válido desde {new Date(`${activePlan.starts_on}T12:00:00`).toLocaleDateString("pt-BR")}</p></div><span>{activePlan.meal_templates?.length??0} refeições/dia</span></article>}
+    {activePlan&&<article className="current-plan">
+      <div><p className="eyebrow">Plano atual de {pet.name}</p><h2>{activePlan.name}</h2><p>Válido desde {new Date(`${activePlan.starts_on}T12:00:00`).toLocaleDateString("pt-BR")}</p></div>
+      <div className="current-plan-actions"><span>{currentPlanTimes.length} refeições/dia</span><button type="button" className="secondary-button compact" onClick={openScheduleEditor}>Editar horários</button></div>
+    </article>}
+
+    {activePlan&&editingSchedule&&<article className="panel-card schedule-editor-card">
+      <div className="section-heading">
+        <div><p className="eyebrow">Rotina</p><h2>Editar horários</h2><p className="muted readable">Alimentos, quantidades diárias e divisão das porções serão mantidos exatamente como estão.</p></div>
+        <button type="button" className="secondary-button compact" onClick={()=>setEditingSchedule(false)}>Cancelar</button>
+      </div>
+
+      <form className="stack-form" onSubmit={submitSchedule}>
+        <label>Aplicar os novos horários a partir de<input type="date" min={todayLocal()} required value={scheduleStartsOn} onChange={event=>setScheduleStartsOn(event.target.value)}/></label>
+        <p className="notice">Caso já existam refeições concluídas ou marcadas como não servidas nessa data, escolha uma data posterior para preservar o histórico.</p>
+
+        <div className="segmented"><button type="button" className={scheduleMode==="window"?"active":""} onClick={()=>setScheduleMode("window")}>Distribuir por janela</button><button type="button" className={scheduleMode==="manual"?"active":""} onClick={()=>setScheduleMode("manual")}>Definir horários</button></div>
+
+        {scheduleMode==="window"?<>
+          <div className="form-grid"><label>Primeira refeição<input type="time" value={scheduleWindowStart} onChange={event=>setScheduleWindowStart(event.target.value)}/></label><label>Última refeição<input type="time" value={scheduleWindowEnd} onChange={event=>setScheduleWindowEnd(event.target.value)}/></label></div>
+          <div className="time-preview">{scheduleSuggested.map((time,index)=><span key={index}>{time}</span>)}</div>
+        </>:<div className="manual-times schedule-manual-times">{scheduleManualTimes.map((time,index)=><label key={index}>Refeição {index+1}<input type="time" value={time} onChange={event=>setScheduleManualTimes(current=>current.map((value,itemIndex)=>itemIndex===index?event.target.value:value))}/></label>)}</div>}
+
+        <section className="preserved-plan-summary" aria-label="Itens que serão mantidos">
+          <div><p className="eyebrow">Sem alterações</p><h3>Composição do plano</h3></div>
+          <div className="preserved-plan-list">{currentPlanFoods.map(item=><div key={item.id}><strong>{item.name}</strong><span>{numberPt(item.quantity)} {unitLabels[item.unit]} por dia · divididos em {item.meals} {item.meals===1?"refeição":"refeições"}</span></div>)}</div>
+        </section>
+
+        {scheduleError&&<p className="error-box">{scheduleError}</p>}
+        <button className="primary-button" disabled={scheduleBusy}>{scheduleBusy?"Salvando horários…":"Salvar novos horários"}</button>
+      </form>
+    </article>}
 
     <article className="panel-card">
-      <p className="eyebrow">Configuração</p><h2>{activePlan?"Substituir plano":"Criar plano alimentar"}</h2><p className="muted readable">Ao salvar um novo plano, o anterior é encerrado sem apagar o histórico.</p>
+      <p className="eyebrow">Plano nutricional</p><h2>{activePlan?"Criar uma nova versão completa":"Criar plano alimentar"}</h2><p className="muted readable">{activePlan?"Use esta área apenas quando também quiser mudar alimentos, quantidades ou o número de refeições. Para mudar somente os horários, use o botão acima.":"Defina os alimentos, as quantidades diárias e como serão divididos ao longo do dia."}</p>
       <form className="stack-form" onSubmit={submit}>
-        <div className="form-grid"><label>Nome do plano<input value={name} onChange={event=>setName(event.target.value)}/></label><label>Início<input type="date" required value={startsOn} onChange={event=>setStartsOn(event.target.value)}/></label></div>
+        <div className="form-grid"><label>Nome do plano<input value={name} onChange={event=>setName(event.target.value)}/></label><label>Início<input type="date" min={todayLocal()} required value={startsOn} onChange={event=>setStartsOn(event.target.value)}/></label></div>
         <label>Refeições por dia<select value={count} onChange={event=>setCount(Number(event.target.value))}>{[1,2,3,4,5,6,7,8].map(number=><option key={number} value={number}>{number}</option>)}</select></label>
         <div className="segmented"><button type="button" className={mode==="window"?"active":""} onClick={()=>setMode("window")}>Distribuir por janela</button><button type="button" className={mode==="manual"?"active":""} onClick={()=>setMode("manual")}>Definir horários</button></div>
         {mode==="window"?<><div className="form-grid"><label>Primeira refeição<input type="time" value={windowStart} onChange={event=>setWindowStart(event.target.value)}/></label><label>Última refeição<input type="time" value={windowEnd} onChange={event=>setWindowEnd(event.target.value)}/></label></div><div className="time-preview">{suggested.map((time,index)=><span key={index}>{time}</span>)}</div></>:<div className="manual-times">{manualTimes.map((time,index)=><label key={index}>Refeição {index+1}<input type="time" value={time} onChange={event=>setManualTimes(current=>current.map((value,itemIndex)=>itemIndex===index?event.target.value:value))}/></label>)}</div>}

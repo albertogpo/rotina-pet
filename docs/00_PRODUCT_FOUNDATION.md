@@ -180,6 +180,7 @@ Preferir estados e ações concretas:
 - Plano alimentar
 - Múltiplos alimentos por refeição
 - Lembretes
+- Histórico de refeições por data
 - Tela "Hoje"
 - Histórico de peso
 - Sincronização entre dispositivos
@@ -197,6 +198,51 @@ O tutor pode reorganizar:
 Sem alterar a quantidade diária prescrita.
 
 ---
+
+
+## ✅ Histórico por data
+
+A visualização de refeições não deve ficar restrita ao dia atual.
+
+O tutor precisa conseguir navegar por datas anteriores para consultar:
+
+- o que estava programado em cada dia;
+- o que foi concluído;
+- o que ficou pendente;
+- se a refeição não foi servida;
+- se o animal não comeu tudo.
+
+A navegação histórica pode coexistir dentro da própria tela **Hoje**, desde que a troca de data seja simples e visível.
+
+## ✅ Notificações confiáveis exigem infraestrutura
+
+A solução final de notificações não deve depender de temporizadores locais rodando na aba ou no PWA em primeiro plano.
+
+Direção aprovada:
+
+- cliente inscrito em Web Push / OneSignal;
+- cron no Supabase;
+- Edge Function para decidir quais refeições devem gerar lembrete;
+- log para impedir notificações duplicadas.
+
+Essa arquitetura deve atender iPhone, Android e navegadores desktop compatíveis.
+
+## ✅ Horários podem mudar sem refazer a prescrição
+
+Alterar os horários da rotina não deve obrigar o tutor a recriar o plano nutricional.
+
+Na edição rápida de horários:
+
+- alimentos permanecem iguais;
+- quantidades diárias permanecem iguais;
+- unidades permanecem iguais;
+- divisão dos alimentos entre as refeições permanece igual;
+- a quantidade de refeições permanece fixa;
+- o tutor escolhe a data de início da nova rotina.
+
+A implementação pode criar uma nova versão técnica da rotina para preservar o histórico, mas essa complexidade não deve ser exposta como trabalho adicional para o tutor.
+
+Se já houver refeições concluídas ou marcadas como não servidas na data escolhida, a alteração deve começar em uma data posterior.
 
 ## ✅ Registro de consumo sem etapa obrigatória
 
