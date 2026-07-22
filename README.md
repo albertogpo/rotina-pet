@@ -4,7 +4,7 @@ O **Rotina Pet** é um aplicativo web instalável (PWA) para organizar a aliment
 
 Ele nasceu para resolver uma necessidade prática: saber, em um único lugar, **o que cada pet precisa comer, em qual horário, em que quantidade e o que realmente aconteceu em cada refeição**.
 
-> **Estado do projeto:** versão de testes `v0.5.1`.
+> **Estado do projeto:** versão de testes `v0.5.2`.
 
 ## Aplicativo publicado
 
@@ -36,6 +36,11 @@ Ele nasceu para resolver uma necessidade prática: saber, em um único lugar, **
 - PWA instalável;
 - deploy automático no GitHub Pages.
 
+
+## Correção da v0.5.2
+
+- restaura as guardas de autenticação antes de acessar `session.user`, corrigindo o erro de build TypeScript da v0.5.1;
+- mantém integralmente as funcionalidades planejadas para a v0.5.1.
 
 ## Destaques da v0.5.1
 
