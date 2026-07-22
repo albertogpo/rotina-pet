@@ -267,11 +267,20 @@ function App(){
     setDisplayDate(today);
   }
 
+  if(!hasSupabaseConfig)return <SetupScreen/>;
+  if(authLoading)return <main className="center-page"><div className="spinner large"/></main>;
+  if(!session)return <AuthScreen/>;
+
+  // A partir daqui a sessão é obrigatoriamente válida.
+  // A variável tipada evita que o TypeScript volte a tratá-la como anulável no JSX.
+  const authenticatedSession:Session=session;
+  const authenticatedUser=authenticatedSession.user;
+
   if(!pets.length&&!archivedPets.length&&!loadingBase){
     return <main className="center-page"><section className="auth-card"><div className="brand-mark">🐾</div><p className="eyebrow">Primeiro passo</p><h1>Cadastre seu primeiro animal</h1><p className="muted">Depois você poderá adicionar os demais perfis.</p><PetForm onSave={createPet} busy={onboardingBusy}/>{error&&<div className="error-box error-with-action"><span>{error}</span><button className="secondary-button compact" onClick={()=>void retryAllData()}>Tentar novamente</button></div>}</section></main>;
   }
 
-  const accountInitial=(session.user.email?.trim().charAt(0)||"U").toUpperCase();
+  const accountInitial=(authenticatedUser.email?.trim().charAt(0)||"U").toUpperCase();
   const isTodayTab=tab==="today";
   const showGlobalRetry=Boolean(error&&!loadingBase&&!loadingPet&&!loadingToday);
 
@@ -316,7 +325,7 @@ function App(){
       {tab==="foods"&&<FoodsPage foods={foods} onCreate={createFood} onUpdate={updateFood} onArchive={archiveFood}/>}
       {tab==="plan"&&(pet?<PlanPage pet={pet} foods={foods} activePlan={activePlan} onSave={savePlan} onUpdateSchedule={updatePlanSchedule} onCreateFood={createFood}/>:<section className="empty-card"><h2>Nenhum animal ativo</h2><p>Cadastre ou restaure um animal antes de criar um plano.</p><button className="primary-button" onClick={()=>setTab("pets")}>Abrir animais</button></section>)}
       {tab==="pets"&&<PetsPage pets={pets} archivedPets={archivedPets} onCreate={createPet} onUpdate={updatePet} onArchive={archivePet} onRestore={restorePet} autoStartCreate={autoCreatePet} onAutoStartHandled={()=>setAutoCreatePet(false)}/>}
-      {tab==="settings"&&<SettingsPage email={session.user.email??"Conta"} onSignOut={api.signOut} userId={session.user.id}/>}
+      {tab==="settings"&&<SettingsPage email={authenticatedUser.email??"Conta"} onSignOut={api.signOut} userId={authenticatedUser.id}/>}
     </div>
 
     <footer><span>Rotina Pet</span><span>•</span><span>versão de testes</span></footer>
