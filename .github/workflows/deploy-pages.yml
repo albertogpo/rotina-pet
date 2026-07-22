@@ -66,13 +66,17 @@ jobs:
             exit 1
           fi
 
-          echo "As variáveis do Supabase foram encontradas."
+          if [ -z "${VITE_ONESIGNAL_APP_ID:-}" ]; then
+            echo "::error::A variável VITE_ONESIGNAL_APP_ID não foi cadastrada."
+            exit 1
+          fi
+
+          echo "As variáveis do Supabase e do OneSignal foram encontradas."
 
       - name: Preparar o Node.js
         uses: actions/setup-node@v5
         with:
           node-version: '22.16.0'
-          package-manager-cache: false
 
       - name: Mostrar versões
         shell: bash

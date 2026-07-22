@@ -216,16 +216,75 @@ A navegação histórica pode coexistir dentro da própria tela **Hoje**, desde 
 
 ## ✅ Notificações confiáveis exigem infraestrutura
 
-A solução final de notificações não deve depender de temporizadores locais rodando na aba ou no PWA em primeiro plano.
+As notificações não dependem de temporizadores locais, da aba aberta ou de o tutor ter acessado a tela **Hoje** naquele dia.
 
-Direção aprovada:
+Arquitetura aprovada:
 
-- cliente inscrito em Web Push / OneSignal;
-- cron no Supabase;
-- Edge Function para decidir quais refeições devem gerar lembrete;
-- log para impedir notificações duplicadas.
+- cliente inscrito em Web Push pelo OneSignal;
+- identidade do usuário vinculada ao ID da conta no Supabase;
+- Cron no Supabase executado a cada minuto;
+- Edge Function para gerar ocorrências necessárias, localizar refeições elegíveis e enviar os lembretes;
+- banco como fonte de verdade para horários, estados e prevenção de duplicidades.
 
 Essa arquitetura deve atender iPhone, Android e navegadores desktop compatíveis.
+
+## ✅ Refeições simultâneas geram uma única notificação
+
+Refeições do mesmo tutor programadas para o mesmo instante são agrupadas antes do envio. O sistema não deve enviar um push separado para cada animal.
+
+A identificação do grupo considera:
+
+- tutor;
+- data e horário locais da rotina;
+- tipo da notificação.
+
+O banco faz uma reserva atômica do grupo e mantém uma chave única. O envio ao OneSignal também usa uma chave de idempotência. A combinação dessas duas proteções deve impedir duplicidades inclusive em reexecuções, timeouts ou chamadas simultâneas.
+
+## ✅ O conteúdo da notificação é adaptativo
+
+A notificação utiliza o emoji escolhido para cada animal e prioriza:
+
+1. nome e emoji dos animais;
+2. primeiro item de cada refeição;
+3. demais itens, enquanto houver espaço útil.
+
+Quando o conteúdo completo ficar longo, o texto informa `+ 1 item`, `+ 2 itens` ou equivalente. Os detalhes integrais permanecem no card da tela **Hoje**.
+
+Observações clínicas, informações sensíveis e textos extensos não devem ser exibidos na tela bloqueada.
+
+## ✅ O toque abre o grupo correspondente na tela Hoje
+
+Cada push contém um deep link com a data e o horário da rotina. Ao tocar, o aplicativo deve:
+
+- abrir a tela **Hoje**;
+- selecionar a data indicada;
+- localizar o grupo de horário;
+- rolar até ele;
+- destacá-lo temporariamente;
+- abrir a primeira refeição ainda pendente, ou a primeira do grupo quando nenhuma estiver pendente.
+
+Como uma notificação pode representar vários animais, o destino principal é o grupo do horário, e não um único card individual.
+
+## ✅ Notificações de refeição têm validade limitada
+
+O TTL padrão das notificações de refeição é de **30 minutos**. Após esse período, um push ainda não entregue deve expirar, evitando lembretes antigos e fora de contexto.
+
+A expiração do push não altera o estado da refeição. A tela **Hoje** continua sendo a fonte de verdade e mostra normalmente refeições pendentes ou atrasadas.
+
+## ✅ O fuso horário pertence à rotina da conta
+
+Cada conta possui um fuso horário IANA, como `America/Sao_Paulo`.
+
+Regras:
+
+- o fuso é detectado inicialmente no dispositivo e salvo na conta;
+- a rotina segue o fuso configurado na conta;
+- uma viagem não altera silenciosamente os horários;
+- a pessoa pode atualizar o fuso nas Configurações;
+- datas e horários são convertidos no servidor, e não pelo relógio local do navegador;
+- a geração das ocorrências ocorre no servidor, inclusive quando o aplicativo não foi aberto no dia.
+
+Notificações são um canal auxiliar e não substituem os estados e registros persistidos no aplicativo.
 
 ## ✅ Horários podem mudar sem refazer a prescrição
 
@@ -522,8 +581,11 @@ Não será desabilitado o zoom manual do usuário, pois isso prejudicaria acessi
 | Registro e histórico de peso | ✅ Implementado |
 | Sincronização pelo Supabase | ✅ Implementado |
 | PWA instalável | ✅ Implementado |
-| Lembretes com o app ativo | ✅ Implementado com limitação |
-| Notificações em segundo plano | 📅 Capacidade futura |
+| Lembretes com o app ativo | ✅ Implementado |
+| Notificações em segundo plano | ✅ Implementado |
+| Agrupamento e prevenção de duplicidade dos pushes | ✅ Implementado |
+| Deep link para o grupo de horário na tela Hoje | ✅ Implementado |
+| Fuso horário da rotina por conta | ✅ Implementado |
 | Consumo aproximado (quase tudo, metade, pouco ou nada) | ✅ Implementado |
 | Onboarding sem login obrigatório | 🧪 Hipótese |
 | Produto profissional para veterinários | 📅 Capacidade futura |

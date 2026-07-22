@@ -57,10 +57,14 @@ export async function initPush(userId?:string){
     });
   }
   const OneSignal=await initPromise;
-  if(userId){
-    try{await OneSignal.login(userId);}catch{}
-  }
+  if(userId)await OneSignal.login(userId);
   return OneSignal;
+}
+
+export async function logoutPush(){
+  if(!hasPushConfig())return;
+  const OneSignal=await initPush();
+  if(OneSignal)await OneSignal.logout();
 }
 
 export async function getPushStatus(userId?:string){
@@ -77,8 +81,6 @@ export async function requestPushPermission(userId?:string){
   const OneSignal=await initPush(userId);
   if(!OneSignal)return {configured:false};
   await OneSignal.Notifications.requestPermission();
-  if(userId){
-    try{await OneSignal.login(userId);}catch{}
-  }
+  if(userId)await OneSignal.login(userId);
   return getPushStatus(userId);
 }

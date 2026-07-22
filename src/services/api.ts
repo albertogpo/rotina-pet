@@ -1,7 +1,6 @@
 import type {Session} from "@supabase/supabase-js";
 import {supabase} from "../lib/supabase";
-import {toLocalScheduledIso} from "../lib/format";
-import type {Food,FoodUnit,MealConsumptionLevel,MealOccurrence,Pet,PlanFoodInput,Species,WeightEntry} from "../types";
+import type {Food,FoodUnit,MealConsumptionLevel,MealOccurrence,Pet,PlanFoodInput,Species,UserPreferences,WeightEntry} from "../types";
 
 function client(){if(!supabase)throw new Error("Supabase ainda não configurado.");return supabase;}
 function appRedirectUrl(){return new URL(import.meta.env.BASE_URL,window.location.href).toString();}
@@ -11,6 +10,9 @@ export async function signIn(email:string,password:string){const{error}=await cl
 export async function signUp(email:string,password:string){const{data,error}=await client().auth.signUp({email,password,options:{emailRedirectTo:appRedirectUrl()}});if(error)throw error;return data;}
 export async function sendPasswordReset(email:string){const{error}=await client().auth.resetPasswordForEmail(email,{redirectTo:appRedirectUrl()});if(error)throw error;}
 export async function signOut(){const{error}=await client().auth.signOut();if(error)throw error;}
+
+export async function ensureUserPreferences(detectedTimezone:string):Promise<UserPreferences>{const{data,error}=await client().rpc("ensure_user_preferences",{p_timezone:detectedTimezone});if(error)throw error;return data as UserPreferences;}
+export async function updateUserTimezone(timezone:string):Promise<UserPreferences>{const{data,error}=await client().rpc("update_user_timezone",{p_timezone:timezone});if(error)throw error;return data as UserPreferences;}
 
 export async function listPets():Promise<Pet[]>{const{data,error}=await client().from("pets").select("*").eq("active",true).order("created_at");if(error)throw error;return data as Pet[];}
 export async function listArchivedPets():Promise<Pet[]>{const{data,error}=await client().from("pets").select("*").eq("active",false).order("created_at",{ascending:false});if(error)throw error;return data as Pet[];}
@@ -31,7 +33,7 @@ export async function archiveFood(id:string){const{error}=await client().from("f
 export async function savePlan(input:{petId:string;name:string;startsOn:string;mealTimes:string[];foods:PlanFoodInput[]}){const payload=input.foods.map(food=>({food_id:food.foodId,daily_quantity:Number(food.dailyQuantity.replace(",",".")),unit:food.unit,meal_sequences:food.mealSequences}));const{data,error}=await client().rpc("save_diet_plan",{p_pet_id:input.petId,p_name:input.name,p_starts_on:input.startsOn,p_meal_times:input.mealTimes,p_foods:payload});if(error)throw error;return data as string;}
 export async function updatePlanSchedule(planId:string,startsOn:string,mealTimes:string[]){const{data,error}=await client().rpc("update_diet_plan_schedule",{p_plan_id:planId,p_starts_on:startsOn,p_meal_times:mealTimes});if(error)throw error;return data as string;}
 export async function getActivePlan(petId:string,date:string){const{data,error}=await client().from("diet_plans").select(`id,name,starts_on,ends_on,active,created_at,meal_templates(id,scheduled_time,sequence,meal_components(id,quantity,unit,foods(name))),plan_foods(id,daily_quantity,unit,meal_sequences,foods(id,name))`).eq("pet_id",petId).lte("starts_on",date).or(`ends_on.is.null,ends_on.gte.${date}`).order("starts_on",{ascending:false}).order("created_at",{ascending:false}).limit(1).maybeSingle();if(error)throw error;return data;}
-export async function ensureMealsForDate(userId:string,petId:string,date:string){const plan=await getActivePlan(petId,date);if(!plan)return[] as MealOccurrence[];const templates=[...(plan.meal_templates??[])].sort((a,b)=>a.sequence-b.sequence);if(templates.length){const rows=templates.map(template=>({user_id:userId,pet_id:petId,meal_template_id:template.id,local_date:date,scheduled_at:toLocalScheduledIso(date,template.scheduled_time)}));const{error}=await client().from("meal_occurrences").upsert(rows,{onConflict:"meal_template_id,local_date",ignoreDuplicates:true});if(error)throw error;}return listMeals(petId,date);}
-export async function ensureTodayMeals(userId:string,petId:string,date:string){return ensureMealsForDate(userId,petId,date);}
+export async function ensureMealsForDate(date:string){const{error}=await client().rpc("ensure_meal_occurrences_for_date",{p_local_date:date});if(error)throw error;return listMealsForDate(date);}
+export async function listMealsForDate(date:string):Promise<MealOccurrence[]>{const{data,error}=await client().from("meal_occurrences").select(`*,meal_templates(id,scheduled_time,sequence,meal_components(id,quantity,unit,foods(name)))`).eq("local_date",date).order("scheduled_at");if(error)throw error;return data as unknown as MealOccurrence[];}
 export async function listMeals(petId:string,date:string):Promise<MealOccurrence[]>{const{data,error}=await client().from("meal_occurrences").select(`*,meal_templates(id,scheduled_time,sequence,meal_components(id,quantity,unit,foods(name)))`).eq("pet_id",petId).eq("local_date",date).order("scheduled_at");if(error)throw error;return data as unknown as MealOccurrence[];}
 export async function setMealOutcome(id:string,status:"pending"|"completed"|"skipped",consumptionLevel:MealConsumptionLevel|null){const{error}=await client().from("meal_occurrences").update({status,consumption_level:status==="completed"?consumptionLevel:null,completed_at:status==="completed"?new Date().toISOString():null}).eq("id",id);if(error)throw error;}

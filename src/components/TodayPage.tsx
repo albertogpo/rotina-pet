@@ -1,4 +1,4 @@
-import {useMemo,useState} from "react";
+import {useEffect,useMemo,useRef,useState} from "react";
 import type {MealConsumptionLevel,MealOccurrence,MealOutcome,Pet} from "../types";
 import {formatLocalDateLong,numberPt,timePt,unitLabels} from "../lib/format";
 
@@ -66,6 +66,9 @@ export function TodayPage({
   onPreviousDay,
   onNextDay,
   onGoToToday,
+  timezone,
+  focusTime,
+  onFocusHandled,
 }:{
   pets:Pet[];
   meals:MealOccurrence[];
@@ -80,24 +83,45 @@ export function TodayPage({
   onPreviousDay:()=>void;
   onNextDay:()=>void;
   onGoToToday:()=>void;
+  timezone:string;
+  focusTime:string|null;
+  onFocusHandled:()=>void;
 }){
   const[openMealByTime,setOpenMealByTime]=useState<Record<string,string|undefined>>({});
   const[consumptionPickerId,setConsumptionPickerId]=useState<string|null>(null);
   const[busyMealId,setBusyMealId]=useState<string|null>(null);
+  const[focusedTime,setFocusedTime]=useState<string|null>(null);
+  const focusTimer=useRef<number|undefined>(undefined);
   const petById=useMemo(()=>new Map(pets.map(pet=>[pet.id,pet])),[pets]);
   const filteredMeals=useMemo(()=>meals.filter(meal=>selectedPetIds.includes(meal.pet_id)),[meals,selectedPetIds]);
   const groups=useMemo(()=>{
     const grouped=new Map<string,MealOccurrence[]>();
     for(const meal of filteredMeals){
-      const time=timePt(meal.scheduled_at);
+      const time=timePt(meal.scheduled_at,timezone);
       grouped.set(time,[...(grouped.get(time)??[]),meal]);
     }
     return [...grouped.entries()];
-  },[filteredMeals]);
+  },[filteredMeals,timezone]);
   const registered=filteredMeals.filter(meal=>meal.status!=="pending").length;
   const progress=filteredMeals.length?Math.round(registered/filteredMeals.length*100):0;
   const selectedPets=pets.filter(pet=>selectedPetIds.includes(pet.id));
   const normalizedDate=formatLocalDateLong(displayDate);
+
+  useEffect(()=>{
+    if(loading||!focusTime)return;
+    const target=groups.find(([time])=>time===focusTime);
+    if(!target){onFocusHandled();return;}
+    const[,groupMeals]=target;
+    const firstPending=groupMeals.find(meal=>meal.status==="pending")??groupMeals[0];
+    if(firstPending)setOpenMealByTime(current=>({...current,[focusTime]:firstPending.id}));
+    setFocusedTime(focusTime);
+    window.requestAnimationFrame(()=>document.getElementById(groupId(focusTime))?.scrollIntoView({behavior:"smooth",block:"start"}));
+    clearTimeout(focusTimer.current);
+    focusTimer.current=window.setTimeout(()=>setFocusedTime(null),4500);
+    onFocusHandled();
+  },[focusTime,groups,loading,onFocusHandled]);
+
+  useEffect(()=>()=>clearTimeout(focusTimer.current),[]);
 
   function toggleMeal(time:string,mealId:string){
     setOpenMealByTime(current=>({...current,[time]:current[time]===mealId?undefined:mealId}));
@@ -163,7 +187,7 @@ export function TodayPage({
     <div className="time-groups">
       {groups.map(([time,groupMeals])=>{
         const groupRegistered=groupMeals.filter(meal=>meal.status!=="pending").length;
-        return <section className="time-group" id={groupId(time)} key={time}>
+        return <section className={`time-group ${focusedTime===time?"deep-link-highlight":""}`} id={groupId(time)} key={time}>
           <header className="time-group-heading"><h2>{time}</h2><span>{registeredLabel(groupRegistered,groupMeals.length)}</span></header>
           <div className="time-group-list">
             {groupMeals.map(meal=>{
@@ -187,7 +211,7 @@ export function TodayPage({
                   </div>
 
                   <div className="meal-record-summary plain-text-summary">
-                    {meal.status==="completed"&&<p><strong>{consumption?consumptionLabels[consumption]:"Comeu tudo"}</strong>{meal.completed_at?` · registrado às ${timePt(meal.completed_at)}`:""}</p>}
+                    {meal.status==="completed"&&<p><strong>{consumption?consumptionLabels[consumption]:"Comeu tudo"}</strong>{meal.completed_at?` · registrado às ${timePt(meal.completed_at,timezone)}`:""}</p>}
                     {meal.status==="skipped"&&<p><strong>Não foi servida.</strong> A refeição ficou registrada como não oferecida.</p>}
                     {meal.status==="pending"&&<p>{state.className==="late"?"O horário já passou e ainda não há registro.":"Escolha o que aconteceu quando a refeição for oferecida."}</p>}
                   </div>

@@ -1,5 +1,5 @@
 import {useEffect,useMemo,useState} from "react";
-import {generateEvenTimes,numberPt,todayLocal,unitLabels} from "../lib/format";
+import {datePt,generateEvenTimes,numberPt,unitLabels} from "../lib/format";
 import type {Food,FoodUnit,Pet,PlanFoodInput} from "../types";
 
 const units=Object.keys(unitLabels) as FoodUnit[];
@@ -23,16 +23,17 @@ function validateTimes(times:string[]){
   return "";
 }
 
-export function PlanPage({pet,foods,activePlan,onSave,onUpdateSchedule,onCreateFood}:{
+export function PlanPage({pet,foods,activePlan,onSave,onUpdateSchedule,onCreateFood,today}:{
   pet:Pet;
   foods:Food[];
   activePlan:any;
   onSave:(input:{name:string;startsOn:string;mealTimes:string[];foods:PlanFoodInput[]})=>Promise<void>;
   onUpdateSchedule:(planId:string,startsOn:string,mealTimes:string[])=>Promise<void>;
   onCreateFood:(name:string,unit:FoodUnit)=>Promise<Food>;
+  today:string;
 }){
   const[name,setName]=useState("Plano alimentar");
-  const[startsOn,setStartsOn]=useState(todayLocal());
+  const[startsOn,setStartsOn]=useState(today);
   const[count,setCount]=useState(4);
   const[mode,setMode]=useState<TimeMode>("window");
   const[windowStart,setWindowStart]=useState("07:00");
@@ -49,13 +50,19 @@ export function PlanPage({pet,foods,activePlan,onSave,onUpdateSchedule,onCreateF
   const[foodError,setFoodError]=useState("");
 
   const[editingSchedule,setEditingSchedule]=useState(false);
-  const[scheduleStartsOn,setScheduleStartsOn]=useState(todayLocal());
+  const[scheduleStartsOn,setScheduleStartsOn]=useState(today);
   const[scheduleMode,setScheduleMode]=useState<TimeMode>("manual");
   const[scheduleWindowStart,setScheduleWindowStart]=useState("07:00");
   const[scheduleWindowEnd,setScheduleWindowEnd]=useState("22:00");
   const[scheduleManualTimes,setScheduleManualTimes]=useState<string[]>([]);
   const[scheduleBusy,setScheduleBusy]=useState(false);
   const[scheduleError,setScheduleError]=useState("");
+
+
+  useEffect(()=>{
+    setStartsOn(current=>current<today?today:current);
+    setScheduleStartsOn(current=>current<today?today:current);
+  },[today]);
 
   const currentPlanTimes=useMemo(()=>{
     return [...(activePlan?.meal_templates??[])]
@@ -84,7 +91,7 @@ export function PlanPage({pet,foods,activePlan,onSave,onUpdateSchedule,onCreateF
   useEffect(()=>{
     if(!activePlan)return;
     const times=currentPlanTimes;
-    setScheduleStartsOn(todayLocal());
+    setScheduleStartsOn(today);
     setScheduleMode("manual");
     setScheduleManualTimes(times);
     setScheduleWindowStart(times[0]??"07:00");
@@ -102,7 +109,7 @@ export function PlanPage({pet,foods,activePlan,onSave,onUpdateSchedule,onCreateF
   const scheduleTimes=scheduleMode==="window"?scheduleSuggested:scheduleManualTimes;
 
   function openScheduleEditor(){
-    setScheduleStartsOn(todayLocal());
+    setScheduleStartsOn(today);
     setScheduleMode("manual");
     setScheduleManualTimes(currentPlanTimes);
     setScheduleWindowStart(currentPlanTimes[0]??"07:00");
@@ -188,7 +195,7 @@ export function PlanPage({pet,foods,activePlan,onSave,onUpdateSchedule,onCreateF
 
   return <section className="page-grid">
     {activePlan&&<article className="current-plan">
-      <div><p className="eyebrow">Plano atual de {pet.name}</p><h2>{activePlan.name}</h2><p>Válido desde {new Date(`${activePlan.starts_on}T12:00:00`).toLocaleDateString("pt-BR")}</p></div>
+      <div><p className="eyebrow">Plano atual de {pet.name}</p><h2>{activePlan.name}</h2><p>Válido desde {datePt(activePlan.starts_on)}</p></div>
       <div className="current-plan-actions"><span>{currentPlanTimes.length} refeições/dia</span><button type="button" className="secondary-button compact" onClick={openScheduleEditor}>Editar horários</button></div>
     </article>}
 
@@ -199,7 +206,7 @@ export function PlanPage({pet,foods,activePlan,onSave,onUpdateSchedule,onCreateF
       </div>
 
       <form className="stack-form" onSubmit={submitSchedule}>
-        <label>Aplicar os novos horários a partir de<input type="date" min={todayLocal()} required value={scheduleStartsOn} onChange={event=>setScheduleStartsOn(event.target.value)}/></label>
+        <label>Aplicar os novos horários a partir de<input type="date" min={today} required value={scheduleStartsOn} onChange={event=>setScheduleStartsOn(event.target.value)}/></label>
         <p className="notice">Caso já existam refeições concluídas ou marcadas como não servidas nessa data, escolha uma data posterior para preservar o histórico.</p>
 
         <div className="segmented"><button type="button" className={scheduleMode==="window"?"active":""} onClick={()=>setScheduleMode("window")}>Distribuir por janela</button><button type="button" className={scheduleMode==="manual"?"active":""} onClick={()=>setScheduleMode("manual")}>Definir horários</button></div>
@@ -222,7 +229,7 @@ export function PlanPage({pet,foods,activePlan,onSave,onUpdateSchedule,onCreateF
     <article className="panel-card">
       <p className="eyebrow">Plano nutricional</p><h2>{activePlan?"Criar uma nova versão completa":"Criar plano alimentar"}</h2><p className="muted readable">{activePlan?"Use esta área apenas quando também quiser mudar alimentos, quantidades ou o número de refeições. Para mudar somente os horários, use o botão acima.":"Defina os alimentos, as quantidades diárias e como serão divididos ao longo do dia."}</p>
       <form className="stack-form" onSubmit={submit}>
-        <div className="form-grid"><label>Nome do plano<input value={name} onChange={event=>setName(event.target.value)}/></label><label>Início<input type="date" min={todayLocal()} required value={startsOn} onChange={event=>setStartsOn(event.target.value)}/></label></div>
+        <div className="form-grid"><label>Nome do plano<input value={name} onChange={event=>setName(event.target.value)}/></label><label>Início<input type="date" min={today} required value={startsOn} onChange={event=>setStartsOn(event.target.value)}/></label></div>
         <label>Refeições por dia<select value={count} onChange={event=>setCount(Number(event.target.value))}>{[1,2,3,4,5,6,7,8].map(number=><option key={number} value={number}>{number}</option>)}</select></label>
         <div className="segmented"><button type="button" className={mode==="window"?"active":""} onClick={()=>setMode("window")}>Distribuir por janela</button><button type="button" className={mode==="manual"?"active":""} onClick={()=>setMode("manual")}>Definir horários</button></div>
         {mode==="window"?<><div className="form-grid"><label>Primeira refeição<input type="time" value={windowStart} onChange={event=>setWindowStart(event.target.value)}/></label><label>Última refeição<input type="time" value={windowEnd} onChange={event=>setWindowEnd(event.target.value)}/></label></div><div className="time-preview">{suggested.map((time,index)=><span key={index}>{time}</span>)}</div></>:<div className="manual-times">{manualTimes.map((time,index)=><label key={index}>Refeição {index+1}<input type="time" value={time} onChange={event=>setManualTimes(current=>current.map((value,itemIndex)=>itemIndex===index?event.target.value:value))}/></label>)}</div>}

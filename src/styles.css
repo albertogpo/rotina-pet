@@ -330,3 +330,17 @@ input:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(82
   .schedule-editor-card .section-heading{display:grid}
   .schedule-editor-card .section-heading>.secondary-button{width:100%}
 }
+
+
+/* Fuso horário e navegação por notificação */
+.field-label{display:block;margin:16px 0 7px;color:#454842;font-size:.84rem;font-weight:720}
+.timezone-detected{margin:9px 0 0;font-size:.8rem}
+.timezone-actions{display:flex;align-items:center;justify-content:flex-end;gap:9px;flex-wrap:wrap;margin-top:14px}
+.time-group.deep-link-highlight{position:relative;animation:deepLinkPulse 1.15s ease-in-out 2}
+.time-group.deep-link-highlight::before{content:"";position:absolute;inset:-10px;border:2px solid rgba(82,107,89,.35);border-radius:24px;pointer-events:none}
+@keyframes deepLinkPulse{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+
+@media(max-width:470px){
+  .timezone-actions{display:grid;grid-template-columns:1fr}
+  .timezone-actions .primary-button,.timezone-actions .secondary-button{width:100%}
+}

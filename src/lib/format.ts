@@ -14,42 +14,48 @@ export function numberPt(v:number,d=3){
 }
 
 export function datePt(v:string){
-  return new Date(`${v.slice(0,10)}T12:00:00`).toLocaleDateString("pt-BR");
+  return new Date(`${v.slice(0,10)}T12:00:00Z`).toLocaleDateString("pt-BR",{timeZone:"UTC"});
+}
+
+export function detectTimeZone(){
+  try{return Intl.DateTimeFormat().resolvedOptions().timeZone||"America/Sao_Paulo";}catch{return"America/Sao_Paulo";}
+}
+
+export function todayInTimeZone(timeZone:string){
+  const parts=new Intl.DateTimeFormat("en-CA",{
+    timeZone,
+    year:"numeric",
+    month:"2-digit",
+    day:"2-digit",
+  }).formatToParts(new Date());
+  const year=parts.find(part=>part.type==="year")?.value;
+  const month=parts.find(part=>part.type==="month")?.value;
+  const day=parts.find(part=>part.type==="day")?.value;
+  return year&&month&&day?`${year}-${month}-${day}`:new Date().toISOString().slice(0,10);
 }
 
 export function todayLocal(){
-  const n=new Date();
-  const y=n.getFullYear();
-  const m=String(n.getMonth()+1).padStart(2,"0");
-  const d=String(n.getDate()).padStart(2,"0");
-  return `${y}-${m}-${d}`;
+  return todayInTimeZone(detectTimeZone());
 }
 
 export function shiftLocalDate(date:string,days:number){
-  const value=new Date(`${date}T12:00:00`);
-  value.setDate(value.getDate()+days);
-  const y=value.getFullYear();
-  const m=String(value.getMonth()+1).padStart(2,"0");
-  const d=String(value.getDate()).padStart(2,"0");
-  return `${y}-${m}-${d}`;
+  const value=new Date(`${date}T12:00:00Z`);
+  value.setUTCDate(value.getUTCDate()+days);
+  return value.toISOString().slice(0,10);
 }
 
 export function formatLocalDateLong(date:string){
-  const value=new Date(`${date}T12:00:00`);
-  const label=new Intl.DateTimeFormat("pt-BR",{weekday:"long",day:"numeric",month:"long"}).format(value);
+  const value=new Date(`${date}T12:00:00Z`);
+  const label=new Intl.DateTimeFormat("pt-BR",{weekday:"long",day:"numeric",month:"long",timeZone:"UTC"}).format(value);
   return label.charAt(0).toUpperCase()+label.slice(1);
 }
 
-export function isBeforeToday(date:string){
-  return date<todayLocal();
+export function isBeforeToday(date:string,timeZone=detectTimeZone()){
+  return date<todayInTimeZone(timeZone);
 }
 
-export function toLocalScheduledIso(date:string,time:string){
-  return new Date(`${date}T${time.slice(0,5)}:00`).toISOString();
-}
-
-export function timePt(iso:string){
-  return new Date(iso).toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
+export function timePt(iso:string,timeZone?:string){
+  return new Date(iso).toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit",...(timeZone?{timeZone}:{})});
 }
 
 export function generateEvenTimes(start:string,end:string,count:number){

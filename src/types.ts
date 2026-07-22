@@ -11,3 +11,4 @@ export type MealComponentView={id:string;quantity:number;unit:FoodUnit;foods:{na
 export type MealTemplateView={id:string;scheduled_time:string;sequence:number;meal_components:MealComponentView[]};
 export type MealOccurrence={id:string;user_id:string;pet_id:string;meal_template_id:string;local_date:string;scheduled_at:string;status:MealStatus;consumption_level:MealConsumptionLevel|null;completed_at:string|null;notes:string|null;meal_templates:MealTemplateView|null};
 export type PlanFoodInput={foodId:string;dailyQuantity:string;unit:FoodUnit;mealSequences:number[]};
+export type UserPreferences={user_id:string;timezone:string;created_at:string;updated_at:string};
