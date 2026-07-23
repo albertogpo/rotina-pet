@@ -401,7 +401,7 @@ function App(){
       {tab==="settings"&&<SettingsPage email={authenticatedUser.email??"Conta"} onSignOut={handleSignOut} userId={authenticatedUser.id} timezone={timezone} detectedTimezone={detectedTimezone} onTimezoneChange={updateTimezone}/>} 
     </div>
 
-    <footer><span>Rotina Pet</span><span>•</span><span>v0.6.1</span></footer>
+    <footer><span>Rotina Pet</span><span>•</span><span>v0.6.2</span></footer>
   </main>;
 }
 

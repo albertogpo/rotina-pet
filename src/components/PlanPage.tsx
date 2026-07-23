@@ -207,7 +207,7 @@ export function PlanPage({pet,foods,activePlan,onSave,onUpdateSchedule,onCreateF
 
       <form className="stack-form" onSubmit={submitSchedule}>
         <label>Aplicar os novos horários a partir de<input type="date" min={today} required value={scheduleStartsOn} onChange={event=>setScheduleStartsOn(event.target.value)}/></label>
-        <p className="notice">Caso já existam refeições concluídas ou marcadas como não servidas nessa data, escolha uma data posterior para preservar o histórico.</p>
+        <p className="notice">Refeições já concluídas ou marcadas como não servidas serão mantidas no histórico. Apenas as refeições pendentes a partir desta data receberão os novos horários.</p>
 
         <div className="segmented"><button type="button" className={scheduleMode==="window"?"active":""} onClick={()=>setScheduleMode("window")}>Distribuir por janela</button><button type="button" className={scheduleMode==="manual"?"active":""} onClick={()=>setScheduleMode("manual")}>Definir horários</button></div>
 

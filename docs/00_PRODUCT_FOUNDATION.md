@@ -596,3 +596,16 @@ Não será desabilitado o zoom manual do usuário, pois isso prejudicaria acessi
 O Rotina Pet mantém flexibilidade total: o tutor pode registrar uma refeição antes do horário programado. Para reduzir erros sem impor bloqueios, a interface mostra uma confirmação com o horário e o tempo restante.
 
 Notificações de refeição são enviadas apenas para ocorrências `pending`. A Edge Function revalida o status imediatamente antes do envio para cobrir alterações concorrentes.
+
+## Decisão de produto — reconciliação de refeições ao alterar o plano (v0.6.2)
+
+Quando um plano alimentar é substituído, ou quando apenas seus horários são alterados, a data escolhida define o início da nova versão da rotina.
+
+A partir dessa data:
+
+- ocorrências ainda `pending` são removidas e recriadas conforme o plano vigente;
+- ocorrências `completed` e `skipped` permanecem intactas como histórico;
+- uma ocorrência já registrada para a mesma sequência da refeição impede a criação de uma nova ocorrência pendente equivalente;
+- a edição exclusiva de horários mantém alimentos, quantidades diárias e distribuição por refeição.
+
+Essa regra evita cards inválidos do plano anterior na tela Hoje sem apagar ações já registradas pelo tutor.
