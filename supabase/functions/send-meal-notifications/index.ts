@@ -40,6 +40,7 @@ type ItemSummary={name:string;quantity:number;unit:string};
 type PetSummary={id:string;name:string;icon:string;items:ItemSummary[]};
 
 Deno.serve(async()=>{
+  const startedAt = performance.now();
   try{
     if(!ONESIGNAL_APP_ID||!ONESIGNAL_REST_API_KEY){
       return json({ok:false,error:"OneSignal não configurado."},500);
@@ -78,7 +79,15 @@ Deno.serve(async()=>{
 
     if(mealsError)return json({ok:false,error:mealsError.message},500);
     const meals=(mealRows??[]) as unknown as RawMeal[];
-    if(!meals.length)return json({ok:true,groups:0,sent:0,skipped:0,failed:0});
+    if(!meals.length)
+      return json({
+        ok:true,
+        executionTimeMs: Math.round(performance.now() - startedAt),
+        groups:0,
+        sent:0,
+        skipped:0,
+        failed:0
+      });
 
     const occurrenceIds=meals.map(meal=>meal.id);
     const {data:loggedRows,error:logsError}=await supabase
@@ -90,7 +99,15 @@ Deno.serve(async()=>{
     if(logsError)return json({ok:false,error:logsError.message},500);
     const loggedIds=new Set((loggedRows??[]).map(row=>row.meal_occurrence_id as string));
     const pendingMeals=meals.filter(meal=>!loggedIds.has(meal.id));
-    if(!pendingMeals.length)return json({ok:true,groups:0,sent:0,skipped:0,failed:0});
+    if(!pendingMeals.length)
+      return json({
+        ok:true,
+        executionTimeMs: Math.round(performance.now() - startedAt),
+        groups:grouped.size,
+        sent,
+        skipped,
+        failed
+    });
 
     const userIds=[...new Set(pendingMeals.map(meal=>meal.user_id))];
     const {data:preferenceRows,error:preferencesError}=await supabase
@@ -165,7 +182,24 @@ Deno.serve(async()=>{
         const localTime=timeInZone(first.scheduled_at,timezone);
         const deepLink=buildDeepLink(localDate,localTime);
 
-        const response=await fetch("https://api.onesignal.com/notifications",{
+        const controller = new AbortController();
+
+        const timeout = setTimeout(
+            () => controller.abort(),
+            4000
+        );
+        
+        try {
+        
+            const response = await fetch(...,{
+                signal: controller.signal
+            });
+        
+        } finally {
+        
+            clearTimeout(timeout);
+        
+        }
           method:"POST",
           headers:{
             "Content-Type":"application/json",
@@ -230,7 +264,13 @@ Deno.serve(async()=>{
 
     return json({ok:true,groups:grouped.size,sent,skipped,failed});
   }catch(error){
-    return json({ok:false,error:error instanceof Error?error.message:String(error)},500);
+    return json({
+      ok:false,
+      executionTimeMs: Math.round(performance.now() - startedAt),
+      error:error instanceof Error
+        ? error.message
+        : String(error)
+},500);
   }
 });
 
