@@ -255,7 +255,7 @@ export function TodayPage({
                   <div className="meal-outcome-actions" aria-label="Registrar resultado da refeição">
                     <button disabled={busy} className={`outcome-button eat-all ${consumption==="full"?"is-selected":""}`} onClick={()=>requestOutcome(meal,"full",time)}>Comeu tudo</button>
                     <button disabled={busy} className={`outcome-button partial-consumption ${consumption&&consumption!=="full"?"is-selected":""}`} aria-expanded={consumptionPickerId===meal.id} onClick={()=>setConsumptionPickerId(current=>current===meal.id?null:meal.id)}>Não comeu tudo</button>
-                    <button disabled={busy} className={`outcome-button not-served ${meal.status==="skipped"?"is-selected":""}`} onClick={()=>requestOutcome(meal,"not_served",time)}>Não foi servida</button>
+                    <button disabled={busy} className={`outcome-button not-served ${meal.status==="skipped"?"is-selected":""}`} onClick={()=>requestOutcome(meal,"not_served",time)}>Não servida</button>
                   </div>
 
                   {consumptionPickerId===meal.id&&<div className="consumption-picker">

@@ -1,4 +1,4 @@
-import {useCallback,useEffect,useMemo,useRef,useState} from "react";
+import {useCallback,useEffect,useMemo,useRef,useState,type TouchEvent} from "react";
 import type {Session} from "@supabase/supabase-js";
 import {hasSupabaseConfig,supabase} from "./lib/supabase";
 import {detectTimeZone,shiftLocalDate,todayInTimeZone} from "./lib/format";
@@ -69,6 +69,9 @@ function App(){
   const[displayDate,setDisplayDate]=useState(initialDeepLink.current?.date??todayInTimeZone(detectedTimezone));
   const retryTimer=useRef<number|undefined>(undefined);
   const lastAutoRetryAt=useRef(0);
+  const pullStartY=useRef<number|null>(null);
+  const[pullDistance,setPullDistance]=useState(0);
+  const[refreshing,setRefreshing]=useState(false);
 
   const pet=pets.find(x=>x.id===selectedPetId)??pets[0];
   const today=todayInTimeZone(timezone);
@@ -164,6 +167,56 @@ function App(){
     clearTimeout(retryTimer.current);
     await Promise.all([loadBase(),loadSelectedPetData(),loadDisplayedMeals()]);
   },[loadBase,loadSelectedPetData,loadDisplayedMeals]);
+
+  function handlePullStart(event:TouchEvent<HTMLElement>){
+    if(refreshing||window.scrollY>1||event.touches.length!==1){
+      pullStartY.current=null;
+      return;
+    }
+    pullStartY.current=event.touches[0].clientY;
+  }
+
+  function handlePullMove(event:TouchEvent<HTMLElement>){
+    if(pullStartY.current===null||window.scrollY>1)return;
+    const delta=event.touches[0].clientY-pullStartY.current;
+    if(delta<=0){setPullDistance(0);return;}
+    setPullDistance(Math.min(112,delta*.48));
+  }
+
+  async function reloadApplicationFromServer(){
+    // Remove apenas o service worker principal da PWA. O worker do OneSignal
+    // usa outro escopo e precisa permanecer registrado para receber pushes.
+    if("serviceWorker" in navigator){
+      const registrations=await navigator.serviceWorker.getRegistrations();
+      const appRegistrations=registrations.filter(registration=>{
+        const scriptUrl=registration.active?.scriptURL
+          ??registration.waiting?.scriptURL
+          ??registration.installing?.scriptURL
+          ??"";
+        return !scriptUrl.includes("OneSignal")&&!registration.scope.includes("/push/onesignal/");
+      });
+      await Promise.all(appRegistrations.map(registration=>registration.unregister()));
+    }
+
+    // A URL exclusiva evita reutilizar uma resposta HTTP antiga do index.html.
+    // Na nova carga, o PWA registra novamente seu service worker normalmente.
+    const url=new URL(window.location.href);
+    url.searchParams.set("app-refresh",Date.now().toString());
+    window.location.replace(url.toString());
+  }
+
+  async function handlePullEnd(){
+    pullStartY.current=null;
+    if(pullDistance<72){setPullDistance(0);return;}
+    setPullDistance(58);
+    setRefreshing(true);
+    try{
+      await reloadApplicationFromServer();
+    }catch(error){
+      console.error("Não foi possível recarregar a aplicação a partir do servidor.",error);
+      window.location.reload();
+    }
+  }
 
   useEffect(()=>{
     if(!error||loadingBase||loadingPet||loadingToday)return;
@@ -354,7 +407,12 @@ function App(){
   const isTodayTab=tab==="today";
   const showGlobalRetry=Boolean(error&&!loadingBase&&!loadingPet&&!loadingToday);
 
-  return <main className="app-shell">
+  return <main className="app-shell" onTouchStart={handlePullStart} onTouchMove={handlePullMove} onTouchEnd={()=>void handlePullEnd()} onTouchCancel={()=>{pullStartY.current=null;setPullDistance(0);}}>
+    <div className="status-bar-scrim" aria-hidden="true"/>
+    <div className={`pull-refresh ${refreshing?"is-refreshing":""} ${pullDistance>=72?"is-ready":""}`} style={{transform:`translate(-50%, ${pullDistance-54}px)`,opacity:pullDistance>8||refreshing?1:0}} aria-live="polite">
+      <span className="pull-refresh-icon" aria-hidden="true">{refreshing?"↻":pullDistance>=72?"↓":"↓"}</span>
+      <span>{refreshing?"Atualizando…":pullDistance>=72?"Solte para atualizar":"Puxe para atualizar"}</span>
+    </div>
     <header className="topbar">
       <div className="brand-heading"><span className="brand-symbol" aria-hidden="true">●</span><div><p className="eyebrow">Rotina e acompanhamento</p><h1>Rotina Pet</h1></div></div>
       <button className="avatar-button" onClick={()=>setTab("settings")} title="Conta e configurações" aria-label="Abrir conta e configurações">{accountInitial}</button>
@@ -401,7 +459,7 @@ function App(){
       {tab==="settings"&&<SettingsPage email={authenticatedUser.email??"Conta"} onSignOut={handleSignOut} userId={authenticatedUser.id} timezone={timezone} detectedTimezone={detectedTimezone} onTimezoneChange={updateTimezone}/>} 
     </div>
 
-    <footer><span>Rotina Pet</span><span>•</span><span>v0.6.2</span></footer>
+    <footer><span>Rotina Pet</span><span>•</span><span>v0.6.4</span></footer>
   </main>;
 }
 
