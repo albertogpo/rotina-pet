@@ -589,3 +589,10 @@ Não será desabilitado o zoom manual do usuário, pois isso prejudicaria acessi
 | Consumo aproximado (quase tudo, metade, pouco ou nada) | ✅ Implementado |
 | Onboarding sem login obrigatório | 🧪 Hipótese |
 | Produto profissional para veterinários | 📅 Capacidade futura |
+
+
+## Decisão de produto — registros antecipados (v0.6.1)
+
+O Rotina Pet mantém flexibilidade total: o tutor pode registrar uma refeição antes do horário programado. Para reduzir erros sem impor bloqueios, a interface mostra uma confirmação com o horário e o tempo restante.
+
+Notificações de refeição são enviadas apenas para ocorrências `pending`. A Edge Function revalida o status imediatamente antes do envio para cobrir alterações concorrentes.

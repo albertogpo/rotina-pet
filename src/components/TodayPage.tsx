@@ -10,6 +10,12 @@ type MealVisualState={
   icon:StatusIconName;
 };
 
+type PendingFutureOutcome={
+  meal:MealOccurrence;
+  outcome:MealOutcome;
+  time:string;
+};
+
 const consumptionLabels:Record<MealConsumptionLevel,string>={
   full:"Comeu tudo",
   almost:"Quase tudo",
@@ -52,6 +58,19 @@ function registeredLabel(count:number,total:number){
   return `${count} de ${total} registradas`;
 }
 
+function futureDistanceLabel(scheduledAt:string){
+  const remaining=Math.max(0,new Date(scheduledAt).getTime()-Date.now());
+  const totalMinutes=Math.ceil(remaining/60000);
+  const days=Math.floor(totalMinutes/1440);
+  const hours=Math.floor((totalMinutes%1440)/60);
+  const minutes=totalMinutes%60;
+  const parts:string[]=[];
+  if(days)parts.push(`${days}d`);
+  if(hours)parts.push(`${hours}h`);
+  if(minutes||!parts.length)parts.push(`${minutes}min`);
+  return parts.join(" ");
+}
+
 export function TodayPage({
   pets,
   meals,
@@ -91,6 +110,7 @@ export function TodayPage({
   const[consumptionPickerId,setConsumptionPickerId]=useState<string|null>(null);
   const[busyMealId,setBusyMealId]=useState<string|null>(null);
   const[focusedTime,setFocusedTime]=useState<string|null>(null);
+  const[pendingFutureOutcome,setPendingFutureOutcome]=useState<PendingFutureOutcome|null>(null);
   const focusTimer=useRef<number|undefined>(undefined);
   const petById=useMemo(()=>new Map(pets.map(pet=>[pet.id,pet])),[pets]);
   const filteredMeals=useMemo(()=>meals.filter(meal=>selectedPetIds.includes(meal.pet_id)),[meals,selectedPetIds]);
@@ -132,7 +152,7 @@ export function TodayPage({
     document.getElementById(groupId(time))?.scrollIntoView({behavior:"smooth",block:"start"});
   }
 
-  async function setOutcome(meal:MealOccurrence,outcome:MealOutcome,time:string){
+  async function performOutcome(meal:MealOccurrence,outcome:MealOutcome,time:string){
     setBusyMealId(meal.id);
     try{
       await onSetOutcome(meal,outcome);
@@ -141,6 +161,22 @@ export function TodayPage({
     }finally{
       setBusyMealId(null);
     }
+  }
+
+  function requestOutcome(meal:MealOccurrence,outcome:MealOutcome,time:string){
+    const isFuture=outcome!=="pending"&&new Date(meal.scheduled_at).getTime()>Date.now();
+    if(isFuture){
+      setPendingFutureOutcome({meal,outcome,time});
+      return;
+    }
+    void performOutcome(meal,outcome,time);
+  }
+
+  function confirmFutureOutcome(){
+    if(!pendingFutureOutcome)return;
+    const request=pendingFutureOutcome;
+    setPendingFutureOutcome(null);
+    void performOutcome(request.meal,request.outcome,request.time);
   }
 
   if(loading)return <section className="empty-card"><div className="spinner"/><p>{isToday?"Organizando as refeições de hoje…":`Buscando o histórico de ${normalizedDate.toLowerCase()}…`}</p></section>;
@@ -217,19 +253,19 @@ export function TodayPage({
                   </div>
 
                   <div className="meal-outcome-actions" aria-label="Registrar resultado da refeição">
-                    <button disabled={busy} className={`outcome-button eat-all ${consumption==="full"?"is-selected":""}`} onClick={()=>void setOutcome(meal,"full",time)}>Comeu tudo</button>
+                    <button disabled={busy} className={`outcome-button eat-all ${consumption==="full"?"is-selected":""}`} onClick={()=>requestOutcome(meal,"full",time)}>Comeu tudo</button>
                     <button disabled={busy} className={`outcome-button partial-consumption ${consumption&&consumption!=="full"?"is-selected":""}`} aria-expanded={consumptionPickerId===meal.id} onClick={()=>setConsumptionPickerId(current=>current===meal.id?null:meal.id)}>Não comeu tudo</button>
-                    <button disabled={busy} className={`outcome-button not-served ${meal.status==="skipped"?"is-selected":""}`} onClick={()=>void setOutcome(meal,"not_served",time)}>Não foi servida</button>
+                    <button disabled={busy} className={`outcome-button not-served ${meal.status==="skipped"?"is-selected":""}`} onClick={()=>requestOutcome(meal,"not_served",time)}>Não foi servida</button>
                   </div>
 
                   {consumptionPickerId===meal.id&&<div className="consumption-picker">
                     <div><p className="eyebrow">Quanto comeu?</p><p className="muted">Escolha a aproximação que melhor descreve a refeição.</p></div>
                     <div className="consumption-options">
-                      {partialOptions.map(option=><button key={option.value} disabled={busy} className={consumption===option.value?"is-selected":""} onClick={()=>void setOutcome(meal,option.value,time)}><strong>{option.label}</strong><span>{option.description}</span></button>)}
+                      {partialOptions.map(option=><button key={option.value} disabled={busy} className={consumption===option.value?"is-selected":""} onClick={()=>requestOutcome(meal,option.value,time)}><strong>{option.label}</strong><span>{option.description}</span></button>)}
                     </div>
                   </div>}
 
-                  {meal.status!=="pending"&&<button className="reset-meal-button" disabled={busy} onClick={()=>void setOutcome(meal,"pending",time)}>Desfazer registro</button>}
+                  {meal.status!=="pending"&&<button className="reset-meal-button" disabled={busy} onClick={()=>requestOutcome(meal,"pending",time)}>Desfazer registro</button>}
                 </div>}
               </article>;
             })}
@@ -237,5 +273,19 @@ export function TodayPage({
         </section>;
       })}
     </div>
+
+    {pendingFutureOutcome&&<div className="alert-sheet-backdrop" role="presentation" onMouseDown={event=>{if(event.target===event.currentTarget)setPendingFutureOutcome(null);}}>
+      <section className="alert-sheet" role="alertdialog" aria-modal="true" aria-labelledby="future-meal-title" aria-describedby="future-meal-description">
+        <div className="alert-sheet-handle" aria-hidden="true"/>
+        <p className="eyebrow">Confirmar registro antecipado</p>
+        <h2 id="future-meal-title">Esta refeição ainda está programada para mais tarde</h2>
+        <p id="future-meal-description">Você está marcando como registrada uma refeição programada para <strong>{timePt(pendingFutureOutcome.meal.scheduled_at,timezone)}</strong> (daqui {futureDistanceLabel(pendingFutureOutcome.meal.scheduled_at)}). Tem certeza de que deseja continuar?</p>
+        <p className="alert-sheet-note">O Rotina Pet não impede o registro antecipado. Esta confirmação existe apenas para ajudar a evitar marcações por engano.</p>
+        <div className="alert-sheet-actions">
+          <button className="secondary-button" type="button" onClick={()=>setPendingFutureOutcome(null)}>Cancelar</button>
+          <button className="primary-button" type="button" onClick={confirmFutureOutcome}>Sim, continuar</button>
+        </div>
+      </section>
+    </div>}
   </section>;
 }

@@ -4,7 +4,7 @@ O **Rotina Pet** é um aplicativo web instalável (PWA) para organizar a aliment
 
 Ele nasceu para resolver uma necessidade prática: saber, em um único lugar, **o que cada pet precisa comer, em qual horário, em que quantidade e o que realmente aconteceu em cada refeição**.
 
-> **Estado do projeto:** versão de testes `v0.6.0`.
+> **Estado do projeto:** versão de testes `v0.6.1`.
 
 ## Aplicativo publicado
 
@@ -36,6 +36,13 @@ Ele nasceu para resolver uma necessidade prática: saber, em um único lugar, **
 - PWA instalável;
 - notificações push automáticas via OneSignal + Supabase Cron;
 - deploy automático no GitHub Pages.
+
+
+## Ajustes da v0.6.1
+
+- O push só considera ocorrências com status `pending` e faz uma segunda validação imediatamente antes do envio, evitando notificações quando a refeição foi registrada durante a execução do Cron.
+- Refeições futuras continuam podendo ser registradas livremente. Antes da confirmação, o aplicativo exibe um alert sheet informando o horário programado e quanto tempo falta.
+- Botões de ação em Web Push não foram ativados nesta versão porque o Safari Web Push, usado pela PWA no iPhone, não os suporta de forma consistente.
 
 ## Destaques da v0.6.0
 

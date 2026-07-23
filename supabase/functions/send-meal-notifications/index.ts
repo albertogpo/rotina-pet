@@ -132,7 +132,33 @@ Deno.serve(async()=>{
       if(!claim)continue;
 
       try{
-        const petSummaries=summarizePets(groupMeals);
+        // O estado pode mudar entre a consulta inicial e o envio.
+        // Revalidamos aqui para nunca notificar uma ocorrência já registrada.
+        const candidateIds=groupMeals.map(meal=>meal.id);
+        const {data:stillPendingRows,error:recheckError}=await supabase
+          .from("meal_occurrences")
+          .select("id")
+          .in("id",candidateIds)
+          .eq("status","pending");
+
+        if(recheckError)throw recheckError;
+        const stillPendingIds=new Set((stillPendingRows??[]).map(row=>row.id as string));
+        const sendableMeals=groupMeals.filter(meal=>stillPendingIds.has(meal.id));
+
+        if(!sendableMeals.length){
+          const {error:completeError}=await supabase.rpc("complete_meal_notification_group",{
+            p_group_id:claim.id,
+            p_status:"skipped",
+            p_message_id:null,
+            p_occurrence_ids:[],
+            p_note:"Todas as refeições do grupo já estavam registradas antes do envio.",
+          });
+          if(completeError)throw completeError;
+          skipped+=1;
+          continue;
+        }
+
+        const petSummaries=summarizePets(sendableMeals);
         const {title,body}=buildMessage(petSummaries);
         const localDate=first.local_date;
         const timezone=timezones.get(first.user_id)??"America/Sao_Paulo";
@@ -170,7 +196,7 @@ Deno.serve(async()=>{
         }
 
         const messageId=typeof responsePayload?.id==="string"?responsePayload.id:"";
-        const occurrenceIdsForGroup=groupMeals.map(meal=>meal.id);
+        const occurrenceIdsForGroup=sendableMeals.map(meal=>meal.id);
 
         if(messageId){
           const {error:completeError}=await supabase.rpc("complete_meal_notification_group",{
