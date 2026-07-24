@@ -4,7 +4,7 @@ O **Rotina Pet** é um aplicativo web instalável (PWA) para organizar a aliment
 
 Ele nasceu para resolver uma necessidade prática: saber, em um único lugar, **o que cada pet precisa comer, em qual horário, em que quantidade e o que realmente aconteceu em cada refeição**.
 
-> **Estado do projeto:** versão de testes `v0.6.1`.
+> **Estado do projeto:** versão de testes `v0.6.5`.
 
 ## Aplicativo publicado
 
@@ -37,6 +37,15 @@ Ele nasceu para resolver uma necessidade prática: saber, em um único lugar, **
 - notificações push automáticas via OneSignal + Supabase Cron;
 - deploy automático no GitHub Pages.
 
+
+## Ajustes da v0.6.5
+
+- A interface passa a usar a família tipográfica **Manrope**, com pesos mais leves nos textos pequenos.
+- Foram adicionados dois temas visuais de marca: **Clínica Serena** e **Editorial Acolhedora**.
+- O seletor de tema fica na barra superior, ao lado do avatar do usuário.
+- A escolha é persistida localmente no dispositivo e restaurada antes da primeira renderização, reduzindo mudanças visuais durante a abertura.
+- O tema também atualiza a `theme-color` da PWA.
+- A implementação usa tokens CSS compartilhados; não há alteração no banco ou nas rotinas de alimentação.
 
 ## Ajustes da v0.6.1
 

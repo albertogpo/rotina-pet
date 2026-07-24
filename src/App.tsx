@@ -18,6 +18,14 @@ import {AppIcon,type AppIconName} from "./components/AppIcon";
 
 type Tab="today"|"weight"|"foods"|"plan"|"pets"|"settings";
 type MealDeepLink={date:string;time:string};
+type BrandTheme="clinical"|"editorial";
+
+const BRAND_THEME_STORAGE_KEY="rotina-pet-brand-theme";
+
+function readBrandTheme():BrandTheme{
+  try{return localStorage.getItem(BRAND_THEME_STORAGE_KEY)==="editorial"?"editorial":"clinical";}
+  catch{return "clinical";}
+}
 
 const navItems:{id:Exclude<Tab,"settings">;label:string;icon:AppIconName}[]=[
   {id:"today",label:"Hoje",icon:"today"},
@@ -72,9 +80,17 @@ function App(){
   const pullStartY=useRef<number|null>(null);
   const[pullDistance,setPullDistance]=useState(0);
   const[refreshing,setRefreshing]=useState(false);
+  const[brandTheme,setBrandTheme]=useState<BrandTheme>(readBrandTheme);
 
   const pet=pets.find(x=>x.id===selectedPetId)??pets[0];
   const today=todayInTimeZone(timezone);
+
+  useEffect(()=>{
+    document.documentElement.dataset.theme=brandTheme;
+    const themeColor=brandTheme==="editorial"?"#faf6f0":"#f7f8f5";
+    document.querySelector<HTMLMetaElement>('meta[name="theme-color"]')?.setAttribute("content",themeColor);
+    try{localStorage.setItem(BRAND_THEME_STORAGE_KEY,brandTheme);}catch{}
+  },[brandTheme]);
 
   useEffect(()=>{
     if(!supabase){setAuthLoading(false);return;}
@@ -415,7 +431,17 @@ function App(){
     </div>
     <header className="topbar">
       <div className="brand-heading"><span className="brand-symbol" aria-hidden="true">●</span><div><p className="eyebrow">Rotina e acompanhamento</p><h1>Rotina Pet</h1></div></div>
-      <button className="avatar-button" onClick={()=>setTab("settings")} title="Conta e configurações" aria-label="Abrir conta e configurações">{accountInitial}</button>
+      <div className="topbar-actions">
+        <div className="theme-switcher" role="group" aria-label="Escolher paleta visual">
+          <button type="button" className={brandTheme==="clinical"?"active":""} aria-pressed={brandTheme==="clinical"} onClick={()=>setBrandTheme("clinical")} title="Clínica Serena">
+            <span className="theme-swatch clinical" aria-hidden="true"><i/></span><span className="sr-only">Usar tema Clínica Serena</span>
+          </button>
+          <button type="button" className={brandTheme==="editorial"?"active":""} aria-pressed={brandTheme==="editorial"} onClick={()=>setBrandTheme("editorial")} title="Editorial Acolhedora">
+            <span className="theme-swatch editorial" aria-hidden="true"><i/></span><span className="sr-only">Usar tema Editorial Acolhedora</span>
+          </button>
+        </div>
+        <button className="avatar-button" onClick={()=>setTab("settings")} title="Conta e configurações" aria-label="Abrir conta e configurações">{accountInitial}</button>
+      </div>
     </header>
 
     {tab!=="settings"&&<section className="pet-switcher" aria-label={isTodayTab?"Filtrar refeições por animal":"Selecionar animal"}>
@@ -459,7 +485,7 @@ function App(){
       {tab==="settings"&&<SettingsPage email={authenticatedUser.email??"Conta"} onSignOut={handleSignOut} userId={authenticatedUser.id} timezone={timezone} detectedTimezone={detectedTimezone} onTimezoneChange={updateTimezone}/>} 
     </div>
 
-    <footer><span>Rotina Pet</span><span>•</span><span>v0.6.4</span></footer>
+    <footer><span>Rotina Pet</span><span>•</span><span>v0.6.5</span></footer>
   </main>;
 }
 

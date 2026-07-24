@@ -3,8 +3,18 @@
   <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"/>
-    <meta name="theme-color" content="#f7f5f0"/>
+    <meta name="theme-color" content="#f7f8f5"/>
     <meta name="description" content="Organize a alimentação, os horários e a evolução de peso dos seus animais."/>
+    <script>
+      try {
+        const theme=localStorage.getItem("rotina-pet-brand-theme")==="editorial"?"editorial":"clinical";
+        document.documentElement.dataset.theme=theme;
+        document.querySelector('meta[name="theme-color"]')?.setAttribute("content",theme==="editorial"?"#faf6f0":"#f7f8f5");
+      } catch {}
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet"/>
     <link rel="icon" type="image/svg+xml" href="./favicon.svg"/>
     <link rel="apple-touch-icon" href="./icons/icon-192.png"/>
     <title>Rotina Pet</title>

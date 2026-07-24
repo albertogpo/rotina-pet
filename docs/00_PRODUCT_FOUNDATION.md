@@ -609,3 +609,23 @@ A partir dessa data:
 - a edição exclusiva de horários mantém alimentos, quantidades diárias e distribuição por refeição.
 
 Essa regra evita cards inválidos do plano anterior na tela Hoje sem apagar ações já registradas pelo tutor.
+
+
+## ✅ Temas visuais de marca no MVP
+
+O MVP oferece duas variações cromáticas da mesma identidade visual:
+
+- **Clínica Serena** — tema padrão, com base porcelana, teal e damasco;
+- **Editorial Acolhedora** — alternativa com base creme, ameixa e pêssego.
+
+Regras:
+
+- os temas não representam modo claro e escuro;
+- não alteram funcionalidades, permissões ou o papel do usuário;
+- o seletor fica na barra superior, próximo ao avatar;
+- a preferência é persistida inicialmente no dispositivo;
+- a interface mantém a mesma estrutura, tipografia, componentes e linguagem nos dois temas;
+- a tipografia principal do produto passa a ser **Manrope**;
+- cores de estado preservam significado sem depender apenas da cor.
+
+A existência dos dois temas no MVP serve também como instrumento de aprendizado antes da definição final da identidade visual.
