@@ -88,6 +88,8 @@ export function TodayPage({
   timezone,
   focusTime,
   onFocusHandled,
+  previousDayPendingCount,
+  onReviewPreviousDay,
 }:{
   pets:Pet[];
   meals:MealOccurrence[];
@@ -105,6 +107,8 @@ export function TodayPage({
   timezone:string;
   focusTime:string|null;
   onFocusHandled:()=>void;
+  previousDayPendingCount:number;
+  onReviewPreviousDay:()=>void;
 }){
   const[openMealByTime,setOpenMealByTime]=useState<Record<string,string|undefined>>({});
   const[consumptionPickerId,setConsumptionPickerId]=useState<string|null>(null);
@@ -127,15 +131,24 @@ export function TodayPage({
   const selectedPets=pets.filter(pet=>selectedPetIds.includes(pet.id));
   const normalizedDate=formatLocalDateLong(displayDate);
 
+  function centerExpandedContent(elementId:string){
+    const reduceMotion=window.matchMedia?.("(prefers-reduced-motion: reduce)").matches??false;
+    window.requestAnimationFrame(()=>window.requestAnimationFrame(()=>{
+      document.getElementById(elementId)?.scrollIntoView({behavior:reduceMotion?"auto":"smooth",block:"center"});
+    }));
+  }
+
   useEffect(()=>{
     if(loading||!focusTime)return;
     const target=groups.find(([time])=>time===focusTime);
     if(!target){onFocusHandled();return;}
     const[,groupMeals]=target;
     const firstPending=groupMeals.find(meal=>meal.status==="pending")??groupMeals[0];
-    if(firstPending)setOpenMealByTime(current=>({...current,[focusTime]:firstPending.id}));
+    if(firstPending){
+      setOpenMealByTime(current=>({...current,[focusTime]:firstPending.id}));
+      centerExpandedContent(`meal-card-${firstPending.id}`);
+    }
     setFocusedTime(focusTime);
-    window.requestAnimationFrame(()=>document.getElementById(groupId(focusTime))?.scrollIntoView({behavior:"smooth",block:"start"}));
     clearTimeout(focusTimer.current);
     focusTimer.current=window.setTimeout(()=>setFocusedTime(null),4500);
     onFocusHandled();
@@ -144,12 +157,21 @@ export function TodayPage({
   useEffect(()=>()=>clearTimeout(focusTimer.current),[]);
 
   function toggleMeal(time:string,mealId:string){
+    const opening=openMealByTime[time]!==mealId;
     setOpenMealByTime(current=>({...current,[time]:current[time]===mealId?undefined:mealId}));
     setConsumptionPickerId(null);
+    if(opening)centerExpandedContent(`meal-card-${mealId}`);
+  }
+
+  function toggleConsumptionPicker(mealId:string){
+    const opening=consumptionPickerId!==mealId;
+    setConsumptionPickerId(current=>current===mealId?null:mealId);
+    if(opening)centerExpandedContent(`consumption-picker-${mealId}`);
   }
 
   function scrollToTime(time:string){
-    document.getElementById(groupId(time))?.scrollIntoView({behavior:"smooth",block:"start"});
+    const reduceMotion=window.matchMedia?.("(prefers-reduced-motion: reduce)").matches??false;
+    document.getElementById(groupId(time))?.scrollIntoView({behavior:reduceMotion?"auto":"smooth",block:"start"});
   }
 
   async function performOutcome(meal:MealOccurrence,outcome:MealOutcome,time:string){
@@ -201,13 +223,20 @@ export function TodayPage({
       </div>
 
       <div className="date-navigator" aria-label="Alterar dia exibido">
-        <button className="secondary-button compact icon-button" onClick={onPreviousDay} aria-label="Ver dia anterior">‹</button>
-        <div className="date-navigator-summary"><strong>{normalizedDate}</strong><span>{isToday?"Acompanhamento de hoje":"Refeições e registros deste dia"}</span></div>
-        <div className="date-navigator-actions">
-          {!isToday&&<button className="secondary-button compact" onClick={onGoToToday}>Voltar para hoje</button>}
-          <button className="secondary-button compact icon-button" onClick={onNextDay} disabled={!canGoForward} aria-label="Ver dia seguinte">›</button>
+        <button className="secondary-button compact icon-button date-previous" onClick={onPreviousDay} aria-label="Ver dia anterior">‹</button>
+        <div className="date-navigator-summary">
+          <strong>{normalizedDate}</strong>
+          <span>{isToday?"Acompanhamento de hoje":"Refeições e registros deste dia"}</span>
+          {!isToday&&<button className="return-today-button" type="button" onClick={onGoToToday}>↩ Voltar para hoje</button>}
         </div>
+        <button className="secondary-button compact icon-button date-next" onClick={onNextDay} disabled={!canGoForward} aria-label="Ver dia seguinte">›</button>
       </div>
+
+      {isToday&&previousDayPendingCount>0&&<button className="previous-day-alert" type="button" onClick={onReviewPreviousDay}>
+        <span className="previous-day-alert-icon" aria-hidden="true">!</span>
+        <span><strong>Ontem ficou {previousDayPendingCount} {previousDayPendingCount===1?"refeição pendente":"refeições pendentes"}</strong><small>Toque para revisar o registro anterior.</small></span>
+        <span className="previous-day-alert-action">Revisar</span>
+      </button>}
 
       <div className="today-time-summary">
         <p className="eyebrow">Horários do dia</p>
@@ -233,7 +262,7 @@ export function TodayPage({
               const open=openMealByTime[time]===meal.id;
               const busy=busyMealId===meal.id;
               const consumption=meal.status==="completed"?(meal.consumption_level??"full"):null;
-              return <article key={meal.id} className={`meal-accordion ${state.className} ${open?"is-open":""}`}>
+              return <article id={`meal-card-${meal.id}`} key={meal.id} className={`meal-accordion ${state.className} ${open?"is-open":""}`}>
                 <button className="meal-accordion-trigger" type="button" aria-expanded={open} aria-controls={`meal-details-${meal.id}`} onClick={()=>toggleMeal(time,meal.id)}>
                   <span className="meal-pet-icon">{mealPet?.icon??"🐾"}</span>
                   <strong className="meal-pet-name">{mealPet?.name??"Animal"}</strong>
@@ -254,11 +283,11 @@ export function TodayPage({
 
                   <div className="meal-outcome-actions" aria-label="Registrar resultado da refeição">
                     <button disabled={busy} className={`outcome-button eat-all ${consumption==="full"?"is-selected":""}`} onClick={()=>requestOutcome(meal,"full",time)}>Comeu tudo</button>
-                    <button disabled={busy} className={`outcome-button partial-consumption ${consumption&&consumption!=="full"?"is-selected":""}`} aria-expanded={consumptionPickerId===meal.id} onClick={()=>setConsumptionPickerId(current=>current===meal.id?null:meal.id)}>Não comeu tudo</button>
+                    <button disabled={busy} className={`outcome-button partial-consumption ${consumption&&consumption!=="full"?"is-selected":""}`} aria-expanded={consumptionPickerId===meal.id} onClick={()=>toggleConsumptionPicker(meal.id)}>Não comeu tudo</button>
                     <button disabled={busy} className={`outcome-button not-served ${meal.status==="skipped"?"is-selected":""}`} onClick={()=>requestOutcome(meal,"not_served",time)}>Não servida</button>
                   </div>
 
-                  {consumptionPickerId===meal.id&&<div className="consumption-picker">
+                  {consumptionPickerId===meal.id&&<div className="consumption-picker" id={`consumption-picker-${meal.id}`}>
                     <div><p className="eyebrow">Quanto comeu?</p><p className="muted">Escolha a aproximação que melhor descreve a refeição.</p></div>
                     <div className="consumption-options">
                       {partialOptions.map(option=><button key={option.value} disabled={busy} className={consumption===option.value?"is-selected":""} onClick={()=>requestOutcome(meal,option.value,time)}><strong>{option.label}</strong><span>{option.description}</span></button>)}

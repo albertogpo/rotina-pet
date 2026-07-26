@@ -1,7 +1,7 @@
 import {useCallback,useEffect,useMemo,useRef,useState,type TouchEvent} from "react";
 import type {Session} from "@supabase/supabase-js";
 import {hasSupabaseConfig,supabase} from "./lib/supabase";
-import {detectTimeZone,shiftLocalDate,todayInTimeZone} from "./lib/format";
+import {detectTimeZone,shiftLocalDate,timePt,todayInTimeZone} from "./lib/format";
 import {initPush,logoutPush} from "./lib/push";
 import * as api from "./services/api";
 import type {Food,FoodUnit,MealOccurrence,MealOutcome,Pet,PlanFoodInput,Species,WeightEntry} from "./types";
@@ -81,9 +81,28 @@ function App(){
   const[pullDistance,setPullDistance]=useState(0);
   const[refreshing,setRefreshing]=useState(false);
   const[brandTheme,setBrandTheme]=useState<BrandTheme>(readBrandTheme);
+  const[clockTick,setClockTick]=useState(0);
+  const[previousDayPendingCount,setPreviousDayPendingCount]=useState(0);
+  const[previousDayFirstPendingTime,setPreviousDayFirstPendingTime]=useState<string|null>(null);
 
   const pet=pets.find(x=>x.id===selectedPetId)??pets[0];
-  const today=todayInTimeZone(timezone);
+  const today=useMemo(()=>todayInTimeZone(timezone),[timezone,clockTick]);
+  const previousKnownToday=useRef(today);
+
+  useEffect(()=>{
+    const updateClock=()=>setClockTick(current=>current+1);
+    const timer=window.setInterval(updateClock,60000);
+    const handleVisible=()=>{if(document.visibilityState==="visible")updateClock();};
+    document.addEventListener("visibilitychange",handleVisible);
+    return()=>{window.clearInterval(timer);document.removeEventListener("visibilitychange",handleVisible);};
+  },[]);
+
+  useEffect(()=>{
+    const previous=previousKnownToday.current;
+    if(today===previous)return;
+    if(tab==="today"&&displayDate===previous)setDisplayDate(today);
+    previousKnownToday.current=today;
+  },[today,tab,displayDate]);
 
   useEffect(()=>{
     document.documentElement.dataset.theme=brandTheme;
@@ -179,10 +198,27 @@ function App(){
 
   useEffect(()=>{void loadDisplayedMeals();},[loadDisplayedMeals]);
 
+  const loadPreviousDayPending=useCallback(async()=>{
+    if(!session||!pets.length||!preferencesReady){setPreviousDayPendingCount(0);setPreviousDayFirstPendingTime(null);return;}
+    try{
+      const previousDate=shiftLocalDate(today,-1);
+      const activePetIds=new Set(pets.map(item=>item.id));
+      const result=await api.ensureMealsForDate(previousDate);
+      const pending=result.filter(meal=>meal.status==="pending"&&activePetIds.has(meal.pet_id)).sort((a,b)=>new Date(a.scheduled_at).getTime()-new Date(b.scheduled_at).getTime());
+      setPreviousDayPendingCount(pending.length);
+      setPreviousDayFirstPendingTime(pending[0]?timePt(pending[0].scheduled_at,timezone):null);
+    }catch{
+      setPreviousDayPendingCount(0);
+      setPreviousDayFirstPendingTime(null);
+    }
+  },[session,pets,preferencesReady,today,timezone]);
+
+  useEffect(()=>{void loadPreviousDayPending();},[loadPreviousDayPending]);
+
   const retryAllData=useCallback(async()=>{
     clearTimeout(retryTimer.current);
-    await Promise.all([loadBase(),loadSelectedPetData(),loadDisplayedMeals()]);
-  },[loadBase,loadSelectedPetData,loadDisplayedMeals]);
+    await Promise.all([loadBase(),loadSelectedPetData(),loadDisplayedMeals(),loadPreviousDayPending()]);
+  },[loadBase,loadSelectedPetData,loadDisplayedMeals,loadPreviousDayPending]);
 
   function handlePullStart(event:TouchEvent<HTMLElement>){
     if(refreshing||window.scrollY>1||event.touches.length!==1){
@@ -346,7 +382,7 @@ function App(){
       if(outcome==="pending")await api.setMealOutcome(meal.id,"pending",null);
       else if(outcome==="not_served")await api.setMealOutcome(meal.id,"skipped",null);
       else await api.setMealOutcome(meal.id,"completed",outcome);
-      await loadDisplayedMeals();
+      await Promise.all([loadDisplayedMeals(),loadPreviousDayPending()]);
     }catch(e){
       setError(e instanceof Error?e.message:"Não foi possível registrar a refeição.");
       throw e;
@@ -404,6 +440,14 @@ function App(){
     setDisplayDate(current=>current<today?shiftLocalDate(current,1):current);
   }
 
+  function reviewPreviousDay(){
+    const previousDate=shiftLocalDate(today,-1);
+    setTab("today");
+    setTodayPetIds(pets.map(item=>item.id));
+    setDisplayDate(previousDate);
+    if(previousDayFirstPendingTime)setDeepLinkTarget({date:previousDate,time:previousDayFirstPendingTime});
+  }
+
   function returnToToday(){
     setDisplayDate(today);
   }
@@ -430,7 +474,7 @@ function App(){
       <span>{refreshing?"Atualizando…":pullDistance>=72?"Solte para atualizar":"Puxe para atualizar"}</span>
     </div>
     <header className="topbar">
-      <div className="brand-heading"><span className="brand-symbol" aria-hidden="true">●</span><div><p className="eyebrow">Rotina e acompanhamento</p><h1>Rotina Pet</h1></div></div>
+      <div className="brand-heading"><img className="brand-logo" src={`${import.meta.env.BASE_URL}icons/icon-192.png`} alt=""/><div><p className="eyebrow">Rotina e acompanhamento</p><h1>Rotina Pet</h1></div></div>
       <div className="topbar-actions">
         <div className="theme-switcher" role="group" aria-label="Escolher paleta visual">
           <button type="button" className={brandTheme==="clinical"?"active":""} aria-pressed={brandTheme==="clinical"} onClick={()=>setBrandTheme("clinical")} title="Clínica Serena">
@@ -456,7 +500,7 @@ function App(){
     {showGlobalRetry&&<div className="error-box global-error error-with-action"><span>{error}</span><button className="secondary-button compact" onClick={()=>void retryAllData()}>Tentar novamente</button></div>}
 
     <nav className="main-nav" aria-label="Navegação principal">
-      {navItems.map(item=><button key={item.id} className={tab===item.id?"active":""} onClick={()=>setTab(item.id)}><AppIcon name={item.icon}/><span>{item.label}</span></button>)}
+      {navItems.map(item=><button key={item.id} className={tab===item.id?"active":""} onClick={()=>{if(item.id==="today")setDisplayDate(today);setTab(item.id);}}><AppIcon name={item.icon}/><span>{item.label}</span>{item.id==="today"&&previousDayPendingCount>0&&<span className="nav-badge" aria-label={`${previousDayPendingCount} ${previousDayPendingCount===1?"refeição pendente de ontem":"refeições pendentes de ontem"}`}>{previousDayPendingCount>9?"9+":previousDayPendingCount}</span>}</button>)}
     </nav>
 
     <div className="page-content">
@@ -477,6 +521,8 @@ function App(){
         timezone={timezone}
         focusTime={deepLinkTarget?.date===displayDate?deepLinkTarget.time:null}
         onFocusHandled={handleDeepLinkFocus}
+        previousDayPendingCount={previousDayPendingCount}
+        onReviewPreviousDay={reviewPreviousDay}
       />}
       {tab==="weight"&&(pet?<WeightPage pet={pet} entries={weights} loading={loadingPet} onAdd={addWeight} onDelete={deleteWeight} today={today}/>:<section className="empty-card"><h2>Nenhum animal ativo</h2><p>Restaure um perfil arquivado ou cadastre um novo animal.</p><button className="primary-button" onClick={()=>setTab("pets")}>Abrir animais</button></section>)}
       {tab==="foods"&&<FoodsPage foods={foods} onCreate={createFood} onUpdate={updateFood} onArchive={archiveFood}/>} 
@@ -485,7 +531,7 @@ function App(){
       {tab==="settings"&&<SettingsPage email={authenticatedUser.email??"Conta"} onSignOut={handleSignOut} userId={authenticatedUser.id} timezone={timezone} detectedTimezone={detectedTimezone} onTimezoneChange={updateTimezone}/>} 
     </div>
 
-    <footer><span>Rotina Pet</span><span>•</span><span>v0.6.5</span></footer>
+    <footer><span>Rotina Pet</span><span>•</span><span>v0.7.0</span></footer>
   </main>;
 }
 

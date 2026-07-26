@@ -4,7 +4,7 @@ O **Rotina Pet** é um aplicativo web instalável (PWA) para organizar a aliment
 
 Ele nasceu para resolver uma necessidade prática: saber, em um único lugar, **o que cada pet precisa comer, em qual horário, em que quantidade e o que realmente aconteceu em cada refeição**.
 
-> **Estado do projeto:** versão de testes `v0.6.5`.
+> **Estado do projeto:** versão de testes `v0.7.0`.
 
 ## Aplicativo publicado
 
@@ -37,6 +37,37 @@ Ele nasceu para resolver uma necessidade prática: saber, em um único lugar, **
 - notificações push automáticas via OneSignal + Supabase Cron;
 - deploy automático no GitHub Pages.
 
+
+## Destaques da v0.7.0
+
+### Navegação e acompanhamento diário
+
+- cabeçalho mobile reduzido para uma área visual de 44 px, preservando a safe area do aparelho;
+- data centralizada geometricamente entre os botões de navegação;
+- ação **Voltar para hoje** com tratamento visual terciário;
+- cards e seletores expandidos são reposicionados no centro da área visível;
+- a aba **Hoje** sempre retorna à data atual quando aberta diretamente;
+- ao atravessar a meia-noite com o aplicativo aberto, a data avança automaticamente quando o usuário estava acompanhando o dia corrente.
+
+### Pendências do dia anterior
+
+- refeições ainda pendentes de ontem geram um aviso no card Hoje;
+- a aba Hoje exibe um badge com a quantidade pendente;
+- tocar em **Revisar** abre ontem, centraliza e expande a primeira refeição sem registro;
+- pendências antigas não mantêm um contador permanente nesta primeira versão, evitando ruído visual.
+
+### Configurações
+
+- seletor completo de fusos IANA com campo de busca, lista scrollável e navegação por teclado;
+- indicação do fuso atual e do fuso detectado no aparelho;
+- toggle para ativar ou desativar notificações apenas no aparelho/navegador atual;
+- o desligamento usa `optOut` e preserva a permissão do sistema para permitir reativação futura.
+
+### Identidade do aplicativo
+
+- novo ícone aplicado ao PWA, Tela de Início do iOS e favicon;
+- manifesto inclui ícones `192x192`, `512x512` e uma variante `maskable`;
+- rodapé e metadados do pacote atualizados para `v0.7.0`.
 
 ## Ajustes da v0.6.5
 
@@ -255,7 +286,6 @@ VITE_ONESIGNAL_APP_ID=SEU_APP_ID_ONESIGNAL
 
 ## Limitações conhecidas
 
-- o ícone visual do aplicativo ainda será redesenhado;
 - identidade verificada do OneSignal ainda não foi adicionada;
 - push depende de permissão, conexão, configurações do sistema e políticas do navegador;
 - a tela Hoje permanece a fonte de verdade quando uma notificação não é exibida;

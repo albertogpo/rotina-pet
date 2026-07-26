@@ -77,10 +77,21 @@ export async function getPushStatus(userId?:string){
   return {configured:true,supported,permission,subscribed};
 }
 
-export async function requestPushPermission(userId?:string){
+export async function setPushSubscription(enabled:boolean,userId?:string){
   const OneSignal=await initPush(userId);
   if(!OneSignal)return {configured:false};
-  await OneSignal.Notifications.requestPermission();
   if(userId)await OneSignal.login(userId);
+
+  if(enabled){
+    if("Notification" in window&&Notification.permission==="denied")return getPushStatus(userId);
+    if("Notification" in window&&Notification.permission==="default")await OneSignal.Notifications.requestPermission();
+    if("Notification" in window&&Notification.permission==="granted")await OneSignal.User.PushSubscription.optIn();
+  }else{
+    await OneSignal.User.PushSubscription.optOut();
+  }
   return getPushStatus(userId);
+}
+
+export async function requestPushPermission(userId?:string){
+  return setPushSubscription(true,userId);
 }
