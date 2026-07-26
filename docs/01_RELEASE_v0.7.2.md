@@ -2,7 +2,7 @@
 
 ## Objetivo
 
-Dar prioridade à próxima refeição na tela Hoje, reduzir novamente o cabeçalho mobile, melhorar o seletor de fuso e evitar que novas instalações da PWA reutilizem ícones antigos do cache.
+Dar prioridade à próxima refeição na tela Hoje, reduzir novamente o cabeçalho mobile, melhorar o seletor de fuso e aplicar corretamente os novos ícones da PWA.
 
 ## Atualizações
 
@@ -19,6 +19,7 @@ Dar prioridade à próxima refeição na tela Hoje, reduzir novamente o cabeçal
 - Redução da altura visual no mobile.
 - Logo, seletor de tema, avatar e espaçamento superior ficaram mais compactos.
 - A safe area do iOS continua preservada.
+- A camada de fundo da barra de status termina na própria safe area e não avança mais sobre o conteúdo.
 
 ### Fuso horário
 
@@ -27,7 +28,8 @@ Dar prioridade à próxima refeição na tela Hoje, reduzir novamente o cabeçal
 
 ### Ícones da PWA
 
-- Assets passam a usar nomes versionados `*-v072.png` no HTML e no manifesto.
+- Os assets permanecem nos nomes estáveis já adotados pelo projeto.
+- A tentativa de usar nomes `*-v072.png` foi descartada antes da publicação por criar duplicação sem resolver de forma confiável o cache do iOS.
 - Em instalações existentes no iOS, pode ser necessário remover o app da Tela de Início e adicioná-lo novamente pelo Safari para trocar o ícone.
 
 ## Banco e backend

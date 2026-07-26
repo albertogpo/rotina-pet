@@ -21,6 +21,8 @@ Versão do documento: 1.2
 - **Arquivo criado:** `docs/01_RELEASE_v0.7.2.md`.
 - **Migração SQL:** não necessária.
 - **Status:** gerado e salvo no código-fonte; publicação e validação visual no iOS devem ser confirmadas.
+- **Correção antes da publicação:** os ícones voltaram a usar nomes estáveis; as cópias `*-v072.png` foram descartadas.
+- **Ajuste de interface:** o fundo da barra de status foi limitado à safe area para não sobrepor o cabeçalho.
 
 ### v0.7.1
 - Auto-scroll da faixa de horários planejado, mas a versão não foi salva/publicada separadamente. A alteração foi incorporada à v0.7.2.

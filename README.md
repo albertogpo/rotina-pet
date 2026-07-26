@@ -52,15 +52,17 @@ Ele nasceu para resolver uma necessidade prática: saber, em um único lugar, **
 ### Interface e configurações
 
 - cabeçalho mobile novamente reduzido, com logo, seletor de tema e avatar mais compactos;
+- o fundo suavizado da barra de status foi limitado à safe area do aparelho, deixando de avançar sobre o cabeçalho;
 - o campo de busca de fuso recebeu um botão **×** para limpar rapidamente o conteúdo;
 - a ação **Usar fuso do aparelho** voltou a ficar sempre disponível, sendo desabilitada apenas quando esse fuso já está selecionado;
 - rodapé e metadados do pacote atualizados para `v0.7.2`.
 
 ### Atualização dos ícones no iOS
 
-- os arquivos de ícone passaram a usar nomes versionados com `v072`, evitando que novas instalações reutilizem arquivos antigos do cache;
-- o iOS pode manter o ícone que foi copiado no momento da instalação. Quando uma PWA já instalada continuar mostrando o ícone anterior, remova-a da Tela de Início e adicione-a novamente pelo Safari;
-- remover e reinstalar a PWA não apaga os dados da conta armazenados no Supabase, mas permissões locais — como notificações — podem precisar ser confirmadas outra vez.
+- os ícones permanecem nos caminhos estáveis do projeto (`icon-192.png`, `icon-512.png`, `icon-maskable-512.png`, `apple-touch-icon.png` e `icon-32.png`);
+- uma PWA já instalada pode continuar exibindo o ícone copiado pelo iOS no momento da instalação. Nesse caso, remova-a da Tela de Início e adicione-a novamente pelo Safari;
+- remover e reinstalar a PWA não apaga os dados da conta armazenados no Supabase, mas permissões locais — como notificações — podem precisar ser confirmadas outra vez;
+- não são criadas cópias versionadas dos assets apenas para contornar cache.
 
 ## Destaques da v0.7.0
 

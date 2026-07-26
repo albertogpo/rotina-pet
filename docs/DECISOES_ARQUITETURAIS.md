@@ -2,14 +2,14 @@
 
 > Documento de decisões permanentes do projeto.
 
-Versão do documento: 1.1
+Versão do documento: 1.2
 
 ## Filosofia
 - Evolução incremental.
 - Priorizar estabilidade.
 - Evitar regressões.
 - Discutir arquitetura antes da implementação.
-- Trabalhar sempre sobre o código-fonte mais recente fornecido pelo usuário.
+- Trabalhar sempre sobre o código-fonte mais recente disponível no Google Drive, sincronizado com o repositório.
 
 ## Regras de negócio
 - Histórico nunca é alterado.
@@ -27,6 +27,8 @@ Versão do documento: 1.1
 - React + Vite + Supabase + OneSignal.
 - Não alterar Edge Function sem necessidade.
 - "from Rotina Pet" no iOS é limitação do Web Push.
+- Ícones da PWA mantêm nomes e caminhos estáveis.
+- Não criar cópias versionadas de ícones apenas para contornar cache do iOS; em instalações antigas, orientar reinstalação quando necessária.
 
 ## Releases
 - Entregar apenas arquivos modificados.
