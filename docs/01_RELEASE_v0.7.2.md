@@ -29,6 +29,7 @@ Dar prioridade à próxima refeição na tela Hoje, reduzir novamente o cabeçal
 ### Ícones da PWA
 
 - Os assets permanecem nos nomes estáveis já adotados pelo projeto.
+- O logo do cabeçalho também referencia `icons/icon-192.png`; a referência antiga `icon-192-v072.png` causava a imagem quebrada observada na interface.
 - A tentativa de usar nomes `*-v072.png` foi descartada antes da publicação por criar duplicação sem resolver de forma confiável o cache do iOS.
 - Em instalações existentes no iOS, pode ser necessário remover o app da Tela de Início e adicioná-lo novamente pelo Safari para trocar o ícone.
 

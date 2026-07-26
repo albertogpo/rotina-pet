@@ -474,7 +474,7 @@ function App(){
       <span>{refreshing?"Atualizando…":pullDistance>=72?"Solte para atualizar":"Puxe para atualizar"}</span>
     </div>
     <header className="topbar">
-      <div className="brand-heading"><img className="brand-logo" src={`${import.meta.env.BASE_URL}icons/icon-192-v072.png`} alt=""/><div><p className="eyebrow">Rotina e acompanhamento</p><h1>Rotina Pet</h1></div></div>
+      <div className="brand-heading"><img className="brand-logo" src={`${import.meta.env.BASE_URL}icons/icon-192.png`} alt=""/><div><p className="eyebrow">Rotina e acompanhamento</p><h1>Rotina Pet</h1></div></div>
       <div className="topbar-actions">
         <div className="theme-switcher" role="group" aria-label="Escolher paleta visual">
           <button type="button" className={brandTheme==="clinical"?"active":""} aria-pressed={brandTheme==="clinical"} onClick={()=>setBrandTheme("clinical")} title="Clínica Serena">

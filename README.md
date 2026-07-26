@@ -60,6 +60,7 @@ Ele nasceu para resolver uma necessidade prática: saber, em um único lugar, **
 ### Atualização dos ícones no iOS
 
 - os ícones permanecem nos caminhos estáveis do projeto (`icon-192.png`, `icon-512.png`, `icon-maskable-512.png`, `apple-touch-icon.png` e `icon-32.png`);
+- a referência do logo exibido no cabeçalho também usa o caminho estável `icon-192.png`, evitando imagem quebrada após a remoção das cópias versionadas;
 - uma PWA já instalada pode continuar exibindo o ícone copiado pelo iOS no momento da instalação. Nesse caso, remova-a da Tela de Início e adicione-a novamente pelo Safari;
 - remover e reinstalar a PWA não apaga os dados da conta armazenados no Supabase, mas permissões locais — como notificações — podem precisar ser confirmadas outra vez;
 - não são criadas cópias versionadas dos assets apenas para contornar cache.

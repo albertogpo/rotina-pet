@@ -23,6 +23,7 @@ Versão do documento: 1.2
 - **Status:** gerado e salvo no código-fonte; publicação e validação visual no iOS devem ser confirmadas.
 - **Correção antes da publicação:** os ícones voltaram a usar nomes estáveis; as cópias `*-v072.png` foram descartadas.
 - **Ajuste de interface:** o fundo da barra de status foi limitado à safe area para não sobrepor o cabeçalho.
+- **Correção de asset:** o logo do cabeçalho deixou de apontar para `icon-192-v072.png` removido e voltou a usar `icon-192.png`; os demais ícones foram auditados sem novas referências quebradas.
 
 ### v0.7.1
 - Auto-scroll da faixa de horários planejado, mas a versão não foi salva/publicada separadamente. A alteração foi incorporada à v0.7.2.
