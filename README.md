@@ -4,7 +4,7 @@ O **Rotina Pet** é um aplicativo web instalável (PWA) para organizar a aliment
 
 Ele nasceu para resolver uma necessidade prática: saber, em um único lugar, **o que cada pet precisa comer, em qual horário, em que quantidade e o que realmente aconteceu em cada refeição**.
 
-> **Estado do projeto:** versão de testes `v0.7.0`.
+> **Estado do projeto:** versão de testes `v0.7.2`.
 
 ## Aplicativo publicado
 
@@ -37,6 +37,30 @@ Ele nasceu para resolver uma necessidade prática: saber, em um único lugar, **
 - notificações push automáticas via OneSignal + Supabase Cron;
 - deploy automático no GitHub Pages.
 
+
+## Destaques da v0.7.2
+
+### Próxima refeição em primeiro plano
+
+- na faixa horizontal **Horários do dia**, o primeiro horário que ainda possui alguma refeição pendente é trazido automaticamente para a primeira posição visível;
+- horários totalmente concluídos continuam à esquerda e ficam recortados fora da área visível, mas permanecem acessíveis ao deslizar manualmente;
+- refeições atrasadas ainda pendentes têm prioridade sobre horários futuros;
+- quando o horário em foco é totalmente registrado, a faixa avança para a próxima pendência;
+- o reposicionamento automático funciona apenas na data de hoje e não interfere na consulta manual de datas históricas;
+- a melhoria planejada inicialmente para a v0.7.1 foi incorporada diretamente nesta versão e não foi publicada separadamente.
+
+### Interface e configurações
+
+- cabeçalho mobile novamente reduzido, com logo, seletor de tema e avatar mais compactos;
+- o campo de busca de fuso recebeu um botão **×** para limpar rapidamente o conteúdo;
+- a ação **Usar fuso do aparelho** voltou a ficar sempre disponível, sendo desabilitada apenas quando esse fuso já está selecionado;
+- rodapé e metadados do pacote atualizados para `v0.7.2`.
+
+### Atualização dos ícones no iOS
+
+- os arquivos de ícone passaram a usar nomes versionados com `v072`, evitando que novas instalações reutilizem arquivos antigos do cache;
+- o iOS pode manter o ícone que foi copiado no momento da instalação. Quando uma PWA já instalada continuar mostrando o ícone anterior, remova-a da Tela de Início e adicione-a novamente pelo Safari;
+- remover e reinstalar a PWA não apaga os dados da conta armazenados no Supabase, mas permissões locais — como notificações — podem precisar ser confirmadas outra vez.
 
 ## Destaques da v0.7.0
 
@@ -234,6 +258,21 @@ VITE_ONESIGNAL_APP_ID=SEU_APP_ID_ONESIGNAL
 7. Tocar no push e confirmar o destaque do horário na tela Hoje.
 
 ## Testes principais
+
+### Faixa de horários
+
+- abrir Hoje com um ou mais horários já concluídos e confirmar que a primeira pendência fica na borda esquerda;
+- concluir a última refeição de um horário e confirmar o avanço para o próximo horário pendente;
+- manter uma refeição atrasada sem registro e confirmar que ela permanece como prioridade;
+- deslizar manualmente para horários concluídos e confirmar que eles continuam acessíveis;
+- abrir uma data histórica e confirmar que não há reposicionamento automático.
+
+### PWA no iOS
+
+- remover a instalação anterior da Tela de Início;
+- abrir o aplicativo publicado no Safari e adicioná-lo novamente à Tela de Início;
+- confirmar o ícone novo;
+- revalidar a permissão de notificações, quando necessário.
 
 ### Agrupamento
 

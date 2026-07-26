@@ -45,6 +45,7 @@ export function SettingsPage({
   const[timezoneLoading,setTimezoneLoading]=useState(false);
   const[timezoneMessage,setTimezoneMessage]=useState("");
   const timezoneListRef=useRef<HTMLDivElement|null>(null);
+  const timezoneInputRef=useRef<HTMLInputElement|null>(null);
   const timezones=useMemo(()=>availableTimeZones(timezone,detectedTimezone),[timezone,detectedTimezone]);
   const filteredTimezones=useMemo(()=>timezones.filter(item=>matchesTimezone(item,timezoneQuery)),[timezones,timezoneQuery]);
 
@@ -96,6 +97,15 @@ export function SettingsPage({
     setTimezoneQuery(value);
     setTimezoneOpen(false);
     setTimezoneMessage("");
+  }
+
+  function clearTimezoneField(){
+    setTimezoneDraft("");
+    setTimezoneQuery("");
+    setTimezoneOpen(true);
+    setActiveTimezoneIndex(0);
+    setTimezoneMessage("");
+    window.requestAnimationFrame(()=>timezoneInputRef.current?.focus());
   }
 
   function handleTimezoneKeyDown(event:KeyboardEvent<HTMLInputElement>){
@@ -154,6 +164,7 @@ export function SettingsPage({
       <label className="field-label" htmlFor="routine-timezone">Fuso da rotina</label>
       <div className={`timezone-combobox ${timezoneOpen?"is-open":""}`} onBlur={event=>{if(!event.currentTarget.contains(event.relatedTarget as Node|null)){setTimezoneOpen(false);setTimezoneQuery(timezoneDraft);}}}>
         <input
+          ref={timezoneInputRef}
           id="routine-timezone"
           role="combobox"
           aria-autocomplete="list"
@@ -168,6 +179,7 @@ export function SettingsPage({
           placeholder="Busque por cidade ou região"
           autoComplete="off"
         />
+        {timezoneQuery&&<button className="timezone-combobox-clear" type="button" aria-label="Limpar campo de fuso" title="Limpar campo" onMouseDown={event=>event.preventDefault()} onClick={clearTimezoneField}>×</button>}
         <button className="timezone-combobox-toggle" type="button" tabIndex={-1} aria-label={timezoneOpen?"Fechar lista de fusos":"Abrir lista de fusos"} onMouseDown={event=>event.preventDefault()} onClick={()=>setTimezoneOpen(current=>!current)}>⌄</button>
         {timezoneOpen&&<div className="timezone-options" id="routine-timezone-options" role="listbox" ref={timezoneListRef}>
           {filteredTimezones.length?filteredTimezones.map((item,index)=><button
@@ -186,7 +198,7 @@ export function SettingsPage({
       </div>
       <p className="muted timezone-detected">Fuso detectado neste aparelho: <strong>{detectedTimezone}</strong></p>
       <div className="timezone-actions">
-        {detectedTimezone!==timezoneDraft&&<button className="secondary-button" type="button" onClick={()=>selectTimezone(detectedTimezone)}>Usar o fuso deste aparelho</button>}
+        <button className="secondary-button" type="button" disabled={timezoneLoading||detectedTimezone===timezoneDraft} onClick={()=>selectTimezone(detectedTimezone)}>Usar fuso do aparelho</button>
         <button className="primary-button" type="button" disabled={timezoneLoading||timezoneDraft.trim()===timezone||!validTimezone(timezoneDraft.trim())} onClick={()=>void saveTimezone()}>{timezoneLoading?"Salvando…":"Salvar fuso"}</button>
       </div>
       {timezoneMessage&&<p className={timezoneMessage.startsWith("Fuso da rotina atualizado")?"success-box":"notice"}>{timezoneMessage}</p>}

@@ -208,7 +208,7 @@ input:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--f
 .return-today-button:hover{background:var(--surface);color:var(--accent)}
 .icon-button{min-width:42px;padding-inline:0;display:grid;place-items:center;font-size:1.1rem}
 .today-time-summary .eyebrow{margin:0}
-.today-time-nav{display:flex;gap:10px;min-width:0;padding:1px 1px 4px;overflow-x:auto;scrollbar-width:none}
+.today-time-nav{display:flex;gap:10px;min-width:0;padding:1px 1px 4px;overflow-x:auto;overflow-y:hidden;overscroll-behavior-inline:contain;scrollbar-width:none}
 .today-time-nav::-webkit-scrollbar{display:none}
 .today-time-nav button{display:grid;grid-template-columns:auto auto;align-items:baseline;gap:9px;flex:0 0 auto;min-width:94px;min-height:47px;padding:9px 12px;border:1px solid var(--line);border-radius:14px;background:var(--paper);color:var(--ink);box-shadow:0 4px 12px rgba(45,50,45,.035)}
 .today-time-nav button:hover{border-color:var(--line-strong);background:var(--surface)}
@@ -329,16 +329,19 @@ input:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--f
 .app-shell>footer{display:flex;justify-content:center;gap:8px;margin-top:34px;color:var(--muted);font-size:.76rem}
 
 @media(max-width:760px){
-  .app-shell{padding-top:calc(max(18px,env(safe-area-inset-top)) + 8px);padding-right:max(14px,env(safe-area-inset-right));padding-bottom:max(34px,env(safe-area-inset-bottom));padding-left:max(14px,env(safe-area-inset-left))}
-  .brand-heading{gap:7px}
-  .topbar{gap:8px;min-height:44px}
-  .topbar-actions{gap:6px}
+  .app-shell{padding-top:max(8px,calc(env(safe-area-inset-top) + 3px));padding-right:max(14px,env(safe-area-inset-right));padding-bottom:max(34px,env(safe-area-inset-bottom));padding-left:max(14px,env(safe-area-inset-left))}
+  .status-bar-scrim{height:calc(env(safe-area-inset-top) + 32px)}
+  .brand-heading{gap:6px}
+  .topbar{gap:7px;min-height:36px}
+  .topbar-actions{gap:5px}
   .theme-switcher{padding:2px}
-  .theme-switcher button{width:28px;height:28px}
-  .brand-logo{width:34px;height:34px}
+  .theme-switcher button{width:24px;height:24px}
+  .theme-swatch{width:16px;height:16px}
+  .brand-logo{width:28px;height:28px;border-radius:8px}
   .brand-heading .eyebrow{display:none}
-  .topbar h1{font-size:1.32rem;letter-spacing:-.035em;white-space:nowrap}
-  .avatar-button{width:40px;height:40px}
+  .topbar h1{font-size:1.18rem;letter-spacing:-.035em;white-space:nowrap}
+  .avatar-button{width:34px;height:34px;font-size:.78rem}
+  .pet-switcher{margin-top:18px}
   .filter-hint{display:none}
   .main-nav{position:fixed;left:max(10px,env(safe-area-inset-left));right:max(10px,env(safe-area-inset-right));bottom:max(9px,env(safe-area-inset-bottom));top:auto;margin:auto;max-width:720px;box-shadow:0 14px 38px rgba(var(--ink-rgb),.16)}
   .main-nav button{display:grid;justify-items:center;gap:3px;min-height:50px;padding:7px 4px;font-size:.66rem}
@@ -441,8 +444,11 @@ input:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--f
 }
 
 .timezone-combobox{position:relative}
-.timezone-combobox input{padding-right:42px}
-.timezone-combobox-toggle{position:absolute;top:0;right:0;display:grid;place-items:center;width:42px;height:45px;border:0;background:transparent;color:var(--muted);font-size:1.05rem}
+.timezone-combobox input{padding-right:82px}
+.timezone-combobox-clear,.timezone-combobox-toggle{position:absolute;top:0;display:grid;place-items:center;height:45px;border:0;background:transparent;color:var(--muted)}
+.timezone-combobox-clear{right:42px;width:38px;font-size:1.15rem;line-height:1}
+.timezone-combobox-clear:hover{color:var(--ink)}
+.timezone-combobox-toggle{right:0;width:42px;border-left:1px solid var(--line);font-size:1.05rem}
 .timezone-combobox.is-open .timezone-combobox-toggle{transform:rotate(180deg)}
 .timezone-options{position:absolute;z-index:30;top:calc(100% + 6px);left:0;right:0;max-height:min(320px,48vh);padding:6px;border:1px solid var(--line-strong);border-radius:14px;background:var(--paper);box-shadow:0 18px 45px rgba(var(--ink-rgb),.16);overflow-y:auto}
 .timezone-options button{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px;width:100%;min-height:42px;padding:9px 10px;border:0;border-radius:9px;background:transparent;color:var(--ink);text-align:left}

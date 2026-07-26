@@ -116,6 +116,9 @@ export function TodayPage({
   const[focusedTime,setFocusedTime]=useState<string|null>(null);
   const[pendingFutureOutcome,setPendingFutureOutcome]=useState<PendingFutureOutcome|null>(null);
   const focusTimer=useRef<number|undefined>(undefined);
+  const timeNavRef=useRef<HTMLElement|null>(null);
+  const lastTimeNavAutoScrollKey=useRef<string|null>(null);
+  const hasAutoScrolledTimeNav=useRef(false);
   const petById=useMemo(()=>new Map(pets.map(pet=>[pet.id,pet])),[pets]);
   const filteredMeals=useMemo(()=>meals.filter(meal=>selectedPetIds.includes(meal.pet_id)),[meals,selectedPetIds]);
   const groups=useMemo(()=>{
@@ -126,6 +129,15 @@ export function TodayPage({
     }
     return [...grouped.entries()];
   },[filteredMeals,timezone]);
+  const nextPendingTime=useMemo(()=>{
+    if(!isToday)return null;
+    return groups.find(([,groupMeals])=>groupMeals.some(meal=>meal.status==="pending"))?.[0]??null;
+  },[groups,isToday]);
+  const timeNavAutoScrollKey=useMemo(()=>{
+    const selectedPetsKey=[...selectedPetIds].sort().join(",");
+    const visibleTimesKey=groups.map(([time])=>time).join("|");
+    return `${displayDate}|${selectedPetsKey}|${visibleTimesKey}|${nextPendingTime??""}`;
+  },[displayDate,groups,nextPendingTime,selectedPetIds]);
   const registered=filteredMeals.filter(meal=>meal.status!=="pending").length;
   const progress=filteredMeals.length?Math.round(registered/filteredMeals.length*100):0;
   const selectedPets=pets.filter(pet=>selectedPetIds.includes(pet.id));
@@ -155,6 +167,36 @@ export function TodayPage({
   },[focusTime,groups,loading,onFocusHandled]);
 
   useEffect(()=>()=>clearTimeout(focusTimer.current),[]);
+
+  useEffect(()=>{
+    if(!isToday){
+      lastTimeNavAutoScrollKey.current=null;
+      hasAutoScrolledTimeNav.current=false;
+      return;
+    }
+    if(loading||!nextPendingTime){
+      lastTimeNavAutoScrollKey.current=null;
+      return;
+    }
+    if(lastTimeNavAutoScrollKey.current===timeNavAutoScrollKey)return;
+
+    const nav=timeNavRef.current;
+    const target=nav
+      ?Array.from(nav.querySelectorAll<HTMLButtonElement>("[data-meal-time]")).find(button=>button.dataset.mealTime===nextPendingTime)
+      :undefined;
+    if(!nav||!target)return;
+
+    const reduceMotion=window.matchMedia?.("(prefers-reduced-motion: reduce)").matches??false;
+    const navRect=nav.getBoundingClientRect();
+    const targetRect=target.getBoundingClientRect();
+    const targetLeft=Math.max(0,nav.scrollLeft+targetRect.left-navRect.left);
+    nav.scrollTo({
+      left:targetLeft,
+      behavior:reduceMotion||!hasAutoScrolledTimeNav.current?"auto":"smooth",
+    });
+    lastTimeNavAutoScrollKey.current=timeNavAutoScrollKey;
+    hasAutoScrolledTimeNav.current=true;
+  },[isToday,loading,nextPendingTime,timeNavAutoScrollKey]);
 
   function toggleMeal(time:string,mealId:string){
     const opening=openMealByTime[time]!==mealId;
@@ -240,10 +282,11 @@ export function TodayPage({
 
       <div className="today-time-summary">
         <p className="eyebrow">Horários do dia</p>
-        <nav className="today-time-nav" aria-label="Ir para um horário de refeição">
+        <nav ref={timeNavRef} className="today-time-nav" aria-label="Ir para um horário de refeição">
           {groups.map(([time,groupMeals])=>{
             const groupRegistered=groupMeals.filter(meal=>meal.status!=="pending").length;
-            return <button key={time} className={groupRegistered===groupMeals.length?"complete":""} onClick={()=>scrollToTime(time)}><strong>{time}</strong><span>{groupRegistered}/{groupMeals.length}</span></button>;
+            const isNextPending=time===nextPendingTime;
+            return <button key={time} data-meal-time={time} className={groupRegistered===groupMeals.length?"complete":""} aria-current={isNextPending?"step":undefined} aria-label={`${time}, ${groupRegistered} de ${groupMeals.length} registradas${isNextPending?", próxima refeição pendente":""}`} onClick={()=>scrollToTime(time)}><strong>{time}</strong><span>{groupRegistered}/{groupMeals.length}</span></button>;
           })}
         </nav>
       </div>
