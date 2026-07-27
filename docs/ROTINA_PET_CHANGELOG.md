@@ -1,22 +1,14 @@
 ﻿# ROTINA_PET_CHANGELOG.md
 
 
-
-
 > Histórico cronológico de releases.
-
-
 
 
 Versão do documento: 1.3
 
 
-
-
 > Atualizar este arquivo a cada release.
 > O ChatGPT deve informar quando esta nova versão precisar substituir a anterior no Projeto.
-
-
 
 
 ## Modelo
@@ -26,19 +18,17 @@ Versão do documento: 1.3
 - Status (Gerado / Publicado / Testado / Confirmado)
 
 
-
-
 ## Histórico
-
-
 
 
 ### v0.7.3
 - **Objetivo:** corrigir a sobreposição visual da barra de status, ampliar o espaçamento do cabeçalho e restaurar a navegação horizontal dos horários no desktop.
-- **Arquivos modificados:** `src/App.tsx`, `src/components/TodayPage.tsx`, `src/styles.css`, `package.json`, `package-lock.json`, `README.md`, `docs/ROTINA_PET_CHANGELOG.md` e `docs/ROTINA_PET_CONTEXTO.md`.
+- **Arquivos modificados:** `src/App.tsx`, `src/components/TodayPage.tsx`, `src/styles.css`, `package.json`, `package-lock.json`, `.github/workflows/deploy-pages.yml`, `README.md`, `docs/ROTINA_PET_CHANGELOG.md` e `docs/ROTINA_PET_CONTEXTO.md`.
 - **Arquivo criado:** `docs/01_RELEASE_v0.7.3.md`.
 - **Migração SQL:** não necessária.
-- **Status:** gerado e salvo no código-fonte; validação visual no iOS e no desktop deve ser confirmada.
+- **Status:** código corrigido e salvo; a primeira tentativa de build falhou antes do deploy e uma nova execução deve ser confirmada.
+- **Correção do build:** o workflow normaliza no runner as URLs do proxy npm interno para o registro público e usa apenas `npm ci`; o fallback para pnpm foi removido.
+- **Pendência técnica:** regenerar o `package-lock.json` diretamente em um ambiente público para eliminar as URLs internas do arquivo-fonte, embora o deploy já não dependa disso.
 - **Escopo não incluído:** restauração de alimentos arquivados.
 
 
@@ -55,42 +45,28 @@ Versão do documento: 1.3
 - **Limitação documentada:** alimentos arquivados ainda não possuem restauração pela interface.
 
 
-
-
 ### v0.7.1
 - Auto-scroll da faixa de horários planejado, mas a versão não foi salva/publicada separadamente. A alteração foi incorporada à v0.7.2.
-
-
 
 
 ### v0.7.0
 - Navegação diária, pendências de ontem, seletor completo de fusos, toggle de notificações e nova identidade de ícones.
 
 
-
-
 ### v0.6.5
 - Temas Clínica Serena e Editorial Acolhedora, tipografia Manrope e refinamentos de identidade visual.
-
-
 
 
 ### v0.6.1
 Infraestrutura de notificações estabilizada.
 
 
-
-
 ### v0.6.2
 Correções planejadas para troca de planos e horários. Status a confirmar.
 
 
-
-
 ### v0.6.3
 Melhorias visuais planejadas. Status a confirmar.
-
-
 
 
 ### v0.6.4
