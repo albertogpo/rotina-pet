@@ -4,7 +4,7 @@
 > Histórico cronológico de releases.
 
 
-Versão do documento: 1.3
+Versão do documento: 1.4
 
 
 > Atualizar este arquivo a cada release.
@@ -21,12 +21,21 @@ Versão do documento: 1.3
 ## Histórico
 
 
+### v0.7.4
+- **Objetivo:** restaurar o scroll vertical da página no desktop.
+- **Causa:** `overflow-y:auto` aplicado simultaneamente em `html` e `body`, criando dois contêineres de rolagem concorrentes no Chrome desktop.
+- **Arquivos modificados:** `src/App.tsx`, `src/styles.css`, `package.json`, `package-lock.json`, `README.md`, `docs/ROTINA_PET_CHANGELOG.md` e `docs/ROTINA_PET_CONTEXTO.md`.
+- **Arquivo criado:** `docs/01_RELEASE_v0.7.4.md`.
+- **Migração SQL:** não necessária.
+- **Validação:** teste automatizado em Chromium confirmou o retorno do scroll vertical; build/deploy no GitHub deve ser confirmado.
+- **Manutenção:** lockfile normalizado para o registro público e salvo sem BOM.
+
 ### v0.7.3
 - **Objetivo:** corrigir a sobreposição visual da barra de status, ampliar o espaçamento do cabeçalho e restaurar a navegação horizontal dos horários no desktop.
 - **Arquivos modificados:** `src/App.tsx`, `src/components/TodayPage.tsx`, `src/styles.css`, `package.json`, `package-lock.json`, `.github/workflows/deploy-pages.yml`, `README.md`, `docs/ROTINA_PET_CHANGELOG.md` e `docs/ROTINA_PET_CONTEXTO.md`.
 - **Arquivo criado:** `docs/01_RELEASE_v0.7.3.md`.
 - **Migração SQL:** não necessária.
-- **Status:** código corrigido e salvo; duas tentativas de build falharam antes do deploy e uma nova execução deve ser confirmada.
+- **Status:** build da v0.7.3 confirmado pelo usuário; publicação/deploy final deve ser confirmada separadamente.
 - **Correção do build:** o workflow normaliza no runner as URLs do proxy npm interno para o registro público e usa apenas `npm ci`; o fallback para pnpm foi removido.
 - **Segunda correção do build:** o `package.json` continha BOM UTF-8; o arquivo foi salvo sem BOM e o workflow passou a validar e normalizar o encoding dos JSONs antes da instalação.
 - **Pendência técnica:** regenerar o `package-lock.json` diretamente em um ambiente público para eliminar as URLs internas do arquivo-fonte, embora o deploy já não dependa disso.

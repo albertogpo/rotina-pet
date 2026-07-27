@@ -13,7 +13,7 @@ Ele nasceu para resolver uma necessidade prática: saber, em um único lugar, **
 
 
 
-> **Estado do projeto:** versão de testes `v0.7.3`.
+> **Estado do projeto:** versão de testes `v0.7.4`.
 
 
 
@@ -64,6 +64,22 @@ Ele nasceu para resolver uma necessidade prática: saber, em um único lugar, **
 
 
 
+
+## Destaques da v0.7.4
+
+### Correção do scroll no desktop
+
+- `html` passa a ser o único contêiner de scroll vertical do documento;
+- `body` e `#root` permanecem com overflow visível, evitando dois contêineres concorrentes no Chrome desktop;
+- a rolagem vertical da página volta a responder à roda do mouse;
+- o scroll horizontal da faixa **Horários do dia** e o auto-scroll da próxima refeição foram preservados;
+- o comportamento foi reproduzido e validado em Chromium: antes da correção a roda mantinha `scrollY = 0`; depois, o mesmo teste avançou para `scrollY = 600`;
+- rodapé e metadados do pacote atualizados para `v0.7.4`.
+
+### Manutenção do pacote
+
+- o `package-lock.json` foi salvo sem BOM UTF-8;
+- as URLs de dependências foram normalizadas para `https://registry.npmjs.org/`, eliminando o proxy interno do arquivo-fonte.
 
 ## Destaques da v0.7.3
 

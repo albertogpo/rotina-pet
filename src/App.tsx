@@ -1,4 +1,4 @@
-﻿import {useCallback,useEffect,useMemo,useRef,useState,type TouchEvent} from "react";
+import {useCallback,useEffect,useMemo,useRef,useState,type TouchEvent} from "react";
 import type {Session} from "@supabase/supabase-js";
 import {hasSupabaseConfig,supabase} from "./lib/supabase";
 import {detectTimeZone,shiftLocalDate,timePt,todayInTimeZone} from "./lib/format";
@@ -595,7 +595,7 @@ function App(){
     </div>
 
 
-    <footer><span>Rotina Pet</span><span>•</span><span>v0.7.3</span></footer>
+    <footer><span>Rotina Pet</span><span>•</span><span>v0.7.4</span></footer>
   </main>;
 }
 

@@ -1,4 +1,4 @@
-﻿:root,
+:root,
 :root[data-theme="clinical"]{
   font-family:Manrope,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
   color:#26312e;
@@ -87,10 +87,10 @@
 
 *{box-sizing:border-box}
 html,body,.panel-card,.weight-highlight,.empty-card,.current-plan,.today-overview,.main-nav,.pet-chip,.meal-accordion,.auth-card{transition:background-color .2s ease,border-color .2s ease,color .2s ease,box-shadow .2s ease}
-html,body,#root{width:100%;max-width:100%;min-width:320px;min-height:100%;overflow-x:hidden}
-html,body{overflow-y:auto}
-html{background:var(--page);transition:background .2s ease}
-body{margin:0;min-height:100vh;overscroll-behavior-y:contain;background:linear-gradient(180deg,var(--page-top) 0,var(--page) 38rem);-webkit-text-size-adjust:100%;text-size-adjust:100%}
+html,body,#root{width:100%;max-width:100%;min-width:320px;min-height:100%}
+html{overflow-x:hidden;overflow-y:auto;background:var(--page);transition:background .2s ease}
+body{margin:0;min-height:100vh;overflow:visible;overscroll-behavior-y:contain;background:linear-gradient(180deg,var(--page-top) 0,var(--page) 38rem);-webkit-text-size-adjust:100%;text-size-adjust:100%}
+#root{overflow:visible}
 button,input,select,textarea{font:inherit}
 input,select,textarea{font-size:16px}
 img,svg{max-width:100%}
