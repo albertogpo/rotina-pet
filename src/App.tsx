@@ -1,4 +1,4 @@
-import {useCallback,useEffect,useMemo,useRef,useState,type TouchEvent} from "react";
+﻿import {useCallback,useEffect,useMemo,useRef,useState,type TouchEvent} from "react";
 import type {Session} from "@supabase/supabase-js";
 import {hasSupabaseConfig,supabase} from "./lib/supabase";
 import {detectTimeZone,shiftLocalDate,timePt,todayInTimeZone} from "./lib/format";
@@ -16,16 +16,20 @@ import {SettingsPage} from "./components/SettingsPage";
 import {PetForm} from "./components/PetForm";
 import {AppIcon,type AppIconName} from "./components/AppIcon";
 
+
 type Tab="today"|"weight"|"foods"|"plan"|"pets"|"settings";
 type MealDeepLink={date:string;time:string};
 type BrandTheme="clinical"|"editorial";
 
+
 const BRAND_THEME_STORAGE_KEY="rotina-pet-brand-theme";
+
 
 function readBrandTheme():BrandTheme{
   try{return localStorage.getItem(BRAND_THEME_STORAGE_KEY)==="editorial"?"editorial":"clinical";}
   catch{return "clinical";}
 }
+
 
 const navItems:{id:Exclude<Tab,"settings">;label:string;icon:AppIconName}[]=[
   {id:"today",label:"Hoje",icon:"today"},
@@ -35,6 +39,7 @@ const navItems:{id:Exclude<Tab,"settings">;label:string;icon:AppIconName}[]=[
   {id:"pets",label:"Animais",icon:"pets"},
 ];
 
+
 function readMealDeepLink():MealDeepLink|null{
   const params=new URLSearchParams(window.location.search);
   const date=params.get("date")??"";
@@ -43,6 +48,7 @@ function readMealDeepLink():MealDeepLink|null{
   return{date,time};
 }
 
+
 function clearMealDeepLinkFromUrl(){
   const url=new URL(window.location.href);
   url.searchParams.delete("view");
@@ -50,6 +56,7 @@ function clearMealDeepLinkFromUrl(){
   url.searchParams.delete("time");
   window.history.replaceState({},"",`${url.pathname}${url.search}${url.hash}`);
 }
+
 
 function App(){
   const detectedTimezone=useMemo(()=>detectTimeZone(),[]);
@@ -85,9 +92,11 @@ function App(){
   const[previousDayPendingCount,setPreviousDayPendingCount]=useState(0);
   const[previousDayFirstPendingTime,setPreviousDayFirstPendingTime]=useState<string|null>(null);
 
+
   const pet=pets.find(x=>x.id===selectedPetId)??pets[0];
   const today=useMemo(()=>todayInTimeZone(timezone),[timezone,clockTick]);
   const previousKnownToday=useRef(today);
+
 
   useEffect(()=>{
     const updateClock=()=>setClockTick(current=>current+1);
@@ -97,12 +106,14 @@ function App(){
     return()=>{window.clearInterval(timer);document.removeEventListener("visibilitychange",handleVisible);};
   },[]);
 
+
   useEffect(()=>{
     const previous=previousKnownToday.current;
     if(today===previous)return;
     if(tab==="today"&&displayDate===previous)setDisplayDate(today);
     previousKnownToday.current=today;
   },[today,tab,displayDate]);
+
 
   useEffect(()=>{
     document.documentElement.dataset.theme=brandTheme;
@@ -111,12 +122,14 @@ function App(){
     try{localStorage.setItem(BRAND_THEME_STORAGE_KEY,brandTheme);}catch{}
   },[brandTheme]);
 
+
   useEffect(()=>{
     if(!supabase){setAuthLoading(false);return;}
     api.getSession().then(setSession).catch(e=>setError(e.message)).finally(()=>setAuthLoading(false));
     const{data}=supabase.auth.onAuthStateChange((_event,nextSession)=>setSession(nextSession));
     return()=>data.subscription.unsubscribe();
   },[]);
+
 
   useEffect(()=>{
     if(!session){setPreferencesReady(false);return;}
@@ -133,6 +146,7 @@ function App(){
     void initPush(session.user.id).catch(()=>{});
     return()=>{cancelled=true;};
   },[session,detectedTimezone]);
+
 
   const loadBase=useCallback(async()=>{
     if(!session)return;
@@ -156,7 +170,9 @@ function App(){
     }
   },[session]);
 
+
   useEffect(()=>{void loadBase();},[loadBase]);
+
 
   useEffect(()=>{
     if(!deepLinkTarget||!pets.length)return;
@@ -164,6 +180,7 @@ function App(){
     setDisplayDate(deepLinkTarget.date);
     setTodayPetIds(pets.map(item=>item.id));
   },[deepLinkTarget,pets]);
+
 
   const loadSelectedPetData=useCallback(async()=>{
     if(!session||!pet){setWeights([]);setActivePlan(null);return;}
@@ -180,7 +197,9 @@ function App(){
     }
   },[session,pet?.id,today]);
 
+
   useEffect(()=>{void loadSelectedPetData();},[loadSelectedPetData]);
+
 
   const loadDisplayedMeals=useCallback(async()=>{
     if(!session||!pets.length||!preferencesReady){setMeals([]);return;}
@@ -196,7 +215,9 @@ function App(){
     }
   },[session,pets,displayDate,preferencesReady,timezone]);
 
+
   useEffect(()=>{void loadDisplayedMeals();},[loadDisplayedMeals]);
+
 
   const loadPreviousDayPending=useCallback(async()=>{
     if(!session||!pets.length||!preferencesReady){setPreviousDayPendingCount(0);setPreviousDayFirstPendingTime(null);return;}
@@ -213,12 +234,15 @@ function App(){
     }
   },[session,pets,preferencesReady,today,timezone]);
 
+
   useEffect(()=>{void loadPreviousDayPending();},[loadPreviousDayPending]);
+
 
   const retryAllData=useCallback(async()=>{
     clearTimeout(retryTimer.current);
     await Promise.all([loadBase(),loadSelectedPetData(),loadDisplayedMeals(),loadPreviousDayPending()]);
   },[loadBase,loadSelectedPetData,loadDisplayedMeals,loadPreviousDayPending]);
+
 
   function handlePullStart(event:TouchEvent<HTMLElement>){
     if(refreshing||window.scrollY>1||event.touches.length!==1){
@@ -228,12 +252,14 @@ function App(){
     pullStartY.current=event.touches[0].clientY;
   }
 
+
   function handlePullMove(event:TouchEvent<HTMLElement>){
     if(pullStartY.current===null||window.scrollY>1)return;
     const delta=event.touches[0].clientY-pullStartY.current;
     if(delta<=0){setPullDistance(0);return;}
     setPullDistance(Math.min(112,delta*.48));
   }
+
 
   async function reloadApplicationFromServer(){
     // Remove apenas o service worker principal da PWA. O worker do OneSignal
@@ -250,12 +276,14 @@ function App(){
       await Promise.all(appRegistrations.map(registration=>registration.unregister()));
     }
 
+
     // A URL exclusiva evita reutilizar uma resposta HTTP antiga do index.html.
     // Na nova carga, o PWA registra novamente seu service worker normalmente.
     const url=new URL(window.location.href);
     url.searchParams.set("app-refresh",Date.now().toString());
     window.location.replace(url.toString());
   }
+
 
   async function handlePullEnd(){
     pullStartY.current=null;
@@ -270,6 +298,7 @@ function App(){
     }
   }
 
+
   useEffect(()=>{
     if(!error||loadingBase||loadingPet||loadingToday)return;
     const now=Date.now();
@@ -280,6 +309,7 @@ function App(){
     return()=>clearTimeout(retryTimer.current);
   },[error,loadingBase,loadingPet,loadingToday,retryAllData]);
 
+
   useEffect(()=>{
     const handleVisible=()=>{
       if(document.visibilityState==="visible"&&error){void retryAllData();}
@@ -287,6 +317,7 @@ function App(){
     document.addEventListener("visibilitychange",handleVisible);
     return()=>document.removeEventListener("visibilitychange",handleVisible);
   },[error,retryAllData]);
+
 
   useEffect(()=>{
     const handleNavigation=()=>{
@@ -297,9 +328,11 @@ function App(){
     return()=>window.removeEventListener("popstate",handleNavigation);
   },[]);
 
+
   useEffect(()=>{
     if(displayDate>today)setDisplayDate(today);
   },[displayDate,today]);
+
 
   async function createPet(input:{name:string;species:Species;icon:string}){
     setOnboardingBusy(true);
@@ -315,10 +348,12 @@ function App(){
     }
   }
 
+
   async function updatePet(id:string,input:{name:string;species:Species;icon:string}){
     const updated=await api.updatePet(id,input);
     setPets(current=>current.map(item=>item.id===id?updated:item));
   }
+
 
   async function archivePet(id:string){
     await api.archivePet(id);
@@ -327,11 +362,13 @@ function App(){
     await loadBase();
   }
 
+
   async function restorePet(id:string){
     await api.restorePet(id);
     await loadBase();
     setSelectedPetId(id);
   }
+
 
   async function addWeight(date:string,value:number,notes:string){
     if(!pet)return;
@@ -339,11 +376,13 @@ function App(){
     setWeights(await api.listWeights(pet.id));
   }
 
+
   async function deleteWeight(id:string){
     if(!pet)return;
     await api.deleteWeight(id);
     setWeights(await api.listWeights(pet.id));
   }
+
 
   async function createFood(name:string,unit:FoodUnit){
     const created=await api.createFood(session!.user.id,name,unit);
@@ -351,15 +390,18 @@ function App(){
     return created;
   }
 
+
   async function updateFood(id:string,name:string,unit:FoodUnit){
     const updated=await api.updateFood(id,name,unit);
     setFoods(current=>current.map(item=>item.id===id?updated:item).sort((a,b)=>a.name.localeCompare(b.name,"pt-BR")));
   }
 
+
   async function archiveFood(id:string){
     await api.archiveFood(id);
     setFoods(current=>current.filter(item=>item.id!==id));
   }
+
 
   async function savePlan(input:{name:string;startsOn:string;mealTimes:string[];foods:PlanFoodInput[]}){
     if(!pet)return;
@@ -369,12 +411,14 @@ function App(){
     setTab("today");
   }
 
+
   async function updatePlanSchedule(planId:string,startsOn:string,mealTimes:string[]){
     await api.updatePlanSchedule(planId,startsOn,mealTimes);
     await Promise.all([loadSelectedPetData(),loadDisplayedMeals()]);
     setDisplayDate(todayInTimeZone(timezone));
     setTab("today");
   }
+
 
   async function setMealOutcome(meal:MealOccurrence,outcome:MealOutcome){
     setError("");
@@ -389,22 +433,26 @@ function App(){
     }
   }
 
+
   async function updateTimezone(nextTimezone:string){
     const preferences=await api.updateUserTimezone(nextTimezone);
     setTimezone(preferences.timezone);
     setDisplayDate(todayInTimeZone(preferences.timezone));
   }
 
+
   async function handleSignOut(){
     try{await logoutPush();}catch{}
     await api.signOut();
   }
+
 
   const handleDeepLinkFocus=useCallback(()=>{
     clearMealDeepLinkFromUrl();
     initialDeepLink.current=null;
     setDeepLinkTarget(null);
   },[]);
+
 
   function toggleTodayPetFilter(id:string){
     const allIds=pets.map(item=>item.id);
@@ -422,23 +470,28 @@ function App(){
     setTodayPetIds([...todayPetIds,id]);
   }
 
+
   function openPetCreation(){
     setAutoCreatePet(true);
     setTab("pets");
   }
+
 
   function openPlanForPet(petId?:string){
     if(petId)setSelectedPetId(petId);
     setTab("plan");
   }
 
+
   function showPreviousDay(){
     setDisplayDate(current=>shiftLocalDate(current,-1));
   }
 
+
   function showNextDay(){
     setDisplayDate(current=>current<today?shiftLocalDate(current,1):current);
   }
+
 
   function reviewPreviousDay(){
     const previousDate=shiftLocalDate(today,-1);
@@ -448,24 +501,30 @@ function App(){
     if(previousDayFirstPendingTime)setDeepLinkTarget({date:previousDate,time:previousDayFirstPendingTime});
   }
 
+
   function returnToToday(){
     setDisplayDate(today);
   }
+
 
   if(!hasSupabaseConfig)return <SetupScreen/>;
   if(authLoading)return <main className="center-page"><div className="spinner large"/></main>;
   if(!session)return <AuthScreen/>;
 
+
   const authenticatedSession:Session=session;
   const authenticatedUser=authenticatedSession.user;
+
 
   if(!pets.length&&!archivedPets.length&&!loadingBase){
     return <main className="center-page"><section className="auth-card"><div className="brand-mark">🐾</div><p className="eyebrow">Primeiro passo</p><h1>Cadastre seu primeiro animal</h1><p className="muted">Depois você poderá adicionar os demais perfis.</p><PetForm onSave={createPet} busy={onboardingBusy}/>{error&&<div className="error-box error-with-action"><span>{error}</span><button className="secondary-button compact" onClick={()=>void retryAllData()}>Tentar novamente</button></div>}</section></main>;
   }
 
+
   const accountInitial=(authenticatedUser.email?.trim().charAt(0)||"U").toUpperCase();
   const isTodayTab=tab==="today";
   const showGlobalRetry=Boolean(error&&!loadingBase&&!loadingPet&&!loadingToday);
+
 
   return <main className="app-shell" onTouchStart={handlePullStart} onTouchMove={handlePullMove} onTouchEnd={()=>void handlePullEnd()} onTouchCancel={()=>{pullStartY.current=null;setPullDistance(0);}}>
     <div className="status-bar-scrim" aria-hidden="true"/>
@@ -488,6 +547,7 @@ function App(){
       </div>
     </header>
 
+
     {tab!=="settings"&&<section className="pet-switcher" aria-label={isTodayTab?"Filtrar refeições por animal":"Selecionar animal"}>
       {pets.map(item=>{
         const active=isTodayTab?todayPetIds.includes(item.id):pet?.id===item.id;
@@ -496,12 +556,15 @@ function App(){
       <button className="pet-chip add-pet" onClick={openPetCreation} aria-label="Adicionar novo animal" title="Adicionar novo animal">＋</button>
     </section>}
 
+
     {isTodayTab&&pets.length>1&&<p className="filter-hint">Todos começam selecionados. Toque em um animal para ver apenas ele; depois, adicione outros ao filtro.</p>}
     {showGlobalRetry&&<div className="error-box global-error error-with-action"><span>{error}</span><button className="secondary-button compact" onClick={()=>void retryAllData()}>Tentar novamente</button></div>}
+
 
     <nav className="main-nav" aria-label="Navegação principal">
       {navItems.map(item=><button key={item.id} className={tab===item.id?"active":""} onClick={()=>{if(item.id==="today")setDisplayDate(today);setTab(item.id);}}><AppIcon name={item.icon}/><span>{item.label}</span>{item.id==="today"&&previousDayPendingCount>0&&<span className="nav-badge" aria-label={`${previousDayPendingCount} ${previousDayPendingCount===1?"refeição pendente de ontem":"refeições pendentes de ontem"}`}>{previousDayPendingCount>9?"9+":previousDayPendingCount}</span>}</button>)}
     </nav>
+
 
     <div className="page-content">
       {tab==="today"&&<TodayPage
@@ -531,8 +594,10 @@ function App(){
       {tab==="settings"&&<SettingsPage email={authenticatedUser.email??"Conta"} onSignOut={handleSignOut} userId={authenticatedUser.id} timezone={timezone} detectedTimezone={detectedTimezone} onTimezoneChange={updateTimezone}/>} 
     </div>
 
-    <footer><span>Rotina Pet</span><span>•</span><span>v0.7.2</span></footer>
+
+    <footer><span>Rotina Pet</span><span>•</span><span>v0.7.3</span></footer>
   </main>;
 }
+
 
 export default App;

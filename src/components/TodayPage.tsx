@@ -1,8 +1,11 @@
-import {useEffect,useMemo,useRef,useState} from "react";
+﻿import {useEffect,useMemo,useRef,useState} from "react";
+import type {WheelEvent} from "react";
 import type {MealConsumptionLevel,MealOccurrence,MealOutcome,Pet} from "../types";
 import {formatLocalDateLong,numberPt,timePt,unitLabels} from "../lib/format";
 
+
 type StatusIconName="check"|"clock"|"pending"|"close";
+
 
 type MealVisualState={
   label:string;
@@ -10,11 +13,13 @@ type MealVisualState={
   icon:StatusIconName;
 };
 
+
 type PendingFutureOutcome={
   meal:MealOccurrence;
   outcome:MealOutcome;
   time:string;
 };
+
 
 const consumptionLabels:Record<MealConsumptionLevel,string>={
   full:"Comeu tudo",
@@ -24,6 +29,7 @@ const consumptionLabels:Record<MealConsumptionLevel,string>={
   none:"Não comeu",
 };
 
+
 const partialOptions:{value:Exclude<MealConsumptionLevel,"full">;label:string;description:string}[]=[
   {value:"almost",label:"Quase tudo",description:"Sobrou só um pouco"},
   {value:"half",label:"Metade",description:"Comeu aproximadamente metade"},
@@ -31,12 +37,14 @@ const partialOptions:{value:Exclude<MealConsumptionLevel,"full">;label:string;de
   {value:"none",label:"Nada",description:"A comida foi oferecida, mas não comeu"},
 ];
 
+
 function StatusIcon({name}:{name:StatusIconName}){
   if(name==="check")return <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m4.5 10.2 3.3 3.3 7.7-8"/></svg>;
   if(name==="clock")return <svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="6.5"/><path d="M10 6.5v4l2.7 1.6"/></svg>;
   if(name==="close")return <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m6 6 8 8M14 6l-8 8"/></svg>;
   return <svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="6.5"/></svg>;
 }
+
 
 function statusOf(meal:MealOccurrence):MealVisualState{
   const late=meal.status==="pending"&&new Date(meal.scheduled_at).getTime()<Date.now();
@@ -51,12 +59,15 @@ function statusOf(meal:MealOccurrence):MealVisualState{
   return{label:"Pendente",className:"pending",icon:"pending"};
 }
 
+
 function groupId(time:string){return `refeicoes-${time.replace(":","-")}`;}
+
 
 function registeredLabel(count:number,total:number){
   if(total===1)return count===1?"Registrada":"Pendente";
   return `${count} de ${total} registradas`;
 }
+
 
 function futureDistanceLabel(scheduledAt:string){
   const remaining=Math.max(0,new Date(scheduledAt).getTime()-Date.now());
@@ -70,6 +81,7 @@ function futureDistanceLabel(scheduledAt:string){
   if(minutes||!parts.length)parts.push(`${minutes}min`);
   return parts.join(" ");
 }
+
 
 export function TodayPage({
   pets,
@@ -143,12 +155,14 @@ export function TodayPage({
   const selectedPets=pets.filter(pet=>selectedPetIds.includes(pet.id));
   const normalizedDate=formatLocalDateLong(displayDate);
 
+
   function centerExpandedContent(elementId:string){
     const reduceMotion=window.matchMedia?.("(prefers-reduced-motion: reduce)").matches??false;
     window.requestAnimationFrame(()=>window.requestAnimationFrame(()=>{
       document.getElementById(elementId)?.scrollIntoView({behavior:reduceMotion?"auto":"smooth",block:"center"});
     }));
   }
+
 
   useEffect(()=>{
     if(loading||!focusTime)return;
@@ -166,7 +180,9 @@ export function TodayPage({
     onFocusHandled();
   },[focusTime,groups,loading,onFocusHandled]);
 
+
   useEffect(()=>()=>clearTimeout(focusTimer.current),[]);
+
 
   useEffect(()=>{
     if(!isToday){
@@ -180,11 +196,13 @@ export function TodayPage({
     }
     if(lastTimeNavAutoScrollKey.current===timeNavAutoScrollKey)return;
 
+
     const nav=timeNavRef.current;
     const target=nav
       ?Array.from(nav.querySelectorAll<HTMLButtonElement>("[data-meal-time]")).find(button=>button.dataset.mealTime===nextPendingTime)
       :undefined;
     if(!nav||!target)return;
+
 
     const reduceMotion=window.matchMedia?.("(prefers-reduced-motion: reduce)").matches??false;
     const navRect=nav.getBoundingClientRect();
@@ -198,6 +216,7 @@ export function TodayPage({
     hasAutoScrolledTimeNav.current=true;
   },[isToday,loading,nextPendingTime,timeNavAutoScrollKey]);
 
+
   function toggleMeal(time:string,mealId:string){
     const opening=openMealByTime[time]!==mealId;
     setOpenMealByTime(current=>({...current,[time]:current[time]===mealId?undefined:mealId}));
@@ -205,16 +224,35 @@ export function TodayPage({
     if(opening)centerExpandedContent(`meal-card-${mealId}`);
   }
 
+
   function toggleConsumptionPicker(mealId:string){
     const opening=consumptionPickerId!==mealId;
     setConsumptionPickerId(current=>current===mealId?null:mealId);
     if(opening)centerExpandedContent(`consumption-picker-${mealId}`);
   }
 
+
+  function handleTimeNavWheel(event:WheelEvent<HTMLElement>){
+    const nav=event.currentTarget;
+    if(nav.scrollWidth<=nav.clientWidth||Math.abs(event.deltaY)<=Math.abs(event.deltaX))return;
+
+
+    const delta=event.deltaY;
+    const atStart=nav.scrollLeft<=1;
+    const atEnd=nav.scrollLeft+nav.clientWidth>=nav.scrollWidth-1;
+    if((delta<0&&atStart)||(delta>0&&atEnd))return;
+
+
+    event.preventDefault();
+    nav.scrollLeft+=delta;
+  }
+
+
   function scrollToTime(time:string){
     const reduceMotion=window.matchMedia?.("(prefers-reduced-motion: reduce)").matches??false;
     document.getElementById(groupId(time))?.scrollIntoView({behavior:reduceMotion?"auto":"smooth",block:"start"});
   }
+
 
   async function performOutcome(meal:MealOccurrence,outcome:MealOutcome,time:string){
     setBusyMealId(meal.id);
@@ -227,6 +265,7 @@ export function TodayPage({
     }
   }
 
+
   function requestOutcome(meal:MealOccurrence,outcome:MealOutcome,time:string){
     const isFuture=outcome!=="pending"&&new Date(meal.scheduled_at).getTime()>Date.now();
     if(isFuture){
@@ -236,12 +275,14 @@ export function TodayPage({
     void performOutcome(meal,outcome,time);
   }
 
+
   function confirmFutureOutcome(){
     if(!pendingFutureOutcome)return;
     const request=pendingFutureOutcome;
     setPendingFutureOutcome(null);
     void performOutcome(request.meal,request.outcome,request.time);
   }
+
 
   if(loading)return <section className="empty-card"><div className="spinner"/><p>{isToday?"Organizando as refeições de hoje…":`Buscando o histórico de ${normalizedDate.toLowerCase()}…`}</p></section>;
   if(!pets.length)return <section className="empty-card"><span className="empty-symbol">◇</span><h2>Nenhum animal ativo</h2><p>Restaure um perfil arquivado ou cadastre um novo animal para montar a rotina.</p><button className="primary-button" onClick={onOpenPets}>Abrir animais</button></section>;
@@ -252,6 +293,7 @@ export function TodayPage({
       :(onlyPet?`${onlyPet.name} não tinha refeições registradas nessa data.`:"Os animais selecionados não têm refeições registradas nessa data.");
     return <section className="empty-card"><span className="empty-symbol">○</span><h2>{isToday?"Nenhuma refeição programada":"Nenhum registro nessa data"}</h2><p>{emptyMessage}</p>{isToday?<button className="primary-button" onClick={()=>onOpenPlan(onlyPet?.id??selectedPets[0]?.id)}>Criar plano</button>:<button className="secondary-button" onClick={onGoToToday}>Voltar para hoje</button>}</section>;
   }
+
 
   return <section className="today-page">
     <article className="today-overview">
@@ -264,6 +306,7 @@ export function TodayPage({
         <div className="progress-summary" aria-label={`${progress}% registrado`}><strong>{progress}%</strong><span><i style={{width:`${progress}%`}}/></span></div>
       </div>
 
+
       <div className="date-navigator" aria-label="Alterar dia exibido">
         <button className="secondary-button compact icon-button date-previous" onClick={onPreviousDay} aria-label="Ver dia anterior">‹</button>
         <div className="date-navigator-summary">
@@ -274,15 +317,17 @@ export function TodayPage({
         <button className="secondary-button compact icon-button date-next" onClick={onNextDay} disabled={!canGoForward} aria-label="Ver dia seguinte">›</button>
       </div>
 
+
       {isToday&&previousDayPendingCount>0&&<button className="previous-day-alert" type="button" onClick={onReviewPreviousDay}>
         <span className="previous-day-alert-icon" aria-hidden="true">!</span>
         <span><strong>Ontem ficou {previousDayPendingCount} {previousDayPendingCount===1?"refeição pendente":"refeições pendentes"}</strong><small>Toque para revisar o registro anterior.</small></span>
         <span className="previous-day-alert-action">Revisar</span>
       </button>}
 
+
       <div className="today-time-summary">
         <p className="eyebrow">Horários do dia</p>
-        <nav ref={timeNavRef} className="today-time-nav" aria-label="Ir para um horário de refeição">
+        <nav ref={timeNavRef} className="today-time-nav" aria-label="Ir para um horário de refeição" onWheel={handleTimeNavWheel}>
           {groups.map(([time,groupMeals])=>{
             const groupRegistered=groupMeals.filter(meal=>meal.status!=="pending").length;
             const isNextPending=time===nextPendingTime;
@@ -291,6 +336,7 @@ export function TodayPage({
         </nav>
       </div>
     </article>
+
 
     <div className="time-groups">
       {groups.map(([time,groupMeals])=>{
@@ -313,10 +359,12 @@ export function TodayPage({
                   <span className="accordion-chevron" aria-hidden="true">⌄</span>
                 </button>
 
+
                 {open&&<div className="meal-accordion-panel" id={`meal-details-${meal.id}`}>
                   <div className="meal-components">
                     {components.map(component=><div className="meal-component-row" key={component.id}><div><span className="component-label">Alimento</span><strong>{component.foods?.name??"Alimento"}</strong></div><span className="component-quantity">{numberPt(component.quantity)} {unitLabels[component.unit]}</span></div>)}
                   </div>
+
 
                   <div className="meal-record-summary plain-text-summary">
                     {meal.status==="completed"&&<p><strong>{consumption?consumptionLabels[consumption]:"Comeu tudo"}</strong>{meal.completed_at?` · registrado às ${timePt(meal.completed_at,timezone)}`:""}</p>}
@@ -324,11 +372,13 @@ export function TodayPage({
                     {meal.status==="pending"&&<p>{state.className==="late"?"O horário já passou e ainda não há registro.":"Escolha o que aconteceu quando a refeição for oferecida."}</p>}
                   </div>
 
+
                   <div className="meal-outcome-actions" aria-label="Registrar resultado da refeição">
                     <button disabled={busy} className={`outcome-button eat-all ${consumption==="full"?"is-selected":""}`} onClick={()=>requestOutcome(meal,"full",time)}>Comeu tudo</button>
                     <button disabled={busy} className={`outcome-button partial-consumption ${consumption&&consumption!=="full"?"is-selected":""}`} aria-expanded={consumptionPickerId===meal.id} onClick={()=>toggleConsumptionPicker(meal.id)}>Não comeu tudo</button>
                     <button disabled={busy} className={`outcome-button not-served ${meal.status==="skipped"?"is-selected":""}`} onClick={()=>requestOutcome(meal,"not_served",time)}>Não servida</button>
                   </div>
+
 
                   {consumptionPickerId===meal.id&&<div className="consumption-picker" id={`consumption-picker-${meal.id}`}>
                     <div><p className="eyebrow">Quanto comeu?</p><p className="muted">Escolha a aproximação que melhor descreve a refeição.</p></div>
@@ -336,6 +386,7 @@ export function TodayPage({
                       {partialOptions.map(option=><button key={option.value} disabled={busy} className={consumption===option.value?"is-selected":""} onClick={()=>requestOutcome(meal,option.value,time)}><strong>{option.label}</strong><span>{option.description}</span></button>)}
                     </div>
                   </div>}
+
 
                   {meal.status!=="pending"&&<button className="reset-meal-button" disabled={busy} onClick={()=>requestOutcome(meal,"pending",time)}>Desfazer registro</button>}
                 </div>}
@@ -345,6 +396,7 @@ export function TodayPage({
         </section>;
       })}
     </div>
+
 
     {pendingFutureOutcome&&<div className="alert-sheet-backdrop" role="presentation" onMouseDown={event=>{if(event.target===event.currentTarget)setPendingFutureOutcome(null);}}>
       <section className="alert-sheet" role="alertdialog" aria-modal="true" aria-labelledby="future-meal-title" aria-describedby="future-meal-description">
