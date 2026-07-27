@@ -1,4 +1,4 @@
-﻿# Rotina Pet v0.7.3
+# Rotina Pet v0.7.3
 
 
 ## Objetivo
@@ -44,6 +44,8 @@ Corrigir o acabamento do cabeçalho em aparelhos com safe area e restaurar a nav
 - O workflow agora normaliza as URLs do lockfile para `https://registry.npmjs.org/` no runner antes da instalação.
 - A instalação passou a usar somente `npm ci`; o fallback automático para pnpm foi removido porque mascarava a causa real e tornava a instalação menos determinística.
 - O lockfile também foi validado localmente com todas as 413 dependências resolvidas pelo registro público; a normalização definitiva do arquivo-fonte fica pendente para uma regeneração fora do ambiente interno.
+- A segunda tentativa chegou ao Vite, mas falhou porque `package.json` começava com BOM UTF-8; o `vite-plugin-pwa` usa `JSON.parse` e rejeitou o caractere invisível antes de `{`.
+- O `package.json` foi salvo novamente sem BOM, e o workflow agora remove BOM e valida os dois arquivos JSON antes do `npm ci`.
 
 
 ## Banco e backend

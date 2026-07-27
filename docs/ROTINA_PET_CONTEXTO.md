@@ -1,4 +1,4 @@
-﻿# ROTINA_PET_CONTEXTO.md
+# ROTINA_PET_CONTEXTO.md
 
 
 > Contexto operacional do projeto.
@@ -15,10 +15,11 @@ Registrar o estado atual do Rotina Pet para continuidade entre conversas.
 - Arquitetura: React + Vite (PWA), Supabase e OneSignal.
 - Notificações estabilizadas.
 - Última release gerada: v0.7.3.
-- Última release publicada: v0.7.2; a primeira tentativa de publicar a v0.7.3 falhou no build.
+- Última release publicada: v0.7.2; duas tentativas de publicar a v0.7.3 falharam no build.
 - A faixa de horários prioriza a próxima refeição e possui suporte à roda do mouse no desktop.
 - O cabeçalho fica acima do degradê da barra de status.
 - O workflow da v0.7.3 normaliza no runner as URLs internas do lockfile para o registro público e usa instalação determinística com `npm ci`.
+- O `package.json` da v0.7.3 foi corrigido para UTF-8 sem BOM; o workflow também valida e normaliza o encoding dos JSONs.
 
 
 ## Pendências

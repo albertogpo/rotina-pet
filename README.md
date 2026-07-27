@@ -1,4 +1,4 @@
-﻿# Rotina Pet
+# Rotina Pet
 
 
 
@@ -91,6 +91,8 @@ Ele nasceu para resolver uma necessidade prática: saber, em um único lugar, **
 - nenhuma alteração de banco, Edge Function ou Cron;
 - alimentos arquivados continuam preservados no banco, mas ainda não possuem restauração pela interface;
 - rodapé e metadados do pacote atualizados para `v0.7.3`.
+- o `package.json` foi normalizado sem BOM UTF-8, evitando falha do `vite-plugin-pwa` ao ler os metadados;
+- o workflow valida `package.json` e `package-lock.json` antes da instalação e remove BOM automaticamente quando necessário.
 
 
 ## Destaques da v0.7.2

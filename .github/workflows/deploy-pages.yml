@@ -1,4 +1,4 @@
-﻿name: Publicar no GitHub Pages
+name: Publicar no GitHub Pages
 
 
 on:
@@ -113,11 +113,24 @@ jobs:
 
 
           python - <<'PYLOCK'
+          import json
           from pathlib import Path
 
 
+          bom = b"\xef\xbb\xbf"
+          for filename in ("package.json", "package-lock.json"):
+              path = Path(filename)
+              raw = path.read_bytes()
+              if raw.startswith(bom):
+                  raw = raw[len(bom):]
+                  path.write_bytes(raw)
+                  print(f"Removido BOM UTF-8 de {filename}.")
+              json.loads(raw.decode("utf-8"))
+              print(f"{filename} é JSON válido e não possui BOM.")
+
+
           lockfile = Path("package-lock.json")
-          text = lockfile.read_text(encoding="utf-8-sig")
+          text = lockfile.read_text(encoding="utf-8")
           internal = "https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/"
           public = "https://registry.npmjs.org/"
           count = text.count(internal)
@@ -127,7 +140,6 @@ jobs:
           else:
               print("O lockfile já usa URLs públicas.")
           PYLOCK
-
 
           npm ci --no-audit --no-fund
 
