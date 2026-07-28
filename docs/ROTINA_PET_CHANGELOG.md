@@ -4,7 +4,7 @@
 > Histórico cronológico de releases.
 
 
-Versão do documento: 1.4
+Versão do documento: 1.5
 
 
 > Atualizar este arquivo a cada release.
@@ -20,6 +20,15 @@ Versão do documento: 1.4
 
 ## Histórico
 
+
+### v0.7.5
+- **Objetivo:** corrigir o aproveitamento horizontal do card Hoje no desktop e personalizar a notificação de boas-vindas do opt-in.
+- **Interface:** o grid interno do card Hoje passa a ocupar toda a largura disponível; os botões de horário permanecem compactos e o scroll horizontal é preservado.
+- **Notificações:** `welcomeNotification` foi configurada no `OneSignal.init` com título e mensagem alinhados ao tom de voz da marca.
+- **Arquivos modificados:** `src/App.tsx`, `src/lib/push.ts`, `src/styles.css`, `package.json`, `package-lock.json`, `README.md`, `docs/00_PRODUCT_FOUNDATION.md`, `docs/ROTINA_PET_CHANGELOG.md` e `docs/ROTINA_PET_CONTEXTO.md`.
+- **Arquivo criado:** `docs/01_RELEASE_v0.7.5.md`.
+- **Migração SQL:** não necessária.
+- **Status:** implementação gerada e arquivos-fonte atualizados; build, deploy e validação visual ainda devem ser confirmados.
 
 ### v0.7.4
 - **Objetivo:** restaurar o scroll vertical da página no desktop.

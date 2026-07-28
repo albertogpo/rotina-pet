@@ -48,6 +48,10 @@ export async function initPush(userId?:string){
             serviceWorkerParam:{scope:WORKER_DIRECTORY},
             allowLocalhostAsSecureOrigin:location.hostname==="localhost",
             notifyButton:{enable:false},
+            welcomeNotification:{
+              title:"Rotina Pet",
+              message:"Tudo certo: as notificações estão ativas. Enviaremos lembretes nos horários das refeições.",
+            },
           });
           resolve(OneSignal);
         }catch(error){

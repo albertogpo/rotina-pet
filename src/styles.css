@@ -241,7 +241,7 @@ input:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--f
 
 /* Tela Hoje */
 .today-page{display:grid;gap:24px;min-width:0}
-.today-overview{display:grid;gap:20px;background:linear-gradient(135deg,var(--paper) 0,var(--overview-end) 100%)}
+.today-overview{display:grid;grid-template-columns:minmax(0,1fr);align-items:stretch;justify-content:stretch;gap:20px;background:linear-gradient(135deg,var(--paper) 0,var(--overview-end) 100%)}
 .today-overview-top{display:flex;align-items:flex-start;justify-content:space-between;gap:22px;min-width:0}
 .today-overview-top>div:first-child{min-width:0}
 .today-overview h2{margin-bottom:6px}

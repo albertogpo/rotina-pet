@@ -13,7 +13,7 @@ Ele nasceu para resolver uma necessidade prática: saber, em um único lugar, **
 
 
 
-> **Estado do projeto:** versão de testes `v0.7.4`.
+> **Estado do projeto:** versão de testes `v0.7.5`.
 
 
 
@@ -64,6 +64,28 @@ Ele nasceu para resolver uma necessidade prática: saber, em um único lugar, **
 
 
 
+
+## Destaques da v0.7.5
+
+### Card Hoje no desktop
+
+- o conteúdo estrutural do card de resumo agora ocupa toda a largura interna disponível;
+- o resumo e o progresso permanecem nas extremidades da primeira faixa;
+- o navegador de data e as linhas divisórias passam a atravessar toda a largura útil do card;
+- os botões de horário continuam compactos e proporcionais ao conteúdo, sem serem esticados apenas para preencher espaço;
+- o scroll horizontal da faixa de horários foi preservado para dias com muitos horários.
+
+### Notificação de boas-vindas
+
+- a notificação automática enviada pelo OneSignal após a primeira assinatura foi personalizada no `OneSignal.init`;
+- título: **Rotina Pet**;
+- mensagem: **“Tudo certo: as notificações estão ativas. Enviaremos lembretes nos horários das refeições.”**;
+- a alteração não interfere nas notificações de refeição, na Edge Function ou no Cron.
+
+### Escopo
+
+- nenhuma migration SQL;
+- rodapé e metadados do pacote atualizados para `v0.7.5`.
 
 ## Destaques da v0.7.4
 

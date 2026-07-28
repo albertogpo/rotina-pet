@@ -228,6 +228,17 @@ Arquitetura aprovada:
 
 Essa arquitetura deve atender iPhone, Android e navegadores desktop compatíveis.
 
+## ✅ O opt-in confirma a ativação das notificações
+
+Após a primeira assinatura no Web Push, o OneSignal envia uma notificação de boas-vindas para confirmar que o canal foi ativado.
+
+Conteúdo aprovado:
+
+- título: **Rotina Pet**;
+- mensagem: **Tudo certo: as notificações estão ativas. Enviaremos lembretes nos horários das refeições.**
+
+A mensagem deve ser clara e funcional, sem euforia, diminutivos ou promessa de entrega absoluta. Ela confirma a ativação do canal, mas não substitui os estados persistidos no aplicativo.
+
 ## ✅ Refeições simultâneas geram uma única notificação
 
 Refeições do mesmo tutor programadas para o mesmo instante são agrupadas antes do envio. O sistema não deve enviar um push separado para cada animal.
@@ -517,6 +528,8 @@ Regras:
 
 - cada horário funciona como atalho para o grupo correspondente na lista;
 - os horários têm espaçamento suficiente para serem diferenciados;
+- em telas largas, a estrutura do card ocupa toda a largura interna disponível;
+- os botões de horário permanecem compactos e não são esticados apenas para preencher espaço;
 - o horário é o título visual do grupo, sem a frase “Refeição das…”;
 - cada grupo informa quantas refeições já foram registradas.
 
@@ -528,6 +541,12 @@ As refeições de um mesmo horário aparecem como linhas compactas em acordeão:
 - controle de expandir ou recolher.
 
 Ao expandir, são exibidos alimentos, quantidades e ações de registro. Apenas uma refeição fica aberta por vez dentro de cada horário. Após registrar uma ação, o card se fecha automaticamente.
+
+---
+
+## 💡 Navegação diária com menor deslocamento do ponteiro
+
+Em uma evolução futura do desktop, os controles de avançar e retroceder datas podem ser aproximados entre si, desde que a data continue visualmente clara e a navegação permaneça acessível. O objetivo é reduzir trajetos longos do ponteiro sem comprometer a leitura do card.
 
 ---
 

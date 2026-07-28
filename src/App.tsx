@@ -595,7 +595,7 @@ function App(){
     </div>
 
 
-    <footer><span>Rotina Pet</span><span>•</span><span>v0.7.4</span></footer>
+    <footer><span>Rotina Pet</span><span>•</span><span>v0.7.5</span></footer>
   </main>;
 }
 
