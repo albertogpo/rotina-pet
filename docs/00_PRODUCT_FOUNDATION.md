@@ -16,6 +16,7 @@
 | 📅 | Capacidades (implementar) |
 | 🧪 | Hipótese (precisa ser validada) |
 | 💡 | Ideia futura |
+| 🚫 | Fora do escopo imediato |
 
 ---
 
@@ -33,6 +34,23 @@ O produto possui dois modos de utilização:
 - Profissional (Veterinários e Clínicas)
 
 O foco estratégico do produto é o mercado profissional, sem impedir o uso independente por tutores.
+
+## 🧪 Hipótese de expansão da visão
+
+O Rotina Pet pode evoluir de uma plataforma de acompanhamento nutricional para uma plataforma de **adesão aos cuidados do pet**.
+
+Nessa visão ampliada, o produto conectaria orientações e planos definidos por profissionais à rotina real dos tutores, permitindo registrar, lembrar e acompanhar a execução de cuidados como:
+
+- alimentação;
+- medicamentos;
+- saúde preventiva;
+- consultas e exames;
+- higiene e bem-estar;
+- outros protocolos de cuidado.
+
+A nutrição permanece como vertical inicial, principal especialidade do produto e ponto de entrada para o mercado profissional.
+
+Esta hipótese não altera, neste momento, o posicionamento público, o escopo comprometido ou a prioridade de desenvolvimento. A ampliação precisa ser validada com tutores e diferentes perfis profissionais antes de se tornar uma definição do produto.
 
 ---
 
@@ -54,6 +72,20 @@ Existem dois tipos de clientes.
 - convida tutores.
 
 O tutor vinculado a um veterinário não paga pela plataforma.
+
+## 🧪 Hipótese de empacotamento comercial
+
+Se a expansão para outros cuidados for validada, o produto deve ser comercializado preferencialmente por **pacotes de valor e perfil de cliente**, e não por cobrança isolada de cada pequena funcionalidade.
+
+Possibilidades a validar:
+
+- plano para tutores, com níveis Essencial e Completo;
+- produto profissional nutricional;
+- produto profissional clínico;
+- plano para clínicas e equipes;
+- verticais especializadas futuras, como adestramento ou operação de pet shops, apenas quando constituírem fluxos profissionais completos.
+
+Add-ons separados fazem mais sentido para capacidades que formem um produto próprio, como integrações, marca branca, múltiplas unidades ou uma vertical profissional especializada. O empacotamento definitivo dependerá de validação de demanda, disposição de pagamento e custo de operação.
 
 ---
 
@@ -168,6 +200,32 @@ Preferir estados e ações concretas:
 - Não foi servida.
 
 Ícones de estado nunca devem aparecer sozinhos: precisam estar acompanhados por uma label textual.
+
+## ✅ Expansões devem preservar a simplicidade do núcleo
+
+Caso novas categorias de cuidado sejam incorporadas, devem obedecer aos seguintes princípios:
+
+### Complexidade progressiva
+
+O aplicativo não deve exibir todas as capacidades para todos os usuários. Cada tutor visualiza apenas as categorias de cuidado que utiliza ou que foram habilitadas por um profissional.
+
+### Arquitetura comum, experiências específicas
+
+Diferentes cuidados podem compartilhar internamente conceitos como plano, recorrência, ocorrência, lembrete, conclusão, profissional responsável, histórico e anexos.
+
+Na interface, cada tipo deve utilizar linguagem, campos e estados próprios. Uma vacina não deve parecer uma refeição, e um medicamento não deve parecer uma tarefa genérica.
+
+### A tela Hoje continua seletiva
+
+A tela **Hoje** deve apresentar apenas cuidados que exigem ação no dia. Eventos futuros de baixa frequência, como vacinas e check-ups, devem aparecer em uma área de próximos cuidados, sem competir permanentemente com refeições e medicamentos.
+
+### O núcleo nutricional não pode ser prejudicado
+
+Uma pessoa que utilize apenas alimentação e peso deve continuar encontrando uma experiência simples, direta e próxima da atual. Novas áreas não devem adicionar etapas, navegação ou ruído ao fluxo nutricional básico.
+
+### Frequência e natureza do cuidado importam
+
+Refeições, doses de medicamentos, vacinas, consultas, hábitos de higiene e programas de treinamento não devem ser tratados como atividades idênticas. A experiência deve considerar frequência, risco, necessidade de comprovação, duração e papel do profissional.
 
 ---
 
@@ -652,3 +710,168 @@ Regras:
 - cores de estado preservam significado sem depender apenas da cor.
 
 A existência dos dois temas no MVP serve também como instrumento de aprendizado antes da definição final da identidade visual.
+
+---
+
+# 14. Hipótese estratégica — adesão aos cuidados do pet
+
+## 🧪 Problema e oportunidade
+
+Tutores precisam organizar não apenas a alimentação, mas também cuidados preventivos, tratamentos, consultas e hábitos de bem-estar. A concentração dessas rotinas em um único produto pode aumentar o valor para o tutor e ampliar o mercado profissional potencial.
+
+A expansão também cria riscos:
+
+- excesso de itens para registrar;
+- aumento da carga cognitiva;
+- notificações demais;
+- perda de foco e diferenciação;
+- aumento de complexidade técnica, clínica e operacional;
+- tentativa prematura de atender profissionais com necessidades muito diferentes.
+
+A oportunidade deve ser perseguida como uma expansão da tese de **adesão**, e não como uma busca por oferecer a maior quantidade possível de funcionalidades.
+
+## 🧪 Formulação estratégica em avaliação
+
+> O Rotina Pet conecta os cuidados recomendados pelos profissionais à rotina real de quem cuida do animal.
+
+Essa formulação permite crescer além da nutrição sem transformar o produto em uma agenda genérica. Ela ainda precisa ser validada antes de substituir a definição oficial do produto.
+
+## 🧪 Hipóteses prioritárias para validação
+
+### Saúde preventiva
+
+- vacinas;
+- vermífugos;
+- antipulgas e carrapatos;
+- outros preventivos;
+- check-ups periódicos.
+
+Essas capacidades possuem ampla aplicabilidade, baixa frequência de registro e alto valor de lembrete e histórico. Constituem a primeira expansão recomendada para descoberta e prototipação.
+
+### Consultas e exames
+
+Primeiro escopo possível:
+
+- registrar consulta ou exame;
+- criar lembrete;
+- registrar motivo e retorno recomendado;
+- anexar comprovantes, pedidos ou resultados;
+- guardar observações.
+
+Não implica, nesta fase, criar prontuário completo, agenda operacional da clínica ou integração com sistemas veterinários.
+
+### Medicamentos
+
+Possível segunda etapa, por possuir grande valor de adesão e maior sensibilidade clínica.
+
+Campos e estados a investigar:
+
+- medicamento, quantidade e unidade prescritas;
+- horários, início, duração ou uso contínuo;
+- instruções de administração;
+- administrado, atrasado, não administrado, pausado, suspenso ou concluído;
+- profissional responsável;
+- distinção entre prescrição profissional e cadastro do tutor;
+- histórico preservado e identificação do cuidador que registrou.
+
+O produto não deve sugerir doses ou substituir orientação profissional.
+
+## 💡 Expansões opcionais de higiene e bem-estar
+
+Podem ser oferecidas apenas quando ativadas pelo usuário:
+
+- banho;
+- escovação de pelos;
+- higiene dental;
+- corte de unhas;
+- limpeza de ouvidos;
+- tosa.
+
+Essas capacidades podem aumentar a utilidade para o tutor, mas lembretes isolados não constituem, por si só, um produto profissional completo para pet shops.
+
+## 💡 Experimentos futuros
+
+### Passeios
+
+Pode começar como uma rotina simples de realização e duração. Recursos como GPS, mapas, metas e integrações com dispositivos configuram outra categoria de produto e não fazem parte da hipótese inicial.
+
+### Hidratação
+
+O registro manual de volume pode ser impreciso, especialmente com vários animais ou recipientes compartilhados. Deve ser investigado prioritariamente como protocolo clínico temporário, permitindo também registros qualitativos como normal, maior ou menor que o habitual.
+
+### Treino e adestramento
+
+Pode formar uma vertical futura baseada em programas, exercícios, evolução e acompanhamento por adestradores. Não deve ser reduzido a um simples lembrete nem incorporado ao núcleo antes de descoberta específica.
+
+### Protocolos especializados
+
+- recuperação pós-operatória;
+- acompanhamento de condições crônicas;
+- rotinas temporárias definidas por profissionais;
+- atividade física avançada.
+
+## ✅ Estratégia para reduzir carga cognitiva
+
+Caso a hipótese avance, a experiência deve utilizar:
+
+- ativação de categorias pelo usuário ou profissional;
+- modelos prontos de recorrência;
+- formulários curtos com detalhes progressivos;
+- separação entre ações de hoje e próximos cuidados;
+- agrupamento de notificações;
+- preferências de lembrete por categoria;
+- navegação sem seções vazias ou ícones para áreas não utilizadas;
+- histórico e anexos acessíveis sem ocupar a tela principal.
+
+## 🧪 Arquitetura conceitual a investigar
+
+O domínio pode compartilhar uma base genérica com:
+
+- plano de cuidado;
+- atividade de cuidado;
+- recorrência;
+- ocorrência agendada;
+- registro de execução;
+- lembrete;
+- profissional responsável;
+- anexos e observações.
+
+A generalização deve existir principalmente no modelo interno. A interface deve continuar específica para cada cuidado.
+
+## 🧪 Sequência preliminar de descoberta e implementação
+
+1. Validar o problema e a disposição de uso com tutores.
+2. Validar valor profissional com veterinários nutricionistas e clínicos gerais.
+3. Prototipar saúde preventiva, check-ups, consultas e exames simples.
+4. Validar se a expansão aumenta retenção sem prejudicar o uso nutricional.
+5. Implementar medicamentos somente após definir estados, responsabilidades e limites clínicos.
+6. Testar higiene e bem-estar como categorias opcionais.
+7. Tratar passeios, hidratação e adestramento como experimentos separados.
+
+## 🚫 Fora do escopo imediato
+
+A discussão desta hipótese não aprova a implementação de:
+
+- prontuário veterinário completo;
+- sistema de gestão de clínicas;
+- agenda operacional de pet shops;
+- marketplace;
+- pagamentos e agendamentos profissionais integrados;
+- telemedicina;
+- GPS ou rastreamento de passeios;
+- plataforma completa de adestramento;
+- recomendações automáticas de medicamentos, doses ou tratamentos;
+- lançamento simultâneo de todas as categorias de cuidado.
+
+## 🧪 Perguntas de validação
+
+- Quais cuidados os tutores realmente esquecem ou têm dificuldade de coordenar?
+- Quais registros eles manteriam após o entusiasmo inicial?
+- Quais informações precisam ser compartilhadas entre cuidadores?
+- Quais dados têm valor concreto para veterinários e outros profissionais?
+- A expansão aumenta retenção ou apenas aumenta a percepção inicial de funcionalidades?
+- Quais categorias justificam pagamento por tutores?
+- Quais capacidades constituem um produto profissional vendável, além de simples lembretes?
+- Como manter a tela Hoje calma quando várias categorias estiverem ativas?
+- A nutrição deve permanecer como produto principal, plano específico ou primeira vertical de uma plataforma mais ampla?
+

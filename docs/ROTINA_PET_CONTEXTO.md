@@ -4,7 +4,7 @@
 > Contexto operacional do projeto.
 
 
-Versão do documento: 1.6
+Versão do documento: 1.7
 
 
 ## Objetivo
@@ -14,6 +14,7 @@ Registrar o estado atual do Rotina Pet para continuidade entre conversas.
 ## Estado atual
 - Arquitetura: React + Vite (PWA), Supabase e OneSignal.
 - Notificações estabilizadas.
+- A Product Foundation registra a hipótese de evolução para uma plataforma de adesão aos cuidados do pet, mantendo a nutrição como vertical inicial; nenhuma nova categoria foi aprovada para implementação.
 - Última release gerada: v0.7.6.
 - Última release com build confirmado: v0.7.3; publicação final deve ser confirmada.
 - A faixa de horários prioriza a próxima refeição e possui suporte à roda do mouse no desktop.
@@ -37,6 +38,7 @@ Registrar o estado atual do Rotina Pet para continuidade entre conversas.
 7. Decidir se o card de animais arquivados deve ficar oculto quando estiver vazio ou virar uma seção recolhível.
 8. AbortController no envio ao OneSignal.
 9. executionTimeMs na Edge Function.
+10. Validar com tutores e profissionais a hipótese de expansão para saúde preventiva, consultas, exames e medicamentos antes de alterar o posicionamento público ou comprometer um novo roadmap.
 
 
 ## Limitações atuais
