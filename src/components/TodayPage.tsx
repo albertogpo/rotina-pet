@@ -127,6 +127,7 @@ export function TodayPage({
   const[busyMealId,setBusyMealId]=useState<string|null>(null);
   const[focusedTime,setFocusedTime]=useState<string|null>(null);
   const[pendingFutureOutcome,setPendingFutureOutcome]=useState<PendingFutureOutcome|null>(null);
+  const[showBackToTop,setShowBackToTop]=useState(false);
   const focusTimer=useRef<number|undefined>(undefined);
   const timeNavRef=useRef<HTMLElement|null>(null);
   const lastTimeNavAutoScrollKey=useRef<string|null>(null);
@@ -182,6 +183,18 @@ export function TodayPage({
 
 
   useEffect(()=>()=>clearTimeout(focusTimer.current),[]);
+
+
+  useEffect(()=>{
+    const updateVisibility=()=>setShowBackToTop(window.scrollY>Math.max(520,window.innerHeight*.75));
+    updateVisibility();
+    window.addEventListener("scroll",updateVisibility,{passive:true});
+    window.addEventListener("resize",updateVisibility);
+    return()=>{
+      window.removeEventListener("scroll",updateVisibility);
+      window.removeEventListener("resize",updateVisibility);
+    };
+  },[]);
 
 
   useEffect(()=>{
@@ -254,12 +267,31 @@ export function TodayPage({
   }
 
 
+  function scrollToTop(){
+    const reduceMotion=window.matchMedia?.("(prefers-reduced-motion: reduce)").matches??false;
+    window.scrollTo({top:0,behavior:reduceMotion?"auto":"smooth"});
+  }
+
+
+  function keepTimeGroupInPlace(time:string,previousTop:number|undefined){
+    if(previousTop===undefined)return;
+    window.requestAnimationFrame(()=>window.requestAnimationFrame(()=>{
+      const nextTop=document.getElementById(groupId(time))?.getBoundingClientRect().top;
+      if(nextTop===undefined)return;
+      const delta=nextTop-previousTop;
+      if(Math.abs(delta)>.5)window.scrollBy(0,delta);
+    }));
+  }
+
+
   async function performOutcome(meal:MealOccurrence,outcome:MealOutcome,time:string){
     setBusyMealId(meal.id);
     try{
       await onSetOutcome(meal,outcome);
+      const groupTop=document.getElementById(groupId(time))?.getBoundingClientRect().top;
       setOpenMealByTime(current=>({...current,[time]:undefined}));
       setConsumptionPickerId(null);
+      keepTimeGroupInPlace(time,groupTop);
     }finally{
       setBusyMealId(null);
     }
@@ -396,6 +428,9 @@ export function TodayPage({
         </section>;
       })}
     </div>
+
+
+    {showBackToTop&&<button className="back-to-top-button" type="button" onClick={scrollToTop} aria-label="Voltar ao topo" title="Voltar ao topo"><span aria-hidden="true">↑</span></button>}
 
 
     {pendingFutureOutcome&&<div className="alert-sheet-backdrop" role="presentation" onMouseDown={event=>{if(event.target===event.currentTarget)setPendingFutureOutcome(null);}}>

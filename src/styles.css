@@ -328,6 +328,10 @@ input:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--f
 .previous-day-alert-action{color:var(--warning);font-size:.78rem;font-weight:800}
 .nav-badge{position:absolute;top:3px;right:max(3px,calc(50% - 34px));display:grid;place-items:center;min-width:18px;height:18px;padding:0 5px;border:2px solid var(--surface);border-radius:999px;background:var(--danger);color:#fff!important;font-size:.61rem!important;font-weight:800;line-height:1}
 .meal-accordion,.consumption-picker{scroll-margin-block:calc(50vh - 120px)}
+.back-to-top-button{position:fixed;right:max(18px,env(safe-area-inset-right));bottom:max(18px,env(safe-area-inset-bottom));z-index:20;display:grid;place-items:center;width:42px;height:42px;padding:0;border:1px solid rgba(var(--ink-rgb),.12);border-radius:50%;background:rgba(var(--paper-rgb),.92);box-shadow:0 8px 24px rgba(var(--ink-rgb),.12);color:var(--muted);font-size:1rem;font-weight:800;backdrop-filter:blur(14px);animation:backToTopIn .18s ease-out}
+.back-to-top-button:hover{border-color:var(--line-strong);color:var(--accent);transform:translateY(-1px)}
+.back-to-top-button:focus-visible{outline:3px solid rgba(var(--accent-rgb),.22);outline-offset:3px}
+@keyframes backToTopIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}
 
 
 
@@ -418,6 +422,7 @@ input:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--f
   .main-nav button{display:grid;justify-items:center;gap:3px;min-height:50px;padding:7px 4px;font-size:.66rem}
   .main-nav button svg{width:19px;height:19px}
   .page-content{padding-bottom:83px}
+  .back-to-top-button{right:max(15px,env(safe-area-inset-right));bottom:calc(max(9px,env(safe-area-inset-bottom)) + 72px)}
   .weight-highlight,.current-plan{align-items:flex-start}
   .progress-summary{min-width:105px}
   .progress-summary>span{width:105px}
@@ -599,4 +604,4 @@ input:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--f
 }
 
 
-@media(prefers-reduced-motion:reduce){html,body,.panel-card,.weight-highlight,.empty-card,.current-plan,.today-overview,.main-nav,.pet-chip,.meal-accordion,.auth-card{transition:none}}
+@media(prefers-reduced-motion:reduce){html,body,.panel-card,.weight-highlight,.empty-card,.current-plan,.today-overview,.main-nav,.pet-chip,.meal-accordion,.auth-card{transition:none}.back-to-top-button{animation:none}}

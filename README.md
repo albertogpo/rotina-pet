@@ -13,7 +13,7 @@ Ele nasceu para resolver uma necessidade prática: saber, em um único lugar, **
 
 
 
-> **Estado do projeto:** versão de testes `v0.7.5`.
+> **Estado do projeto:** versão de testes `v0.7.6`.
 
 
 
@@ -64,6 +64,27 @@ Ele nasceu para resolver uma necessidade prática: saber, em um único lugar, **
 
 
 
+
+## Destaques da v0.7.6
+
+### Registro de refeições sem recarregar a tela
+
+- concluir, alterar ou desfazer uma refeição não substitui mais a tela **Hoje** por um carregamento global;
+- a ocorrência é atualizada imediatamente na interface e reconciliada silenciosamente com o servidor;
+- ao fechar o card após o registro, o grupo do horário permanece na mesma posição visual, evitando que a página salte para o topo ou para outro trecho;
+- o comportamento de deep link e destaque temporário de horários continua preservado.
+
+### Voltar ao topo
+
+- um botão flutuante discreto aparece somente após uma rolagem longa;
+- o botão respeita a preferência de movimento reduzido;
+- no celular, sua posição considera a barra de navegação inferior e as áreas seguras do aparelho.
+
+### Escopo
+
+- nenhuma migration SQL;
+- nenhuma alteração na Edge Function, no Cron ou nas regras de notificações;
+- rodapé e metadados do pacote atualizados para `v0.7.6`.
 
 ## Destaques da v0.7.5
 

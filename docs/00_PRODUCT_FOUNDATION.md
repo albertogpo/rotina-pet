@@ -542,6 +542,10 @@ As refeições de um mesmo horário aparecem como linhas compactas em acordeão:
 
 Ao expandir, são exibidos alimentos, quantidades e ações de registro. Apenas uma refeição fica aberta por vez dentro de cada horário. Após registrar uma ação, o card se fecha automaticamente.
 
+O registro de uma refeição não deve desmontar a tela **Hoje**, exibir um carregamento global ou devolver o tutor ao topo. A interface deve atualizar o estado imediatamente, sincronizar os dados em segundo plano e preservar a posição visual do grupo de horário quando o card for recolhido.
+
+Quando a página tiver conteúdo longo, pode existir um controle flutuante discreto para voltar ao topo. Ele só deve aparecer depois de uma rolagem relevante e não pode cobrir ações, a navegação inferior ou as áreas seguras do aparelho.
+
 ---
 
 ## 💡 Navegação diária com menor deslocamento do ponteiro

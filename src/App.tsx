@@ -201,9 +201,10 @@ function App(){
   useEffect(()=>{void loadSelectedPetData();},[loadSelectedPetData]);
 
 
-  const loadDisplayedMeals=useCallback(async()=>{
+  const loadDisplayedMeals=useCallback(async(options?:{silent?:boolean})=>{
     if(!session||!pets.length||!preferencesReady){setMeals([]);return;}
-    setLoadingToday(true);
+    const silent=options?.silent??false;
+    if(!silent)setLoadingToday(true);
     setError("");
     try{
       const result=await api.ensureMealsForDate(displayDate);
@@ -211,7 +212,7 @@ function App(){
     }catch(e){
       setError(e instanceof Error?e.message:`Erro ao carregar as refeições de ${displayDate}.`);
     }finally{
-      setLoadingToday(false);
+      if(!silent)setLoadingToday(false);
     }
   },[session,pets,displayDate,preferencesReady,timezone]);
 
@@ -423,10 +424,19 @@ function App(){
   async function setMealOutcome(meal:MealOccurrence,outcome:MealOutcome){
     setError("");
     try{
+      const completedAt=new Date().toISOString();
       if(outcome==="pending")await api.setMealOutcome(meal.id,"pending",null);
       else if(outcome==="not_served")await api.setMealOutcome(meal.id,"skipped",null);
       else await api.setMealOutcome(meal.id,"completed",outcome);
-      await Promise.all([loadDisplayedMeals(),loadPreviousDayPending()]);
+
+      setMeals(current=>current.map(item=>{
+        if(item.id!==meal.id)return item;
+        if(outcome==="pending")return{...item,status:"pending",consumption_level:null,completed_at:null};
+        if(outcome==="not_served")return{...item,status:"skipped",consumption_level:null,completed_at:null};
+        return{...item,status:"completed",consumption_level:outcome,completed_at:completedAt};
+      }));
+
+      await Promise.all([loadDisplayedMeals({silent:true}),loadPreviousDayPending()]);
     }catch(e){
       setError(e instanceof Error?e.message:"Não foi possível registrar a refeição.");
       throw e;
@@ -595,7 +605,7 @@ function App(){
     </div>
 
 
-    <footer><span>Rotina Pet</span><span>•</span><span>v0.7.5</span></footer>
+    <footer><span>Rotina Pet</span><span>•</span><span>v0.7.6</span></footer>
   </main>;
 }
 

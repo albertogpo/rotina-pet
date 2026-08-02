@@ -4,7 +4,7 @@
 > Histórico cronológico de releases.
 
 
-Versão do documento: 1.5
+Versão do documento: 1.6
 
 
 > Atualizar este arquivo a cada release.
@@ -20,6 +20,16 @@ Versão do documento: 1.5
 
 ## Histórico
 
+
+### v0.7.6
+- **Objetivo:** eliminar o recarregamento visual da tela Hoje ao registrar refeições e preservar o contexto de rolagem do tutor.
+- **Experiência:** concluir, alterar ou desfazer uma refeição atualiza a ocorrência sem desmontar a tela; o grupo do horário permanece na mesma posição quando o card se fecha.
+- **Navegação:** adicionado botão flutuante discreto para voltar ao topo, exibido somente após rolagem longa e posicionado acima da navegação inferior no celular.
+- **Implementação:** atualização local imediata seguida de sincronização silenciosa com o servidor; mantidos o deep link, o destaque de horários e o carregamento global nos fluxos que realmente trocam o conteúdo da tela.
+- **Arquivos modificados:** `src/App.tsx`, `src/components/TodayPage.tsx`, `src/styles.css`, `package.json`, `package-lock.json`, `README.md`, `docs/00_PRODUCT_FOUNDATION.md`, `docs/ROTINA_PET_CHANGELOG.md` e `docs/ROTINA_PET_CONTEXTO.md`.
+- **Arquivo criado:** `docs/01_RELEASE_v0.7.6.md`.
+- **Migração SQL:** não necessária.
+- **Status:** implementação e documentação atualizadas no código-fonte; build, deploy e validação visual ainda devem ser confirmados.
 
 ### v0.7.5
 - **Objetivo:** corrigir o aproveitamento horizontal do card Hoje no desktop e personalizar a notificação de boas-vindas do opt-in.
