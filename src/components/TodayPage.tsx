@@ -1,4 +1,4 @@
-﻿import {useEffect,useMemo,useRef,useState} from "react";
+import {useEffect,useMemo,useRef,useState} from "react";
 import type {WheelEvent} from "react";
 import type {MealConsumptionLevel,MealOccurrence,MealOutcome,Pet} from "../types";
 import {formatLocalDateLong,numberPt,timePt,unitLabels} from "../lib/format";
@@ -55,7 +55,7 @@ function statusOf(meal:MealOccurrence):MealVisualState{
     return{label:consumptionLabels[consumption],className:"partial",icon:"check"};
   }
   if(meal.status==="skipped")return{label:"Não foi servida",className:"skipped",icon:"close"};
-  if(late)return{label:"Atrasada",className:"late",icon:"clock"};
+  if(late)return{label:"Pendente",className:"late",icon:"clock"};
   return{label:"Pendente",className:"pending",icon:"pending"};
 }
 
@@ -153,6 +153,8 @@ export function TodayPage({
   },[displayDate,groups,nextPendingTime,selectedPetIds]);
   const registered=filteredMeals.filter(meal=>meal.status!=="pending").length;
   const progress=filteredMeals.length?Math.round(registered/filteredMeals.length*100):0;
+  const allRegistered=filteredMeals.length>0&&registered===filteredMeals.length;
+  const allPetsSelected=selectedPetIds.length===pets.length&&pets.every(pet=>selectedPetIds.includes(pet.id));
   const selectedPets=pets.filter(pet=>selectedPetIds.includes(pet.id));
   const normalizedDate=formatLocalDateLong(displayDate);
 
@@ -339,6 +341,13 @@ export function TodayPage({
       </div>
 
 
+      {isToday&&allRegistered&&<div className="completion-banner" role="status" aria-live="polite">
+        <span className="completion-banner-icon" aria-hidden="true">✓</span>
+        <span><strong>{allPetsSelected?"Tudo registrado por hoje":"Tudo registrado neste filtro"}</strong><small>{allPetsSelected?"As refeições de hoje já têm um registro.":"As refeições dos animais selecionados já têm um registro."}</small></span>
+        <span className="completion-sparkle" aria-hidden="true">✨</span>
+      </div>}
+
+
       <div className="date-navigator" aria-label="Alterar dia exibido">
         <button className="secondary-button compact icon-button date-previous" onClick={onPreviousDay} aria-label="Ver dia anterior">‹</button>
         <div className="date-navigator-summary">
@@ -351,8 +360,8 @@ export function TodayPage({
 
 
       {isToday&&previousDayPendingCount>0&&<button className="previous-day-alert" type="button" onClick={onReviewPreviousDay}>
-        <span className="previous-day-alert-icon" aria-hidden="true">!</span>
-        <span><strong>Ontem ficou {previousDayPendingCount} {previousDayPendingCount===1?"refeição pendente":"refeições pendentes"}</strong><small>Toque para revisar o registro anterior.</small></span>
+        <span className="previous-day-alert-icon" aria-hidden="true">↶</span>
+        <span><strong>{previousDayPendingCount===1?"Há 1 refeição de ontem sem registro":`Há ${previousDayPendingCount} refeições de ontem sem registro`}</strong><small>Você pode revisar quando for conveniente.</small></span>
         <span className="previous-day-alert-action">Revisar</span>
       </button>}
 
@@ -401,7 +410,7 @@ export function TodayPage({
                   <div className="meal-record-summary plain-text-summary">
                     {meal.status==="completed"&&<p><strong>{consumption?consumptionLabels[consumption]:"Comeu tudo"}</strong>{meal.completed_at?` · registrado às ${timePt(meal.completed_at,timezone)}`:""}</p>}
                     {meal.status==="skipped"&&<p><strong>Não foi servida.</strong> A refeição ficou registrada como não oferecida.</p>}
-                    {meal.status==="pending"&&<p>{state.className==="late"?"O horário já passou e ainda não há registro.":"Escolha o que aconteceu quando a refeição for oferecida."}</p>}
+                    {meal.status==="pending"&&<p>{state.className==="late"?"O horário previsto já passou. Você pode registrar quando quiser.":"Escolha o que aconteceu quando a refeição for oferecida."}</p>}
                   </div>
 
 

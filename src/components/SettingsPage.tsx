@@ -3,6 +3,38 @@ import {getPushStatus,hasPushConfig,setPushSubscription} from "../lib/push";
 
 type PushState={configured:boolean;supported:boolean;permission:NotificationPermission;subscribed:boolean};
 
+
+type TimezoneMeta={value:string;region:string;regionLabel:string;subgroup:string;label:string};
+
+const timezoneRegionLabels:Record<string,string>={
+  Africa:"África",
+  America:"Américas",
+  Antarctica:"Antártida",
+  Arctic:"Ártico",
+  Asia:"Ásia",
+  Atlantic:"Atlântico",
+  Australia:"Austrália",
+  Europe:"Europa",
+  Indian:"Índico",
+  Pacific:"Pacífico",
+  UTC:"UTC",
+  Etc:"Outros",
+};
+
+function humanizeTimezonePart(value:string){
+  return value.replace(/_/g," ");
+}
+
+function timezoneMeta(value:string):TimezoneMeta{
+  if(value==="UTC")return{value,region:"UTC",regionLabel:"UTC",subgroup:"",label:"UTC"};
+  const parts=value.split("/");
+  const region=parts[0]||"Etc";
+  const rest=parts.slice(1);
+  const subgroup=rest.length>1?humanizeTimezonePart(rest[0]):"";
+  const label=humanizeTimezonePart(rest.at(-1)??value);
+  return{value,region,regionLabel:timezoneRegionLabels[region]??humanizeTimezonePart(region),subgroup,label};
+}
+
 const initialState:PushState={configured:hasPushConfig(),supported:"Notification" in window,permission:"Notification" in window?Notification.permission:"denied",subscribed:false};
 
 function availableTimeZones(current:string,detected:string){
@@ -39,18 +71,37 @@ export function SettingsPage({
   const[pushLoading,setPushLoading]=useState(false);
   const[pushMessage,setPushMessage]=useState("");
   const[timezoneDraft,setTimezoneDraft]=useState(timezone);
-  const[timezoneQuery,setTimezoneQuery]=useState(timezone);
+  const[timezoneQuery,setTimezoneQuery]=useState("");
   const[timezoneOpen,setTimezoneOpen]=useState(false);
+  const[selectedTimezoneRegion,setSelectedTimezoneRegion]=useState(timezoneMeta(timezone).region);
   const[activeTimezoneIndex,setActiveTimezoneIndex]=useState(0);
   const[timezoneLoading,setTimezoneLoading]=useState(false);
   const[timezoneMessage,setTimezoneMessage]=useState("");
   const timezoneListRef=useRef<HTMLDivElement|null>(null);
   const timezoneInputRef=useRef<HTMLInputElement|null>(null);
   const timezones=useMemo(()=>availableTimeZones(timezone,detectedTimezone),[timezone,detectedTimezone]);
-  const filteredTimezones=useMemo(()=>timezones.filter(item=>matchesTimezone(item,timezoneQuery)),[timezones,timezoneQuery]);
+  const timezoneMetas=useMemo(()=>timezones.map(timezoneMeta),[timezones]);
+  const timezoneRegions=useMemo(()=>{
+    const seen=new Set<string>();
+    return timezoneMetas.filter(item=>{if(seen.has(item.region))return false;seen.add(item.region);return true;}).map(item=>({id:item.region,label:item.regionLabel}));
+  },[timezoneMetas]);
+  const visibleTimezones=useMemo(()=>{
+    if(timezoneQuery.trim())return timezones.filter(item=>matchesTimezone(item,timezoneQuery));
+    return timezoneMetas.filter(item=>item.region===selectedTimezoneRegion).map(item=>item.value);
+  },[timezones,timezoneMetas,timezoneQuery,selectedTimezoneRegion]);
+  const visibleTimezoneGroups=useMemo(()=>{
+    const groups=new Map<string,string[]>();
+    for(const item of visibleTimezones){
+      const meta=timezoneMeta(item);
+      const key=meta.subgroup||"Cidades e regiões";
+      groups.set(key,[...(groups.get(key)??[]),item]);
+    }
+    return [...groups.entries()];
+  },[visibleTimezones]);
+  const visibleTimezoneIndex=useMemo(()=>new Map(visibleTimezones.map((item,index)=>[item,index])),[visibleTimezones]);
 
-  useEffect(()=>{setTimezoneDraft(timezone);setTimezoneQuery(timezone);},[timezone]);
-  useEffect(()=>{setActiveTimezoneIndex(0);},[timezoneQuery]);
+  useEffect(()=>{setTimezoneDraft(timezone);setTimezoneQuery("");setSelectedTimezoneRegion(timezoneMeta(timezone).region);},[timezone]);
+  useEffect(()=>{setActiveTimezoneIndex(0);},[timezoneQuery,selectedTimezoneRegion]);
   useEffect(()=>{
     timezoneListRef.current?.querySelector<HTMLElement>(`[data-timezone-index="${activeTimezoneIndex}"]`)?.scrollIntoView({block:"nearest"});
   },[activeTimezoneIndex]);
@@ -94,13 +145,20 @@ export function SettingsPage({
 
   function selectTimezone(value:string){
     setTimezoneDraft(value);
-    setTimezoneQuery(value);
+    setTimezoneQuery("");
+    setSelectedTimezoneRegion(timezoneMeta(value).region);
     setTimezoneOpen(false);
     setTimezoneMessage("");
   }
 
+  function openTimezoneBrowser(){
+    setTimezoneOpen(true);
+    setTimezoneQuery("");
+    setSelectedTimezoneRegion(timezoneMeta(timezoneDraft).region);
+    setActiveTimezoneIndex(0);
+  }
+
   function clearTimezoneField(){
-    setTimezoneDraft("");
     setTimezoneQuery("");
     setTimezoneOpen(true);
     setActiveTimezoneIndex(0);
@@ -112,17 +170,17 @@ export function SettingsPage({
     if(event.key==="ArrowDown"){
       event.preventDefault();
       setTimezoneOpen(true);
-      setActiveTimezoneIndex(current=>Math.min(current+1,Math.max(0,filteredTimezones.length-1)));
+      setActiveTimezoneIndex(current=>Math.min(current+1,Math.max(0,visibleTimezones.length-1)));
     }else if(event.key==="ArrowUp"){
       event.preventDefault();
       setTimezoneOpen(true);
       setActiveTimezoneIndex(current=>Math.max(0,current-1));
-    }else if(event.key==="Enter"&&timezoneOpen&&filteredTimezones.length){
+    }else if(event.key==="Enter"&&timezoneOpen&&visibleTimezones.length){
       event.preventDefault();
-      selectTimezone(filteredTimezones[activeTimezoneIndex]??filteredTimezones[0]);
+      selectTimezone(visibleTimezones[activeTimezoneIndex]??visibleTimezones[0]);
     }else if(event.key==="Escape"){
       setTimezoneOpen(false);
-      setTimezoneQuery(timezoneDraft);
+      setTimezoneQuery("");
     }
   }
 
@@ -162,7 +220,7 @@ export function SettingsPage({
       <h2>Fuso horário</h2>
       <p className="muted readable">Os horários do plano seguem o fuso configurado na conta. Viajar com o celular não altera silenciosamente a rotina dos animais.</p>
       <label className="field-label" htmlFor="routine-timezone">Fuso da rotina</label>
-      <div className={`timezone-combobox ${timezoneOpen?"is-open":""}`} onBlur={event=>{if(!event.currentTarget.contains(event.relatedTarget as Node|null)){setTimezoneOpen(false);setTimezoneQuery(timezoneDraft);}}}>
+      <div className={`timezone-combobox ${timezoneOpen?"is-open":""}`} onBlur={event=>{if(!event.currentTarget.contains(event.relatedTarget as Node|null)){setTimezoneOpen(false);setTimezoneQuery("");}}}>
         <input
           ref={timezoneInputRef}
           id="routine-timezone"
@@ -170,30 +228,48 @@ export function SettingsPage({
           aria-autocomplete="list"
           aria-expanded={timezoneOpen}
           aria-controls="routine-timezone-options"
-          aria-activedescendant={timezoneOpen&&filteredTimezones.length?`timezone-option-${activeTimezoneIndex}`:undefined}
-          value={timezoneQuery}
-          onFocus={()=>setTimezoneOpen(true)}
-          onClick={()=>setTimezoneOpen(true)}
-          onChange={event=>{setTimezoneQuery(event.target.value);setTimezoneDraft(event.target.value);setTimezoneOpen(true);setTimezoneMessage("");}}
+          aria-activedescendant={timezoneOpen&&visibleTimezones.length?`timezone-option-${activeTimezoneIndex}`:undefined}
+          value={timezoneOpen?timezoneQuery:timezoneDraft}
+          onFocus={openTimezoneBrowser}
+          onClick={()=>{if(!timezoneOpen)openTimezoneBrowser();}}
+          onChange={event=>{setTimezoneQuery(event.target.value);setTimezoneOpen(true);setTimezoneMessage("");}}
           onKeyDown={handleTimezoneKeyDown}
           placeholder="Busque por cidade ou região"
           autoComplete="off"
         />
-        {timezoneQuery&&<button className="timezone-combobox-clear" type="button" aria-label="Limpar campo de fuso" title="Limpar campo" onMouseDown={event=>event.preventDefault()} onClick={clearTimezoneField}>×</button>}
-        <button className="timezone-combobox-toggle" type="button" tabIndex={-1} aria-label={timezoneOpen?"Fechar lista de fusos":"Abrir lista de fusos"} onMouseDown={event=>event.preventDefault()} onClick={()=>setTimezoneOpen(current=>!current)}>⌄</button>
+        {timezoneOpen&&timezoneQuery&&<button className="timezone-combobox-clear" type="button" aria-label="Limpar busca de fuso" title="Limpar busca" onMouseDown={event=>event.preventDefault()} onClick={clearTimezoneField}>×</button>}
+        <button className="timezone-combobox-toggle" type="button" tabIndex={-1} aria-label={timezoneOpen?"Fechar lista de fusos":"Abrir lista de fusos"} onMouseDown={event=>event.preventDefault()} onClick={()=>{if(timezoneOpen){setTimezoneOpen(false);setTimezoneQuery("");}else{openTimezoneBrowser();}}}>⌄</button>
         {timezoneOpen&&<div className="timezone-options" id="routine-timezone-options" role="listbox" ref={timezoneListRef}>
-          {filteredTimezones.length?filteredTimezones.map((item,index)=><button
-            type="button"
-            role="option"
-            id={`timezone-option-${index}`}
-            data-timezone-index={index}
-            aria-selected={item===timezoneDraft}
-            className={`${index===activeTimezoneIndex?"is-active":""} ${item===timezoneDraft?"is-selected":""}`}
-            key={item}
-            onMouseDown={event=>event.preventDefault()}
-            onMouseEnter={()=>setActiveTimezoneIndex(index)}
-            onClick={()=>selectTimezone(item)}
-          ><span>{item}</span><small>{item===timezone?"Fuso atual":item===detectedTimezone?"Neste aparelho":""}</small></button>):<p className="timezone-empty">Nenhum fuso encontrado.</p>}
+          <div className="timezone-browser-head">
+            <span className="timezone-browser-label">Região</span>
+            <div className="timezone-region-pills" aria-label="Filtrar fusos por região">
+              {timezoneRegions.map(region=><button key={region.id} type="button" className={selectedTimezoneRegion===region.id&&!timezoneQuery?"is-selected":""} onMouseDown={event=>event.preventDefault()} onClick={()=>{setSelectedTimezoneRegion(region.id);setTimezoneQuery("");setActiveTimezoneIndex(0);}}>{region.label}</button>)}
+            </div>
+          </div>
+          {visibleTimezones.length?<div className="timezone-groups">
+            {visibleTimezoneGroups.map(([group,items])=><section className="timezone-group" key={group}>
+              {!timezoneQuery&&<p>{group}</p>}
+              <div className="timezone-zone-pills">
+                {items.map(item=>{
+                  const index=visibleTimezoneIndex.get(item)??0;
+                  const meta=timezoneMeta(item);
+                  return <button
+                    type="button"
+                    role="option"
+                    id={`timezone-option-${index}`}
+                    data-timezone-index={index}
+                    aria-selected={item===timezoneDraft}
+                    className={`${index===activeTimezoneIndex?"is-active":""} ${item===timezoneDraft?"is-selected":""}`}
+                    key={item}
+                    title={item}
+                    onMouseDown={event=>event.preventDefault()}
+                    onMouseEnter={()=>setActiveTimezoneIndex(index)}
+                    onClick={()=>selectTimezone(item)}
+                  ><span>{timezoneQuery?item:meta.label}</span>{(item===timezone||item===detectedTimezone)&&<small>{item===timezone?"Atual":"Neste aparelho"}</small>}</button>;
+                })}
+              </div>
+            </section>)}
+          </div>:<p className="timezone-empty">Nenhum fuso encontrado.</p>}
         </div>}
       </div>
       <p className="muted timezone-detected">Fuso detectado neste aparelho: <strong>{detectedTimezone}</strong></p>

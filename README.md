@@ -13,7 +13,7 @@ Ele nasceu para resolver uma necessidade prática: saber, em um único lugar, **
 
 
 
-> **Estado do projeto:** versão de testes `v0.7.6`.
+> **Estado do projeto:** versão de testes `v0.7.7`.
 
 
 
@@ -64,6 +64,37 @@ Ele nasceu para resolver uma necessidade prática: saber, em um único lugar, **
 
 
 
+
+## Destaques da v0.7.7
+
+### Correções de interface no mobile
+
+- corrigida uma chave ausente em `styles.css` que fazia o navegador ignorar regras posteriores e afetava simultaneamente o alert sheet, o rodapé, a navegação mobile e o seletor de fuso;
+- a confirmação de registro antecipado volta a abrir como sheet/modal com backdrop, em vez de aparecer encavalada com o conteúdo;
+- a navegação principal permanece no topo no desktop e volta a ficar fixa na parte inferior no mobile;
+- no mobile, a barra de navegação recebeu largura ligeiramente maior que a coluna principal para reforçar sua função estrutural sem ocupar toda a tela;
+- o rodapé ficou menor, centralizado e com mais respiro em relação ao conteúdo e à navegação inferior.
+
+### Progresso diário com linguagem mais leve
+
+- quando todas as refeições visíveis estão registradas, a tela Hoje exibe uma mensagem positiva e discreta: **“Tudo registrado por hoje ✨”**;
+- quando há filtro por animal, a mensagem passa a indicar **“Tudo registrado neste filtro”**, evitando sugerir incorretamente que toda a rotina do dia foi concluída;
+- refeições pendentes cujo horário já passou deixam de usar o rótulo mais carregado **“Atrasada”** e passam a permanecer como **“Pendente”**, com texto apenas informativo.
+
+### Seletor de fuso horário
+
+- o dropdown ganhou altura máxima e scroll interno;
+- os fusos foram organizados visualmente por grandes regiões IANA, como Américas, Europa, Ásia e África;
+- regiões e fusos usam pílulas para manter consistência com a linguagem visual do aplicativo;
+- a busca continua pesquisando todos os fusos disponíveis;
+- subgrupos são aproveitados quando o próprio identificador IANA fornece um nível intermediário.
+
+### Escopo
+
+- nenhuma migration SQL;
+- nenhuma alteração na Edge Function, no Cron ou nas regras de push;
+- arquivos principais atualizados: `App.tsx`, `TodayPage.tsx`, `SettingsPage.tsx` e `styles.css`;
+- documentação atualizada para `v0.7.7`.
 
 ## Destaques da v0.7.6
 
