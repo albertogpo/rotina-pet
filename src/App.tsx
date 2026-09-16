@@ -15,9 +15,12 @@ import {PetsPage} from "./components/PetsPage";
 import {SettingsPage} from "./components/SettingsPage";
 import {PetForm} from "./components/PetForm";
 import {AppIcon,type AppIconName} from "./components/AppIcon";
+import {ProfessionalAreaPage} from "./components/ProfessionalAreaPage";
+import {ProfessionalInvitationPage} from "./components/ProfessionalInvitationPage";
+import {buildProfessionalInvitationUrl,clearProfessionalInvitationFromUrl,readProfessionalInvitationIntent,readProfessionalInvitationToken,setProfessionalInvitationIntentInUrl} from "./lib/professionalInvite";
 
 
-type Tab="today"|"weight"|"foods"|"plan"|"pets"|"settings";
+type Tab="today"|"weight"|"foods"|"plan"|"pets"|"settings"|"professional";
 type MealDeepLink={date:string;time:string};
 type BrandTheme="clinical"|"editorial";
 
@@ -61,7 +64,11 @@ function clearMealDeepLinkFromUrl(){
 function App(){
   const detectedTimezone=useMemo(()=>detectTimeZone(),[]);
   const initialDeepLink=useRef<MealDeepLink|null>(readMealDeepLink());
+  const initialProfessionalInviteToken=useRef<string|null>(readProfessionalInvitationToken());
+  const initialProfessionalInviteIntent=useRef(readProfessionalInvitationIntent());
   const[session,setSession]=useState<Session|null>(null);
+  const[professionalInviteToken,setProfessionalInviteToken]=useState<string|null>(initialProfessionalInviteToken.current);
+  const[professionalInviteIntent,setProfessionalInviteIntent]=useState(initialProfessionalInviteIntent.current);
   const[authLoading,setAuthLoading]=useState(true);
   const[preferencesReady,setPreferencesReady]=useState(false);
   const[timezone,setTimezone]=useState(detectedTimezone);
@@ -324,6 +331,8 @@ function App(){
     const handleNavigation=()=>{
       const next=readMealDeepLink();
       if(next)setDeepLinkTarget(next);
+      setProfessionalInviteToken(readProfessionalInvitationToken());
+      setProfessionalInviteIntent(readProfessionalInvitationIntent());
     };
     window.addEventListener("popstate",handleNavigation);
     return()=>window.removeEventListener("popstate",handleNavigation);
@@ -457,6 +466,17 @@ function App(){
   }
 
 
+  async function finishProfessionalInvite(){
+    clearProfessionalInvitationFromUrl();
+    initialProfessionalInviteToken.current=null;
+    initialProfessionalInviteIntent.current=false;
+    setProfessionalInviteToken(null);
+    setProfessionalInviteIntent(false);
+    setTab("today");
+    await loadBase();
+  }
+
+
   const handleDeepLinkFocus=useCallback(()=>{
     clearMealDeepLinkFromUrl();
     initialDeepLink.current=null;
@@ -519,6 +539,29 @@ function App(){
 
   if(!hasSupabaseConfig)return <SetupScreen/>;
   if(authLoading)return <main className="center-page"><div className="spinner large"/></main>;
+
+  if(professionalInviteToken&&!session&&professionalInviteIntent)return <AuthScreen
+    context="professional-invite"
+    returnUrl={buildProfessionalInvitationUrl(professionalInviteToken,true)}
+  />;
+
+  if(professionalInviteToken){
+    return <ProfessionalInvitationPage
+      token={professionalInviteToken}
+      pets={session?pets:[]}
+      loadingPets={session?loadingBase:false}
+      isAuthenticated={Boolean(session)}
+      acceptedIntent={professionalInviteIntent}
+      onAcceptIntent={()=>{
+        initialProfessionalInviteIntent.current=true;
+        setProfessionalInvitationIntentInUrl(true);
+        setProfessionalInviteIntent(true);
+      }}
+      onFinish={finishProfessionalInvite}
+      onSwitchAccount={handleSignOut}
+    />;
+  }
+
   if(!session)return <AuthScreen/>;
 
 
@@ -526,8 +569,8 @@ function App(){
   const authenticatedUser=authenticatedSession.user;
 
 
-  if(!pets.length&&!archivedPets.length&&!loadingBase){
-    return <main className="center-page"><section className="auth-card"><div className="brand-mark">🐾</div><p className="eyebrow">Primeiro passo</p><h1>Cadastre seu primeiro animal</h1><p className="muted">Depois você poderá adicionar os demais perfis.</p><PetForm onSave={createPet} busy={onboardingBusy}/>{error&&<div className="error-box error-with-action"><span>{error}</span><button className="secondary-button compact" onClick={()=>void retryAllData()}>Tentar novamente</button></div>}</section></main>;
+  if(!pets.length&&!archivedPets.length&&!loadingBase&&tab!=="professional"){
+    return <main className="center-page"><section className="auth-card"><div className="brand-mark">🐾</div><p className="eyebrow">Primeiro passo</p><h1>Cadastre seu primeiro animal</h1><p className="muted">Depois você poderá adicionar os demais perfis.</p><PetForm onSave={createPet} busy={onboardingBusy}/>{error&&<div className="error-box error-with-action"><span>{error}</span><button className="secondary-button compact" onClick={()=>void retryAllData()}>Tentar novamente</button></div>}<div className="professional-onboarding-entry"><span>Você usa o Rotina Pet para atender?</span><button className="link-button" type="button" onClick={()=>setTab("professional")}>Abrir área profissional</button></div></section></main>;
   }
 
 
@@ -558,7 +601,7 @@ function App(){
     </header>
 
 
-    {tab!=="settings"&&<section className="pet-switcher" aria-label={isTodayTab?"Filtrar refeições por animal":"Selecionar animal"}>
+    {tab!=="settings"&&tab!=="professional"&&<section className="pet-switcher" aria-label={isTodayTab?"Filtrar refeições por animal":"Selecionar animal"}>
       {pets.map(item=>{
         const active=isTodayTab?todayPetIds.includes(item.id):pet?.id===item.id;
         return <button key={item.id} className={`pet-chip ${active?"active":""}`} aria-pressed={active} onClick={()=>isTodayTab?toggleTodayPetFilter(item.id):setSelectedPetId(item.id)}><span className="pet-chip-icon">{item.icon}</span><span>{item.name}</span></button>;
@@ -601,7 +644,8 @@ function App(){
       {tab==="foods"&&<FoodsPage foods={foods} onCreate={createFood} onUpdate={updateFood} onArchive={archiveFood}/>} 
       {tab==="plan"&&(pet?<PlanPage pet={pet} foods={foods} activePlan={activePlan} onSave={savePlan} onUpdateSchedule={updatePlanSchedule} onCreateFood={createFood} today={today}/>:<section className="empty-card"><h2>Nenhum animal ativo</h2><p>Cadastre ou restaure um animal antes de criar um plano.</p><button className="primary-button" onClick={()=>setTab("pets")}>Abrir animais</button></section>)}
       {tab==="pets"&&<PetsPage pets={pets} archivedPets={archivedPets} onCreate={createPet} onUpdate={updatePet} onArchive={archivePet} onRestore={restorePet} autoStartCreate={autoCreatePet} onAutoStartHandled={()=>setAutoCreatePet(false)}/>} 
-      {tab==="settings"&&<SettingsPage email={authenticatedUser.email??"Conta"} onSignOut={handleSignOut} userId={authenticatedUser.id} timezone={timezone} detectedTimezone={detectedTimezone} onTimezoneChange={updateTimezone}/>} 
+      {tab==="settings"&&<SettingsPage email={authenticatedUser.email??"Conta"} onSignOut={handleSignOut} userId={authenticatedUser.id} timezone={timezone} detectedTimezone={detectedTimezone} onTimezoneChange={updateTimezone} onOpenProfessional={()=>setTab("professional")}/>} 
+      {tab==="professional"&&<ProfessionalAreaPage/>}
     </div>
 
 

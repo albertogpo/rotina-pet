@@ -59,6 +59,7 @@ export function SettingsPage({
   timezone,
   detectedTimezone,
   onTimezoneChange,
+  onOpenProfessional,
 }:{
   email:string;
   onSignOut:()=>Promise<void>;
@@ -66,6 +67,7 @@ export function SettingsPage({
   timezone:string;
   detectedTimezone:string;
   onTimezoneChange:(timezone:string)=>Promise<void>;
+  onOpenProfessional:()=>void;
 }){
   const[pushState,setPushState]=useState<PushState>(initialState);
   const[pushLoading,setPushLoading]=useState(false);
@@ -214,6 +216,15 @@ export function SettingsPage({
 
   return <section className="page-grid">
     <article className="panel-card"><p className="eyebrow">Conta</p><h2>{email}</h2><button className="secondary-button" onClick={onSignOut}>Sair</button></article>
+
+    <article className="panel-card professional-settings-entry">
+      <div>
+        <p className="eyebrow">Para veterinários</p>
+        <h2>Área profissional</h2>
+        <p className="muted readable">Cadastre pacientes e gere convites sem alterar sua experiência como tutor.</p>
+      </div>
+      <button className="secondary-button" type="button" onClick={onOpenProfessional}>Abrir área profissional</button>
+    </article>
 
     <article className="panel-card">
       <p className="eyebrow">Rotina</p>

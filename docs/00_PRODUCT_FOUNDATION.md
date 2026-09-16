@@ -875,3 +875,222 @@ A discussão desta hipótese não aprova a implementação de:
 - Como manter a tela Hoje calma quando várias categorias estiverem ativas?
 - A nutrição deve permanecer como produto principal, plano específico ou primeira vertical de uma plataforma mais ampla?
 
+
+---
+
+# 16. Professional Pilot — Veterinário + Tutor
+
+## ✅ Objetivo do piloto
+
+Validar o Rotina Pet como ferramenta de trabalho para nutrição veterinária, conectando em um único fluxo:
+
+- prescrição nutricional;
+- documento entregue ao cliente;
+- organização da rotina pelo tutor;
+- registro cotidiano;
+- consolidação de ingestão;
+- acompanhamento entre consultas;
+- atualização do tratamento.
+
+O piloto deve preservar integralmente o uso Tutor Solo e permitir que um mesmo tutor possua, no mesmo aplicativo, pets acompanhados profissionalmente e pets com planos pessoais.
+
+## ✅ Prescrição profissional ≠ rotina
+
+A prescrição profissional é uma entidade clínica própria e não deve ser confundida com o `diet_plan` operacional usado hoje pelo tutor.
+
+- o veterinário controla alimentos, quantidades diárias, objetivos, orientações, opções de composição e revisão sugerida;
+- o tutor controla horários, número de refeições e organização da execução;
+- uma rotina pode ser gerada a partir de uma versão/opção da prescrição;
+- mudanças de prescrição preservam histórico e autoria.
+
+## ✅ Paciente e vínculo profissional
+
+O pet pertence ao tutor. O vínculo com o veterinário é uma relação separada.
+
+O veterinário pode iniciar o cadastro de um paciente antes de o tutor aceitar o convite. Após o aceite, o caso profissional deve ser vinculado ao cadastro real do pet do tutor.
+
+O vínculo profissional não concede acesso geral à conta do tutor: o profissional acessa apenas os dados dos pets vinculados e somente enquanto o relacionamento estiver ativo.
+
+## ✅ Peso no cadastro profissional
+
+Ao cadastrar um paciente, o veterinário pode informar peso opcionalmente.
+
+Esse peso pode ter origem em:
+
+- pesagem feita em consulta presencial;
+- informação fornecida pelo tutor durante consulta online.
+
+Quando o pet já estiver vinculado, o valor deve gerar um registro normal no histórico de peso, preservando data e autoria. Quando o vínculo ainda estiver pendente, o peso pode permanecer como dado inicial do caso e ser materializado no histórico após a vinculação.
+
+## ✅ Versionamento da prescrição
+
+Alterações clínicas relevantes não sobrescrevem silenciosamente o tratamento anterior.
+
+Cada nova prescrição ou ajuste relevante gera uma versão, com:
+
+- autor;
+- data de criação;
+- início de vigência;
+- revisão sugerida opcional;
+- nota da alteração opcional.
+
+O histórico precisa permitir reconstruir qual prescrição estava vigente em cada período.
+
+## ✅ Revisão sugerida
+
+Planos profissionais podem possuir uma data de **revisão sugerida**.
+
+Atingir essa data não encerra nem invalida automaticamente o plano. O objetivo é apoiar o acompanhamento profissional e a priorização de retornos.
+
+## ✅ Múltiplas opções de composição
+
+Uma mesma versão da prescrição pode oferecer mais de uma composição válida, como:
+
+- 70/30;
+- 80/20;
+- 90/10.
+
+Essas proporções representam participação calórica entre alimentos quando assim definidas pelo profissional.
+
+Cada opção pode conter:
+
+- os alimentos utilizados;
+- as quantidades diárias de cada alimento;
+- a participação calórica de cada item;
+- kcal/dia por item quando disponível;
+- instruções específicas.
+
+A rotina do tutor utiliza uma opção ativa por vez. Trocar entre opções autorizadas não altera a prescrição e deve preservar a data de início da nova configuração.
+
+## ✅ Meta calórica
+
+Uma versão da prescrição pode possuir meta energética diária opcional em kcal.
+
+Quando houver meta energética e proporções calóricas, o sistema pode calcular a parcela de kcal correspondente a cada alimento. A conversão automática para gramas só deve ocorrer quando existir informação confiável de densidade energética do alimento.
+
+No MVP, a gramatura prescrita pode continuar sendo informada diretamente pelo veterinário.
+
+## ✅ Registro de consumo aproximado
+
+A experiência do tutor permanece simples e não exige pesagem de sobras.
+
+Escala inicial aprovada:
+
+- Comeu tudo = 100%;
+- Quase tudo = estimativa central de 80%, faixa conceitual 70–90%;
+- Metade = 50%, faixa 40–60%;
+- Pouco = 20%, faixa 10–30%;
+- Nada = 0%;
+- Não foi servida = 0%;
+- Sem registro = ingestão desconhecida.
+
+`Nada` e `Não foi servida` têm o mesmo efeito quantitativo sobre ingestão, mas permanecem semanticamente distintos:
+
+- `Nada`: alimento oferecido e recusado;
+- `Não foi servida`: alimento não oferecido.
+
+`Sem registro` nunca deve ser convertido automaticamente em zero.
+
+A estimativa utilizada em cada ocorrência deve ser persistida para que mudanças futuras na escala não alterem retrospectivamente os dados históricos.
+
+## ✅ Consolidado diário de ingestão
+
+O consolidado diário é uma informação prioritária para o profissional e deve apresentar principalmente a **porcentagem estimada ingerida em relação ao total diário prescrito**.
+
+Também deve apresentar a quantidade estimada na unidade prescrita quando aplicável, por exemplo:
+
+> ≈50% • ≈20 g de 40 g
+
+O percentual continua sendo exibido mesmo quando existem refeições sem registro.
+
+Exemplo:
+
+- prescrito: 40 g/dia;
+- 20 g registrados como consumidos;
+- 20 g sem registro.
+
+O produto deve mostrar:
+
+> **≈50% do total diário prescrito • ≈20 g de 40 g • 1 refeição sem registro**
+
+A ausência de registro não entra no numerador como ingestão e também não é tratada como zero conhecido. O dado deve ser sinalizado como parcial/incompleto, sem ocultar a porcentagem já confirmada ou estimada.
+
+Quando houver múltiplos alimentos/unidades, o consolidado deve preservar os valores por alimento. Uma porcentagem geral só deve ser apresentada quando sua interpretação for válida e não produzir falsa precisão.
+
+## ✅ Observações e incidentes
+
+Devem coexistir:
+
+### Observação por refeição
+
+Nota livre opcional vinculada à ocorrência específica.
+
+### Registro diário
+
+Nota livre opcional por pet/data.
+
+### Incidentes estruturados
+
+Lista de múltipla escolha para eventos recorrentes, inicialmente incluindo:
+
+- vômito;
+- regurgitação;
+- diarreia;
+- fezes amolecidas;
+- constipação;
+- falta de apetite;
+- outro.
+
+Os incidentes devem ser armazenados de forma estruturada para permitir contagens e análise por período, sem depender da interpretação de texto livre.
+
+## ✅ Documento/PDF do plano
+
+O plano criado no Rotina Pet deve poder gerar o documento profissional entregue ao tutor, evitando duplicação de trabalho pelo veterinário.
+
+O PDF deve suportar:
+
+- identificação do profissional;
+- CRMV/UF;
+- títulos/qualificações;
+- clínica/consultório;
+- logo opcional;
+- tutor;
+- paciente;
+- espécie, raça e peso quando disponíveis;
+- objetivo;
+- meta energética opcional;
+- alimentos e quantidades;
+- opções de composição;
+- orientações;
+- seções personalizadas;
+- data da prescrição;
+- revisão sugerida.
+
+O cabeçalho profissional deve ser configurado uma vez no perfil e reutilizado.
+
+A linguagem visual do documento deve derivar da identidade do Rotina Pet, combinando a clareza clínica do território **Clínica Serena** com o acolhimento do território **Editorial Acolhedora**. O MVP não inclui editor visual livre.
+
+## ✅ Compatibilidade do piloto
+
+O Professional Pilot deve ser construído de forma aditiva e retrocompatível.
+
+- a versão estável atual permanece funcional;
+- tabelas existentes não devem ser renomeadas ou removidas para viabilizar o piloto;
+- pets solo continuam funcionando como hoje;
+- dados do tutor devem ser reutilizados sempre que seguro, evitando duas bases independentes;
+- a interface do piloto pode ser publicada em rota ou implantação separada;
+- novas permissões profissionais devem conceder somente o acesso estritamente necessário ao pet vinculado.
+
+## 🚫 Fora do escopo do Professional Pilot
+
+- prontuário veterinário completo;
+- agenda de consultas;
+- faturamento;
+- estoque;
+- CRM completo;
+- chat integral;
+- telemedicina;
+- exames e receitas clínicas gerais;
+- equipes e múltiplas unidades complexas;
+- white label completo.
+

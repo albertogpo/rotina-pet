@@ -3,12 +3,20 @@ import {supabase} from "../lib/supabase";
 import type {Food,FoodUnit,MealConsumptionLevel,MealOccurrence,Pet,PlanFoodInput,Species,UserPreferences,WeightEntry} from "../types";
 
 function client(){if(!supabase)throw new Error("Supabase ainda não configurado.");return supabase;}
-function appRedirectUrl(){return new URL(import.meta.env.BASE_URL,window.location.href).toString();}
+function appRedirectUrl(returnUrl?:string){
+  if(returnUrl){
+    const url=new URL(returnUrl,window.location.href);
+    const appUrl=new URL(import.meta.env.BASE_URL,window.location.href);
+    if(url.origin!==window.location.origin||!url.pathname.startsWith(appUrl.pathname))throw new Error("Destino de autenticação inválido.");
+    return url.toString();
+  }
+  return new URL(import.meta.env.BASE_URL,window.location.href).toString();
+}
 
 export async function getSession():Promise<Session|null>{const{data,error}=await client().auth.getSession();if(error)throw error;return data.session;}
 export async function signIn(email:string,password:string){const{error}=await client().auth.signInWithPassword({email,password});if(error)throw error;}
-export async function signUp(email:string,password:string){const{data,error}=await client().auth.signUp({email,password,options:{emailRedirectTo:appRedirectUrl()}});if(error)throw error;return data;}
-export async function sendPasswordReset(email:string){const{error}=await client().auth.resetPasswordForEmail(email,{redirectTo:appRedirectUrl()});if(error)throw error;}
+export async function signUp(email:string,password:string,returnUrl?:string){const{data,error}=await client().auth.signUp({email,password,options:{emailRedirectTo:appRedirectUrl(returnUrl)}});if(error)throw error;return data;}
+export async function sendPasswordReset(email:string,returnUrl?:string){const{error}=await client().auth.resetPasswordForEmail(email,{redirectTo:appRedirectUrl(returnUrl)});if(error)throw error;}
 export async function signOut(){const{error}=await client().auth.signOut();if(error)throw error;}
 
 export async function ensureUserPreferences(detectedTimezone:string):Promise<UserPreferences>{const{data,error}=await client().rpc("ensure_user_preferences",{p_timezone:detectedTimezone});if(error)throw error;return data as UserPreferences;}
@@ -22,7 +30,7 @@ export async function archivePet(id:string){const{error}=await client().from("pe
 export async function restorePet(id:string){const{error}=await client().from("pets").update({active:true}).eq("id",id);if(error)throw error;}
 
 export async function listWeights(petId:string):Promise<WeightEntry[]>{const{data,error}=await client().from("weight_entries").select("*").eq("pet_id",petId).order("recorded_at",{ascending:false});if(error)throw error;return data as WeightEntry[];}
-export async function addWeight(userId:string,petId:string,recordedAt:string,weightKg:number,notes:string){const{data,error}=await client().from("weight_entries").insert({user_id:userId,pet_id:petId,recorded_at:recordedAt,weight_kg:weightKg,notes:notes.trim()||null}).select().single();if(error)throw error;return data as WeightEntry;}
+export async function addWeight(userId:string,petId:string,recordedAt:string,weightKg:number,notes:string){const{data,error}=await client().from("weight_entries").insert({user_id:userId,pet_id:petId,recorded_at:recordedAt,weight_kg:weightKg,notes:notes.trim()||null,recorded_by:userId,source:"tutor"}).select().single();if(error)throw error;return data as WeightEntry;}
 export async function deleteWeight(id:string){const{error}=await client().from("weight_entries").delete().eq("id",id);if(error)throw error;}
 
 export async function listFoods():Promise<Food[]>{const{data,error}=await client().from("foods").select("*").eq("active",true).order("name");if(error)throw error;return data as Food[];}
