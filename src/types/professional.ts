@@ -1,9 +1,13 @@
-import type { Pet, Species } from "../types";
+﻿import type { Pet, Species } from "../types";
+
 
 export type ProfessionalRole = "tutor" | "veterinarian";
 export type ProfessionalPatientStatus = "draft" | "invited" | "active" | "closed";
-export type ProfessionalInvitationStatus = "pending" | "accepted" | "expired" | "revoked";
+export type ProfessionalInvitationStatus = "pending" | "accepted" | "resolved" | "expired" | "revoked";
 export type ProfessionalRelationshipStatus = "active" | "ended";
+export type ProfessionalPatientClosedReason = "duplicate";
+export type ProfessionalInvitationResolution = "accepted" | "already_active";
+
 
 export type ProfessionalProfile = {
   user_id: string;
@@ -19,6 +23,7 @@ export type ProfessionalProfile = {
   updated_at: string;
 };
 
+
 export type ProfessionalProfileInput = {
   displayName: string;
   crmv?: string | null;
@@ -29,6 +34,7 @@ export type ProfessionalProfileInput = {
   professionalPhone?: string | null;
   logoPath?: string | null;
 };
+
 
 export type ProfessionalPatient = {
   id: string;
@@ -42,10 +48,13 @@ export type ProfessionalPatient = {
   initial_weight_kg: number | null;
   initial_weight_recorded_at: string | null;
   initial_weight_entry_id: string | null;
+  closed_reason: ProfessionalPatientClosedReason | null;
+  duplicate_of_patient_id: string | null;
   status: ProfessionalPatientStatus;
   created_at: string;
   updated_at: string;
 };
+
 
 export type PreliminaryPatientInput = {
   petName: string;
@@ -56,6 +65,7 @@ export type PreliminaryPatientInput = {
   initialWeightRecordedAt?: string | null;
 };
 
+
 export type ProfessionalInvitation = {
   id: string;
   professional_patient_id: string;
@@ -65,8 +75,11 @@ export type ProfessionalInvitation = {
   expires_at: string | null;
   accepted_by: string | null;
   accepted_at: string | null;
+  resolved_by: string | null;
+  resolved_at: string | null;
   created_at: string;
 };
+
 
 export type CreateProfessionalInvitationInput = {
   professionalPatientId: string;
@@ -74,11 +87,13 @@ export type CreateProfessionalInvitationInput = {
   expiresAt?: string | null;
 };
 
+
 export type CreatedProfessionalInvitation = {
   invitationId: string;
   token: string;
   expiresAt: string;
 };
+
 
 export type ProfessionalInvitationPreview = {
   invitationId: string;
@@ -92,13 +107,17 @@ export type ProfessionalInvitationPreview = {
   status: ProfessionalInvitationStatus;
 };
 
+
 export type AcceptProfessionalInvitationResult = {
   invitationId: string;
   professionalPatientId: string;
   petId: string;
   relationshipId: string;
   initialWeightEntryId: string | null;
+  effectiveProfessionalPatientId: string;
+  resolution: ProfessionalInvitationResolution;
 };
+
 
 export type ProfessionalRelationship = {
   id: string;
@@ -112,13 +131,16 @@ export type ProfessionalRelationship = {
   created_at: string;
 };
 
+
 export type PetMatchStrength = "strong" | "probable";
+
 
 export type InvitationPetMatch = {
   pet: Pet;
   strength: PetMatchStrength;
   score: number;
 };
+
 
 export type InvitationPetResolution =
   | { mode: "create"; compatiblePets: [] }

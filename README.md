@@ -1,4 +1,32 @@
-# Rotina Pet
+﻿# Rotina Pet
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -8,12 +36,96 @@ O **Rotina Pet** é um aplicativo web instalável (PWA) para organizar a aliment
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Ele nasceu para resolver uma necessidade prática: saber, em um único lugar, **o que cada pet precisa comer, em qual horário, em que quantidade e o que realmente aconteceu em cada refeição**.
 
 
 
 
-> **Estado do projeto:** versão de testes `v0.7.7`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+> **Estado do projeto:** versão de testes `v0.8.1`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -23,12 +135,96 @@ Ele nasceu para resolver uma necessidade prática: saber, em um único lugar, **
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 **https://albertogpo.github.io/rotina-pet/**
 
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## O que esta versão já entrega
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -57,17 +253,143 @@ Ele nasceu para resolver uma necessidade prática: saber, em um único lugar, **
 - PWA instalável;
 - notificações push automáticas via OneSignal + Supabase Cron;
 - deploy automático no GitHub Pages.
+- Professional Pilot v0.8.1 para **Veterinário + Tutor**, preservando integralmente o Tutor Solo;
+- perfil profissional veterinário e pacientes preliminares;
+- convite profissional com preview público seguro e token bruto apenas na URL;
+- autenticação com retorno ao mesmo convite e troca de conta preservando contexto;
+- matching/seleção explícita de pet já cadastrado pelo tutor;
+- materialização de relacionamento profissional e peso inicial no aceite normal;
+- resolução auditável de novo cadastro/convite quando o mesmo pet já possui acompanhamento ativo com o profissional, sem duplicar pet, relacionamento ou peso.
 
 
 
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Destaques da v0.8.1
+
+
+### Professional Pilot — Veterinário + Tutor
+
+
+A v0.8.1 consolida a primeira Wave do piloto profissional sem alterar a experiência Tutor Solo.
+
+
+Já implementado:
+- perfil veterinário;
+- paciente preliminar antes do vínculo com um pet real;
+- convite seguro com armazenamento apenas de `token_hash`;
+- preview público mínimo antes da autenticação;
+- autenticação/cadastro retornando ao mesmo convite;
+- proteção contra aceite pela conta errada e fluxo de **Entrar com outra conta**;
+- confirmação explícita do pet pelo tutor, inclusive com matching de nomes;
+- aceite transacional com criação/materialização do pet quando necessário;
+- relacionamento profissional ativo e materialização do peso inicial no happy path;
+- idempotência para retry do mesmo convite aceito;
+- tratamento de novo patient/novo convite para pet que já possui acompanhamento ativo: o patient existente permanece canônico, o novo patient é encerrado como duplicado e o convite fica `resolved`, sem criar outro relacionamento ou peso.
+
+
+A camada profissional continua aditiva: `diet_plans`, `meal_templates`, `meal_components` e `meal_occurrences` permanecem como núcleo da rotina do tutor.
+
+
+### Versionamento
+
+
+- `package.json` é a fonte canônica da versão do frontend;
+- `App.tsx` deriva o rodapé dessa versão;
+- versão corrente: **v0.8.1**.
+
+
+### Migrations profissionais relevantes
+
+
+Além da fundação da Etapa 1, a Wave 1 inclui:
+- `20260918161151_sync_professional_invitation_rpc.sql`;
+- `20260918191528_resolve_duplicate_professional_patient.sql`;
+- `20260918192021_fix_professional_invitation_retry_relationship_lookup.sql`.
+
+
+A validação detalhada do piloto e dos cenários de convite está em:
+- `docs/PROFESSIONAL_PILOT_STAGE1.md`;
+- `docs/PROFESSIONAL_PILOT_STAGE1_SMOKE_TEST.md`;
+- `docs/PROFESSIONAL_PILOT_V0_8_1_BACKLOG.md`.
 
 
 ## Destaques da v0.7.7
 
+
+
+
+
+
+
+
 ### Correções de interface no mobile
+
+
+
+
+
+
+
 
 - corrigida uma chave ausente em `styles.css` que fazia o navegador ignorar regras posteriores e afetava simultaneamente o alert sheet, o rodapé, a navegação mobile e o seletor de fuso;
 - a confirmação de registro antecipado volta a abrir como sheet/modal com backdrop, em vez de aparecer encavalada com o conteúdo;
@@ -75,13 +397,41 @@ Ele nasceu para resolver uma necessidade prática: saber, em um único lugar, **
 - no mobile, a barra de navegação recebeu largura ligeiramente maior que a coluna principal para reforçar sua função estrutural sem ocupar toda a tela;
 - o rodapé ficou menor, centralizado e com mais respiro em relação ao conteúdo e à navegação inferior.
 
+
+
+
+
+
+
+
 ### Progresso diário com linguagem mais leve
+
+
+
+
+
+
+
 
 - quando todas as refeições visíveis estão registradas, a tela Hoje exibe uma mensagem positiva e discreta: **“Tudo registrado por hoje ✨”**;
 - quando há filtro por animal, a mensagem passa a indicar **“Tudo registrado neste filtro”**, evitando sugerir incorretamente que toda a rotina do dia foi concluída;
 - refeições pendentes cujo horário já passou deixam de usar o rótulo mais carregado **“Atrasada”** e passam a permanecer como **“Pendente”**, com texto apenas informativo.
 
+
+
+
+
+
+
+
 ### Seletor de fuso horário
+
+
+
+
+
+
+
 
 - o dropdown ganhou altura máxima e scroll interno;
 - os fusos foram organizados visualmente por grandes regiões IANA, como Américas, Europa, Ásia e África;
@@ -89,37 +439,121 @@ Ele nasceu para resolver uma necessidade prática: saber, em um único lugar, **
 - a busca continua pesquisando todos os fusos disponíveis;
 - subgrupos são aproveitados quando o próprio identificador IANA fornece um nível intermediário.
 
+
+
+
+
+
+
+
 ### Escopo
+
+
+
+
+
+
+
 
 - nenhuma migration SQL;
 - nenhuma alteração na Edge Function, no Cron ou nas regras de push;
 - arquivos principais atualizados: `App.tsx`, `TodayPage.tsx`, `SettingsPage.tsx` e `styles.css`;
 - documentação atualizada para `v0.7.7`.
 
+
+
+
+
+
+
+
 ## Destaques da v0.7.6
 
+
+
+
+
+
+
+
 ### Registro de refeições sem recarregar a tela
+
+
+
+
+
+
+
 
 - concluir, alterar ou desfazer uma refeição não substitui mais a tela **Hoje** por um carregamento global;
 - a ocorrência é atualizada imediatamente na interface e reconciliada silenciosamente com o servidor;
 - ao fechar o card após o registro, o grupo do horário permanece na mesma posição visual, evitando que a página salte para o topo ou para outro trecho;
 - o comportamento de deep link e destaque temporário de horários continua preservado.
 
+
+
+
+
+
+
+
 ### Voltar ao topo
+
+
+
+
+
+
+
 
 - um botão flutuante discreto aparece somente após uma rolagem longa;
 - o botão respeita a preferência de movimento reduzido;
 - no celular, sua posição considera a barra de navegação inferior e as áreas seguras do aparelho.
 
+
+
+
+
+
+
+
 ### Escopo
+
+
+
+
+
+
+
 
 - nenhuma migration SQL;
 - nenhuma alteração na Edge Function, no Cron ou nas regras de notificações;
 - rodapé e metadados do pacote atualizados para `v0.7.6`.
 
+
+
+
+
+
+
+
 ## Destaques da v0.7.5
 
+
+
+
+
+
+
+
 ### Card Hoje no desktop
+
+
+
+
+
+
+
 
 - o conteúdo estrutural do card de resumo agora ocupa toda a largura interna disponível;
 - o resumo e o progresso permanecem nas extremidades da primeira faixa;
@@ -127,21 +561,70 @@ Ele nasceu para resolver uma necessidade prática: saber, em um único lugar, **
 - os botões de horário continuam compactos e proporcionais ao conteúdo, sem serem esticados apenas para preencher espaço;
 - o scroll horizontal da faixa de horários foi preservado para dias com muitos horários.
 
+
+
+
+
+
+
+
 ### Notificação de boas-vindas
+
+
+
+
+
+
+
 
 - a notificação automática enviada pelo OneSignal após a primeira assinatura foi personalizada no `OneSignal.init`;
 - título: **Rotina Pet**;
 - mensagem: **“Tudo certo: as notificações estão ativas. Enviaremos lembretes nos horários das refeições.”**;
 - a alteração não interfere nas notificações de refeição, na Edge Function ou no Cron.
 
+
+
+
+
+
+
+
 ### Escopo
+
+
+
+
+
+
+
 
 - nenhuma migration SQL;
 - rodapé e metadados do pacote atualizados para `v0.7.5`.
 
+
+
+
+
+
+
+
 ## Destaques da v0.7.4
 
+
+
+
+
+
+
+
 ### Correção do scroll no desktop
+
+
+
+
+
+
+
 
 - `html` passa a ser o único contêiner de scroll vertical do documento;
 - `body` e `#root` permanecem com overflow visível, evitando dois contêineres concorrentes no Chrome desktop;
@@ -150,15 +633,64 @@ Ele nasceu para resolver uma necessidade prática: saber, em um único lugar, **
 - o comportamento foi reproduzido e validado em Chromium: antes da correção a roda mantinha `scrollY = 0`; depois, o mesmo teste avançou para `scrollY = 600`;
 - rodapé e metadados do pacote atualizados para `v0.7.4`.
 
+
+
+
+
+
+
+
 ### Manutenção do pacote
+
+
+
+
+
+
+
 
 - o `package-lock.json` foi salvo sem BOM UTF-8;
 - as URLs de dependências foram normalizadas para `https://registry.npmjs.org/`, eliminando o proxy interno do arquivo-fonte.
 
+
+
+
+
+
+
+
 ## Destaques da v0.7.3
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### Cabeçalho e barra de status
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 - o degradê da barra de status foi encurtado e elevado, terminando com folga antes do cabeçalho;
@@ -166,7 +698,35 @@ Ele nasceu para resolver uma necessidade prática: saber, em um único lugar, **
 - o espaço entre o seletor de tema e o avatar foi ampliado.
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### Scroll no desktop
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 - a faixa horizontal **Horários do dia** voltou a responder à roda do mouse no desktop;
@@ -175,7 +735,35 @@ Ele nasceu para resolver uma necessidade prática: saber, em um único lugar, **
 - a barra horizontal fica visível de forma discreta no desktop, mantendo-se oculta no mobile.
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### Escopo
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 - nenhuma alteração de banco, Edge Function ou Cron;
@@ -185,12 +773,82 @@ Ele nasceu para resolver uma necessidade prática: saber, em um único lugar, **
 - o workflow valida `package.json` e `package-lock.json` antes da instalação e remove BOM automaticamente quando necessário.
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## Destaques da v0.7.2
 
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### Próxima refeição em primeiro plano
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -205,7 +863,63 @@ Ele nasceu para resolver uma necessidade prática: saber, em um único lugar, **
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### Interface e configurações
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -220,7 +934,63 @@ Ele nasceu para resolver uma necessidade prática: saber, em um único lugar, **
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### Atualização dos ícones no iOS
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -234,12 +1004,96 @@ Ele nasceu para resolver uma necessidade prática: saber, em um único lugar, **
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## Destaques da v0.7.0
 
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### Navegação e acompanhamento diário
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -254,7 +1108,63 @@ Ele nasceu para resolver uma necessidade prática: saber, em um único lugar, **
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### Pendências do dia anterior
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -267,7 +1177,63 @@ Ele nasceu para resolver uma necessidade prática: saber, em um único lugar, **
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### Configurações
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -280,7 +1246,63 @@ Ele nasceu para resolver uma necessidade prática: saber, em um único lugar, **
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### Identidade do aplicativo
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -292,7 +1314,63 @@ Ele nasceu para resolver uma necessidade prática: saber, em um único lugar, **
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## Ajustes da v0.6.5
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -307,7 +1385,63 @@ Ele nasceu para resolver uma necessidade prática: saber, em um único lugar, **
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## Ajustes da v0.6.1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -319,7 +1453,63 @@ Ele nasceu para resolver uma necessidade prática: saber, em um único lugar, **
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## Destaques da v0.6.0
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -329,12 +1519,96 @@ Ele nasceu para resolver uma necessidade prática: saber, em um único lugar, **
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Refeições do mesmo tutor no mesmo horário passam a gerar **uma única notificação**, mesmo quando há vários animais.
 
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Exemplos:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -347,6 +1621,34 @@ Hora da refeição — 🐈 Luna
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ```text
 Refeição — 🐈 Luna e 🐶 Thor
 🐈 Luna: 80 g de ração + 2 itens • 🐶 Thor: 120 g de ração
@@ -355,7 +1657,63 @@ Refeição — 🐈 Luna e 🐶 Thor
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Quando o texto completo não cabe, a mensagem preserva:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -367,12 +1725,96 @@ Quando o texto completo não cabe, a mensagem preserva:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### Proteção contra duplicidades
 
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 A v0.6.0 adiciona duas camadas de proteção:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -383,7 +1825,63 @@ A v0.6.0 adiciona duas camadas de proteção:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Assim, duas execuções próximas do cron não devem enviar o mesmo grupo duas vezes, e uma repetição após timeout pode reutilizar a mesma operação sem criar outra mensagem.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -393,7 +1891,63 @@ Assim, duas execuções próximas do cron não devem enviar o mesmo grupo duas v
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Ao tocar na notificação, o aplicativo recebe:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -405,7 +1959,63 @@ Ao tocar na notificação, o aplicativo recebe:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 O frontend então:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -420,12 +2030,96 @@ O frontend então:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### Fuso horário da rotina
 
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 A rotina agora possui um fuso horário próprio, salvo na conta.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -439,7 +2133,63 @@ A rotina agora possui um fuso horário próprio, salvo na conta.
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### Geração server-side das refeições
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -449,7 +2199,63 @@ As ocorrências do dia não dependem mais de a tela Hoje ter sido aberta.
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 A Edge Function garante as ocorrências necessárias antes de procurar refeições vencendo. Isso permite que a notificação funcione mesmo quando o PWA permanece fechado durante o dia.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -459,12 +2265,96 @@ A Edge Function garante as ocorrências necessárias antes de procurar refeiçõ
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 O push usa TTL padrão de **30 minutos**. Depois disso, a mensagem pode ser descartada pelo serviço de push, mas a refeição continua aparecendo como pendente ou atrasada dentro do aplicativo.
 
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 O intervalo pode ser alterado por secret da Edge Function:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -476,7 +2366,63 @@ MEAL_NOTIFICATION_TTL_SECONDS
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 O valor padrão é `1800`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -486,7 +2432,63 @@ O valor padrão é `1800`.
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Para atualizar uma instalação anterior, execute no **SQL Editor**:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -496,7 +2498,63 @@ Para atualizar uma instalação anterior, execute no **SQL Editor**:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Essa migration cria ou atualiza:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -512,7 +2570,63 @@ Essa migration cria ou atualiza:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Depois, publique novamente a Edge Function:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -524,7 +2638,63 @@ supabase functions deploy send-meal-notifications --use-api
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 O cron atual pode permanecer exatamente como está:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -536,12 +2706,96 @@ O cron atual pode permanecer exatamente como está:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## Secrets da Edge Function
 
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Obrigatórios:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -553,7 +2807,63 @@ Obrigatórios:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Para a publicação atual:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -565,7 +2875,63 @@ APP_PUBLIC_URL=https://albertogpo.github.io/rotina-pet/
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Opcionais:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -578,7 +2944,63 @@ MEAL_NOTIFICATION_TTL_SECONDS=1800
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Sem essas duas secrets, a função usa os valores padrão acima.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -588,7 +3010,63 @@ Sem essas duas secrets, a função usa os valores padrão acima.
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 No GitHub Actions ou em `.env.local`:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -602,7 +3080,63 @@ VITE_ONESIGNAL_APP_ID=SEU_APP_ID_ONESIGNAL
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## Ordem recomendada de publicação da v0.6.0
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -618,12 +3152,96 @@ VITE_ONESIGNAL_APP_ID=SEU_APP_ID_ONESIGNAL
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## Testes principais
 
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### Faixa de horários
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -637,7 +3255,63 @@ VITE_ONESIGNAL_APP_ID=SEU_APP_ID_ONESIGNAL
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### PWA no iOS
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -650,7 +3324,63 @@ VITE_ONESIGNAL_APP_ID=SEU_APP_ID_ONESIGNAL
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### Agrupamento
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -663,7 +3393,63 @@ VITE_ONESIGNAL_APP_ID=SEU_APP_ID_ONESIGNAL
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### Duplicidade
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -676,7 +3462,63 @@ VITE_ONESIGNAL_APP_ID=SEU_APP_ID_ONESIGNAL
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### Deep link
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -689,7 +3531,63 @@ VITE_ONESIGNAL_APP_ID=SEU_APP_ID_ONESIGNAL
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### Fuso
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -702,12 +3600,96 @@ VITE_ONESIGNAL_APP_ID=SEU_APP_ID_ONESIGNAL
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## Destaques anteriores
 
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### v0.5.3
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -720,7 +3702,63 @@ VITE_ONESIGNAL_APP_ID=SEU_APP_ID_ONESIGNAL
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### v0.5.1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -732,7 +3770,63 @@ VITE_ONESIGNAL_APP_ID=SEU_APP_ID_ONESIGNAL
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### v0.5.0
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -744,7 +3838,63 @@ VITE_ONESIGNAL_APP_ID=SEU_APP_ID_ONESIGNAL
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## Limitações conhecidas
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -753,12 +3903,68 @@ VITE_ONESIGNAL_APP_ID=SEU_APP_ID_ONESIGNAL
 - push depende de permissão, conexão, configurações do sistema e políticas do navegador;
 - a tela Hoje permanece a fonte de verdade quando uma notificação não é exibida;
 - alimentos arquivados permanecem no banco, mas ainda não podem ser restaurados pela interface;
-- o produto profissional para veterinários continua em definição.
+- o **Professional Pilot Veterinário + Tutor** já possui fundação, convite, aceite e vínculo implementados, mas ainda não inclui a tela completa de Pacientes, prontuário completo, criador completo de prescrição nutricional nem monitoramento clínico completo.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
 
 ## Tecnologias
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -775,12 +3981,96 @@ VITE_ONESIGNAL_APP_ID=SEU_APP_ID_ONESIGNAL
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## Executar localmente
 
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Requisitos: Node.js 22 ou versão compatível.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -794,7 +4084,63 @@ npm run dev
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Preencha o `.env.local` com as variáveis do frontend.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -804,7 +4150,63 @@ Para uma instalação do zero, execute [`supabase/setup.sql`](supabase/setup.sql
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## Compilar
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -816,7 +4218,63 @@ npm run build
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## Publicação no GitHub Pages
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -826,7 +4284,63 @@ O workflow está em [`.github/workflows/deploy-pages.yml`](.github/workflows/dep
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 No repositório do GitHub:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -838,7 +4352,63 @@ No repositório do GitHub:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## Configuração de autenticação no Supabase
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -848,9 +4418,65 @@ Em **Authentication → URL Configuration**, use:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ```text
 Site URL:
 https://albertogpo.github.io/rotina-pet/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -863,7 +4489,63 @@ https://albertogpo.github.io/rotina-pet/**
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## Base do produto
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -873,7 +4555,63 @@ A visão de produto consolidada está em [`docs/00_PRODUCT_FOUNDATION.md`](docs/
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## Licença
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -1,14 +1,22 @@
-# ROTINA_PET_CHANGELOG.md
+﻿# ROTINA_PET_CHANGELOG.md
+
+
 
 
 > Histórico cronológico de releases.
 
 
-Versão do documento: 1.6
+
+
+Versão do documento: 1.7
+
+
 
 
 > Atualizar este arquivo a cada release.
 > O ChatGPT deve informar quando esta nova versão precisar substituir a anterior no Projeto.
+
+
 
 
 ## Modelo
@@ -18,7 +26,43 @@ Versão do documento: 1.6
 - Status (Gerado / Publicado / Testado / Confirmado)
 
 
+
+
 ## Histórico
+
+
+### v0.8.1
+- **Objetivo:** consolidar a Wave 1 do Professional Pilot e fechar as falhas descobertas no primeiro smoke sem regressão do Tutor Solo.
+- **Versionamento:** `package.json` passa a ser a fonte canônica da versão do frontend; rodapé deriva `0.8.1`.
+- **Convite público:** preview validado antes da autenticação; token inválido/ausente não revela dados e não abre login/cadastro.
+- **Identidade:** conta errada recebe estado específico e **Entrar com outra conta**; logout preserva `invite`, `token` e `intent=accept`.
+- **Bloco 5:** novo patient/novo convite que encontra acompanhamento ativo e íntegro é resolvido sem duplicar acompanhamento: patient existente permanece canônico; patient redundante fica `closed/duplicate`; convite fica `resolved`; nenhum novo relationship, pet ou peso é criado.
+- **Idempotência:** retries de convites `accepted` e `resolved` usam o patient histórico correto.
+- **Migrations:** `20260918161151_sync_professional_invitation_rpc.sql`, `20260918191528_resolve_duplicate_professional_patient.sql` e `20260918192021_fix_professional_invitation_retry_relationship_lookup.sql`.
+- **Validação:** S7, S10 e S11 já PASS no frontend publicado dos blocos anteriores; Bloco 5 possui smoke transacional de backend com `ROLLBACK` PASS. S16 e regressões pós-deploy da v0.8.1 permanecem pendentes.
+- **Status:** código-fonte/documentação atualizados e migrations aplicadas em produção; deploy/validação visual do frontend v0.8.1 ainda devem ser confirmados.
+
+
+### v0.8.0
+- **Objetivo:** primeira publicação funcional da fundação do Professional Pilot — Veterinário + Tutor.
+- **Escopo:** perfil veterinário, patient preliminar, convite seguro, preview público, autenticação/retorno, matching de pet existente, aceite, materialização do pet, relacionamento profissional e peso inicial.
+- **Compatibilidade:** implementação aditiva, preservando a experiência Tutor Solo.
+- **Observação de versão:** o build submetido ao primeiro smoke é tratado como v0.8.0, embora o rodapé ainda exibisse incorretamente `v0.7.7`.
+- **Status:** baseline funcional publicado e usado no primeiro smoke; problemas encontrados originaram o backlog v0.8.1.
+
+
+### v0.7.7
+- **Objetivo:** corrigir regressões de interface mobile e refinar feedback diário.
+- **Interface:** alert sheet voltou ao comportamento modal, navegação mobile retornou à parte inferior, rodapé foi reduzido/centralizado e seletor de fuso ganhou altura máxima com scroll/organização regional.
+- **Gamificação leve:** mensagem positiva quando tudo está registrado e linguagem de pendências menos ansiosa.
+- **Migração SQL:** não necessária.
+- **Status:** publicada; posteriormente serviu como base visual para a introdução do Professional Pilot.
+
+
+
+
+
+
 
 
 ### v0.7.6
@@ -31,6 +75,7 @@ Versão do documento: 1.6
 - **Migração SQL:** não necessária.
 - **Status:** implementação e documentação atualizadas no código-fonte; build, deploy e validação visual ainda devem ser confirmados.
 
+
 ### v0.7.5
 - **Objetivo:** corrigir o aproveitamento horizontal do card Hoje no desktop e personalizar a notificação de boas-vindas do opt-in.
 - **Interface:** o grid interno do card Hoje passa a ocupar toda a largura disponível; os botões de horário permanecem compactos e o scroll horizontal é preservado.
@@ -40,6 +85,7 @@ Versão do documento: 1.6
 - **Migração SQL:** não necessária.
 - **Status:** implementação gerada e arquivos-fonte atualizados; build, deploy e validação visual ainda devem ser confirmados.
 
+
 ### v0.7.4
 - **Objetivo:** restaurar o scroll vertical da página no desktop.
 - **Causa:** `overflow-y:auto` aplicado simultaneamente em `html` e `body`, criando dois contêineres de rolagem concorrentes no Chrome desktop.
@@ -48,6 +94,7 @@ Versão do documento: 1.6
 - **Migração SQL:** não necessária.
 - **Validação:** teste automatizado em Chromium confirmou o retorno do scroll vertical; build/deploy no GitHub deve ser confirmado.
 - **Manutenção:** lockfile normalizado para o registro público e salvo sem BOM.
+
 
 ### v0.7.3
 - **Objetivo:** corrigir a sobreposição visual da barra de status, ampliar o espaçamento do cabeçalho e restaurar a navegação horizontal dos horários no desktop.
@@ -59,6 +106,8 @@ Versão do documento: 1.6
 - **Segunda correção do build:** o `package.json` continha BOM UTF-8; o arquivo foi salvo sem BOM e o workflow passou a validar e normalizar o encoding dos JSONs antes da instalação.
 - **Pendência técnica:** regenerar o `package-lock.json` diretamente em um ambiente público para eliminar as URLs internas do arquivo-fonte, embora o deploy já não dependa disso.
 - **Escopo não incluído:** restauração de alimentos arquivados.
+
+
 
 
 ### v0.7.2
@@ -74,28 +123,42 @@ Versão do documento: 1.6
 - **Limitação documentada:** alimentos arquivados ainda não possuem restauração pela interface.
 
 
+
+
 ### v0.7.1
 - Auto-scroll da faixa de horários planejado, mas a versão não foi salva/publicada separadamente. A alteração foi incorporada à v0.7.2.
+
+
 
 
 ### v0.7.0
 - Navegação diária, pendências de ontem, seletor completo de fusos, toggle de notificações e nova identidade de ícones.
 
 
+
+
 ### v0.6.5
 - Temas Clínica Serena e Editorial Acolhedora, tipografia Manrope e refinamentos de identidade visual.
+
+
 
 
 ### v0.6.1
 Infraestrutura de notificações estabilizada.
 
 
+
+
 ### v0.6.2
 Correções planejadas para troca de planos e horários. Status a confirmar.
 
 
+
+
 ### v0.6.3
 Melhorias visuais planejadas. Status a confirmar.
+
+
 
 
 ### v0.6.4

@@ -1,4 +1,5 @@
-# Rotina Pet — Product Foundation
+﻿# Rotina Pet — Product Foundation
+
 
 > Este documento representa a base do produto.
 >
@@ -6,9 +7,12 @@
 >
 > Ele é a fonte de verdade do projeto. Todo novo requisito deve ser registrado aqui antes de ser implementado.
 
+
 ---
 
+
 # Legenda
+
 
 | Ícone | Significado |
 |-------|-------------|
@@ -18,28 +22,40 @@
 | 💡 | Ideia futura |
 | 🚫 | Fora do escopo imediato |
 
+
 ---
+
 
 # 1. Visão do Produto
 
+
 ## ✅ Definição
+
 
 O Rotina Pet é uma plataforma de acompanhamento nutricional de pets.
 
+
 Ela conecta o plano alimentar definido pelo veterinário à rotina real do tutor, permitindo que ambos acompanhem a evolução do tratamento.
 
+
 O produto possui dois modos de utilização:
+
 
 - Tutor Solo
 - Profissional (Veterinários e Clínicas)
 
+
 O foco estratégico do produto é o mercado profissional, sem impedir o uso independente por tutores.
+
 
 ## 🧪 Hipótese de expansão da visão
 
+
 O Rotina Pet pode evoluir de uma plataforma de acompanhamento nutricional para uma plataforma de **adesão aos cuidados do pet**.
 
+
 Nessa visão ampliada, o produto conectaria orientações e planos definidos por profissionais à rotina real dos tutores, permitindo registrar, lembrar e acompanhar a execução de cuidados como:
+
 
 - alimentação;
 - medicamentos;
@@ -48,36 +64,51 @@ Nessa visão ampliada, o produto conectaria orientações e planos definidos por
 - higiene e bem-estar;
 - outros protocolos de cuidado.
 
+
 A nutrição permanece como vertical inicial, principal especialidade do produto e ponto de entrada para o mercado profissional.
+
 
 Esta hipótese não altera, neste momento, o posicionamento público, o escopo comprometido ou a prioridade de desenvolvimento. A ampliação precisa ser validada com tutores e diferentes perfis profissionais antes de se tornar uma definição do produto.
 
+
 ---
+
 
 # 2. Modelo de Negócio
 
+
 ## ✅ Definição
+
 
 Existem dois tipos de clientes.
 
+
 ### Tutor Solo
+
 
 - utiliza o aplicativo de forma independente;
 - paga sua própria assinatura (modelo ainda será definido).
 
+
 ### Veterinário
+
 
 - assina a plataforma;
 - gerencia pacientes;
 - convida tutores.
 
+
 O tutor vinculado a um veterinário não paga pela plataforma.
+
 
 ## 🧪 Hipótese de empacotamento comercial
 
+
 Se a expansão para outros cuidados for validada, o produto deve ser comercializado preferencialmente por **pacotes de valor e perfil de cliente**, e não por cobrança isolada de cada pequena funcionalidade.
 
+
 Possibilidades a validar:
+
 
 - plano para tutores, com níveis Essencial e Completo;
 - produto profissional nutricional;
@@ -85,32 +116,45 @@ Possibilidades a validar:
 - plano para clínicas e equipes;
 - verticais especializadas futuras, como adestramento ou operação de pet shops, apenas quando constituírem fluxos profissionais completos.
 
+
 Add-ons separados fazem mais sentido para capacidades que formem um produto próprio, como integrações, marca branca, múltiplas unidades ou uma vertical profissional especializada. O empacotamento definitivo dependerá de validação de demanda, disposição de pagamento e custo de operação.
+
 
 ---
 
+
 # 3. Papéis
+
 
 ## ✅ Tutor
 
+
 Responsável pela execução da rotina.
 
+
 Pode:
+
 
 - registrar refeições;
 - registrar peso;
 - alterar horários;
 - alterar número de porções.
 
+
 Não pode alterar a prescrição profissional.
+
 
 ---
 
+
 ## ✅ Veterinário
+
 
 Responsável pelo tratamento.
 
+
 Pode:
+
 
 - criar planos;
 - alterar planos;
@@ -118,80 +162,112 @@ Pode:
 - acompanhar adesão;
 - gerenciar pacientes.
 
+
 ---
+
 
 ## ✅ Pet
 
+
 Paciente acompanhado dentro da plataforma.
+
 
 ---
 
+
 # 4. Conceitos Fundamentais
+
 
 ## ✅ Plano Nutricional ≠ Rotina
 
+
 Plano Nutricional
+
 
 - definido pelo veterinário;
 - representa o tratamento.
 
+
 Rotina
+
 
 - definida pelo tutor;
 - representa como o tratamento será executado.
 
+
 ---
+
 
 # 5. Princípios do Produto
 
+
 ## ✅ O tutor controla
+
 
 - horários;
 - quantidade de porções;
 - organização da rotina.
 
+
 ---
 
+
 ## ✅ O veterinário controla
+
 
 - plano alimentar;
 - quantidade diária;
 - objetivos nutricionais.
 
+
 ---
+
 
 ## ✅ O aplicativo deve transmitir calma
 
+
 Não deve parecer um sistema administrativo.
 
+
 Referências visuais:
+
 
 - Apple Health
 - Things 3
 - Structured
 - Gentler Streak
 
+
 ---
 
+
 ## ✅ A primeira tela deve responder imediatamente
+
 
 - Qual a próxima refeição?
 - Que horas?
 - Quanto oferecer?
 - O que oferecer?
 
+
 Sem navegação desnecessária.
+
 
 ---
 
+
 ## ✅ Linguagem
 
+
 Evitar termos administrativos ou ambíguos, como:
+
 
 - administrada;
 - registrar consumo, quando usado como ação principal sem contexto.
 
+
 Preferir estados e ações concretas:
+
 
 - Pendente;
 - Atrasada;
@@ -199,39 +275,57 @@ Preferir estados e ações concretas:
 - Não comeu tudo;
 - Não foi servida.
 
+
 Ícones de estado nunca devem aparecer sozinhos: precisam estar acompanhados por uma label textual.
+
 
 ## ✅ Expansões devem preservar a simplicidade do núcleo
 
+
 Caso novas categorias de cuidado sejam incorporadas, devem obedecer aos seguintes princípios:
+
 
 ### Complexidade progressiva
 
+
 O aplicativo não deve exibir todas as capacidades para todos os usuários. Cada tutor visualiza apenas as categorias de cuidado que utiliza ou que foram habilitadas por um profissional.
+
 
 ### Arquitetura comum, experiências específicas
 
+
 Diferentes cuidados podem compartilhar internamente conceitos como plano, recorrência, ocorrência, lembrete, conclusão, profissional responsável, histórico e anexos.
+
 
 Na interface, cada tipo deve utilizar linguagem, campos e estados próprios. Uma vacina não deve parecer uma refeição, e um medicamento não deve parecer uma tarefa genérica.
 
+
 ### A tela Hoje continua seletiva
+
 
 A tela **Hoje** deve apresentar apenas cuidados que exigem ação no dia. Eventos futuros de baixa frequência, como vacinas e check-ups, devem aparecer em uma área de próximos cuidados, sem competir permanentemente com refeições e medicamentos.
 
+
 ### O núcleo nutricional não pode ser prejudicado
+
 
 Uma pessoa que utilize apenas alimentação e peso deve continuar encontrando uma experiência simples, direta e próxima da atual. Novas áreas não devem adicionar etapas, navegação ou ruído ao fluxo nutricional básico.
 
+
 ### Frequência e natureza do cuidado importam
+
 
 Refeições, doses de medicamentos, vacinas, consultas, hábitos de higiene e programas de treinamento não devem ser tratados como atividades idênticas. A experiência deve considerar frequência, risco, necessidade de comprovação, duração e papel do profissional.
 
+
 ---
+
 
 # 6. Funcionalidades do Tutor
 
+
 ## 📅 Capacidades
+
 
 - Cadastro de pets
 - Cadastro de alimentos
@@ -244,25 +338,36 @@ Refeições, doses de medicamentos, vacinas, consultas, hábitos de higiene e pr
 - Sincronização entre dispositivos
 - Compartilhamento entre cuidadores
 
+
 ---
+
 
 ## 📅 Capacidades
 
+
 O tutor pode reorganizar:
+
 
 - horários;
 - quantidade de porções.
 
+
 Sem alterar a quantidade diária prescrita.
+
 
 ---
 
 
+
+
 ## ✅ Histórico por data
+
 
 A visualização de refeições não deve ficar restrita ao dia atual.
 
+
 O tutor precisa conseguir navegar por datas anteriores para consultar:
+
 
 - o que estava programado em cada dia;
 - o que foi concluído;
@@ -270,13 +375,18 @@ O tutor precisa conseguir navegar por datas anteriores para consultar:
 - se a refeição não foi servida;
 - se o animal não comeu tudo.
 
+
 A navegação histórica pode coexistir dentro da própria tela **Hoje**, desde que a troca de data seja simples e visível.
+
 
 ## ✅ Notificações confiáveis exigem infraestrutura
 
+
 As notificações não dependem de temporizadores locais, da aba aberta ou de o tutor ter acessado a tela **Hoje** naquele dia.
 
+
 Arquitetura aprovada:
+
 
 - cliente inscrito em Web Push pelo OneSignal;
 - identidade do usuário vinculada ao ID da conta no Supabase;
@@ -284,46 +394,65 @@ Arquitetura aprovada:
 - Edge Function para gerar ocorrências necessárias, localizar refeições elegíveis e enviar os lembretes;
 - banco como fonte de verdade para horários, estados e prevenção de duplicidades.
 
+
 Essa arquitetura deve atender iPhone, Android e navegadores desktop compatíveis.
+
 
 ## ✅ O opt-in confirma a ativação das notificações
 
+
 Após a primeira assinatura no Web Push, o OneSignal envia uma notificação de boas-vindas para confirmar que o canal foi ativado.
 
+
 Conteúdo aprovado:
+
 
 - título: **Rotina Pet**;
 - mensagem: **Tudo certo: as notificações estão ativas. Enviaremos lembretes nos horários das refeições.**
 
+
 A mensagem deve ser clara e funcional, sem euforia, diminutivos ou promessa de entrega absoluta. Ela confirma a ativação do canal, mas não substitui os estados persistidos no aplicativo.
+
 
 ## ✅ Refeições simultâneas geram uma única notificação
 
+
 Refeições do mesmo tutor programadas para o mesmo instante são agrupadas antes do envio. O sistema não deve enviar um push separado para cada animal.
 
+
 A identificação do grupo considera:
+
 
 - tutor;
 - data e horário locais da rotina;
 - tipo da notificação.
 
+
 O banco faz uma reserva atômica do grupo e mantém uma chave única. O envio ao OneSignal também usa uma chave de idempotência. A combinação dessas duas proteções deve impedir duplicidades inclusive em reexecuções, timeouts ou chamadas simultâneas.
+
 
 ## ✅ O conteúdo da notificação é adaptativo
 
+
 A notificação utiliza o emoji escolhido para cada animal e prioriza:
+
 
 1. nome e emoji dos animais;
 2. primeiro item de cada refeição;
 3. demais itens, enquanto houver espaço útil.
 
+
 Quando o conteúdo completo ficar longo, o texto informa `+ 1 item`, `+ 2 itens` ou equivalente. Os detalhes integrais permanecem no card da tela **Hoje**.
+
 
 Observações clínicas, informações sensíveis e textos extensos não devem ser exibidos na tela bloqueada.
 
+
 ## ✅ O toque abre o grupo correspondente na tela Hoje
 
+
 Cada push contém um deep link com a data e o horário da rotina. Ao tocar, o aplicativo deve:
+
 
 - abrir a tela **Hoje**;
 - selecionar a data indicada;
@@ -332,19 +461,27 @@ Cada push contém um deep link com a data e o horário da rotina. Ao tocar, o ap
 - destacá-lo temporariamente;
 - abrir a primeira refeição ainda pendente, ou a primeira do grupo quando nenhuma estiver pendente.
 
+
 Como uma notificação pode representar vários animais, o destino principal é o grupo do horário, e não um único card individual.
+
 
 ## ✅ Notificações de refeição têm validade limitada
 
+
 O TTL padrão das notificações de refeição é de **30 minutos**. Após esse período, um push ainda não entregue deve expirar, evitando lembretes antigos e fora de contexto.
+
 
 A expiração do push não altera o estado da refeição. A tela **Hoje** continua sendo a fonte de verdade e mostra normalmente refeições pendentes ou atrasadas.
 
+
 ## ✅ O fuso horário pertence à rotina da conta
+
 
 Cada conta possui um fuso horário IANA, como `America/Sao_Paulo`.
 
+
 Regras:
+
 
 - o fuso é detectado inicialmente no dispositivo e salvo na conta;
 - a rotina segue o fuso configurado na conta;
@@ -353,13 +490,18 @@ Regras:
 - datas e horários são convertidos no servidor, e não pelo relógio local do navegador;
 - a geração das ocorrências ocorre no servidor, inclusive quando o aplicativo não foi aberto no dia.
 
+
 Notificações são um canal auxiliar e não substituem os estados e registros persistidos no aplicativo.
+
 
 ## ✅ Horários podem mudar sem refazer a prescrição
 
+
 Alterar os horários da rotina não deve obrigar o tutor a recriar o plano nutricional.
 
+
 Na edição rápida de horários:
+
 
 - alimentos permanecem iguais;
 - quantidades diárias permanecem iguais;
@@ -368,42 +510,59 @@ Na edição rápida de horários:
 - a quantidade de refeições permanece fixa;
 - o tutor escolhe a data de início da nova rotina.
 
+
 A implementação pode criar uma nova versão técnica da rotina para preservar o histórico, mas essa complexidade não deve ser exposta como trabalho adicional para o tutor.
+
 
 Se já houver refeições concluídas ou marcadas como não servidas na data escolhida, a alteração deve começar em uma data posterior.
 
+
 ## ✅ Registro de consumo sem etapa obrigatória
 
+
 O registro principal oferece três ações mutuamente claras:
+
 
 - **Comeu tudo**;
 - **Não comeu tudo**;
 - **Não foi servida**.
 
+
 Tocar em **Comeu tudo** encerra o registro imediatamente, sem pergunta adicional.
 
+
 Tocar em **Não comeu tudo** abre uma escolha aproximada:
+
 
 - Quase tudo;
 - Metade;
 - Pouco;
 - Nada.
 
+
 **Nada** significa que a comida foi oferecida, mas o animal não comeu. **Não foi servida** significa que a refeição não chegou a ser oferecida. Essa diferença deve permanecer preservada nos dados e na interface.
+
 
 A escala é deliberadamente descritiva e humana. Percentuais ou quantidades exatas continuam como possibilidades futuras para validação com veterinários.
 
+
 ---
+
 
 ## 💡 Ideia futura
 
+
 Permitir informar que a sobra será reaproveitada na próxima refeição.
+
 
 ---
 
+
 # 7. Funcionalidades do Veterinário
 
+
 ## 📅 Capacidades
+
 
 - Cadastro de pacientes
 - Lista de pacientes
@@ -413,91 +572,133 @@ Permitir informar que a sobra será reaproveitada na próxima refeição.
 - Atualização remota
 - Convite de tutores
 
+
 ---
+
 
 ## 📅 Capacidades
 
+
 Acompanhar:
+
 
 - adesão ao tratamento;
 - evolução do peso;
 - histórico alimentar.
 
+
 ---
 
+
 ## 💡 Ideia futura
+
 
 Dashboard profissional.
 
+
 ---
+
 
 ## 💡 Ideia futura
 
+
 Gestão de clínicas.
 
+
 ---
+
 
 # 8. Comunicação
 
+
 ## 📅 Capacidades
+
 
 Notificar tutor quando houver alteração no plano.
 
+
 ---
+
 
 ## 📅 Capacidades
 
+
 Comunicação contextual baseada em eventos.
 
+
 Exemplos:
+
 
 - plano atualizado;
 - peso registrado;
 - recusa alimentar.
 
+
 ---
+
 
 ## 💡 Ideia futura
 
+
 Chat completo.
+
 
 No momento entendemos que não faz parte do MVP.
 
+
 ---
+
 
 # 9. Onboarding
 
+
 ## ✅ Definição
+
 
 O usuário deve experimentar valor antes de criar uma conta.
 
+
 ---
 
+
 ## 🧪 Hipótese
+
 
 Criar automaticamente uma conta anônima sincronizada com o banco.
 
+
 Posteriormente o usuário apenas adiciona e-mail e senha.
+
 
 Precisamos validar a arquitetura.
 
+
 ---
+
 
 # 10. Diferencial Competitivo
 
+
 ## 🧪 Hipótese
+
 
 O maior diferencial do Rotina Pet não é montar planos alimentares.
 
+
 É permitir que o veterinário acompanhe a adesão real ao tratamento.
+
 
 Essa hipótese deverá ser validada com profissionais.
 
+
 ---
+
 
 # 11. Product Inbox
 
+
 ## 💡 Ideias futuras
+
 
 - cálculo nutricional assistido;
 - QR Code para convites;
@@ -510,79 +711,115 @@ Essa hipótese deverá ser validada com profissionais.
 - medicamentos;
 - gráficos avançados.
 
+
 ---
+
 
 # Regras de manutenção
 
+
 Sempre que uma conversa gerar:
+
 
 - uma decisão;
 - uma nova funcionalidade;
 - uma hipótese;
 - uma mudança de visão;
 
+
 este documento deverá ser atualizado antes da implementação.
+
 
 Este documento é a fonte oficial de verdade do produto.
 
+
 ---
+
 
 # 12. Definições consolidadas durante os testes do protótipo
 
+
 ## ✅ A visão Hoje reúne todos os animais
+
 
 A visão principal não deve ser separada por pet.
 
+
 As refeições de todos os animais ativos aparecem juntas e agrupadas por horário. O tutor pode filtrar por um ou vários animais por meio das pílulas de seleção.
 
+
 Regras do filtro:
+
 
 - todos os animais começam selecionados;
 - quando todos estão selecionados, tocar em um animal passa a mostrar apenas ele;
 - depois disso, outros animais podem ser adicionados ao filtro;
 - o filtro não deve permanecer vazio.
 
+
 ---
+
 
 ## ✅ Cada refeição deve identificar claramente o animal
 
+
 O card mostra o ícone e o nome do animal, além dos alimentos e respectivas quantidades.
+
 
 Quando há mais de um alimento na mesma refeição, cada item deve possuir separação visual suficiente para não parecer uma única linha de conteúdo.
 
+
 ---
+
 
 ## ✅ O cadastro de alimento não interrompe a criação do plano
 
+
 Durante a criação de um plano, o tutor pode cadastrar um alimento que ainda não existe.
+
 
 O formulário do plano permanece preenchido e, após o cadastro, o novo alimento é adicionado automaticamente à composição diária.
 
+
 ---
+
 
 ## ✅ Arquivamento é reversível
 
+
 Arquivar um animal não apaga pesos, planos, refeições ou demais dados históricos.
+
 
 Animais arquivados devem permanecer acessíveis em uma área própria e podem ser restaurados.
 
+
 ---
+
 
 ## ✅ A conta é acessada diretamente pelas iniciais do usuário
 
+
 Enquanto existir apenas um destino de conta e configurações, tocar nas iniciais do usuário abre diretamente essa tela.
+
 
 Não será criado um menu intermediário sem necessidade real.
 
+
 ---
+
+
+
 
 
 
 ## ✅ A tela Hoje privilegia a leitura rápida dos horários
 
+
 O card de resumo apresenta uma faixa horizontal rolável com todos os horários do dia.
 
+
 Regras:
+
 
 - cada horário funciona como atalho para o grupo correspondente na lista;
 - os horários têm espaçamento suficiente para serem diferenciados;
@@ -591,55 +828,78 @@ Regras:
 - o horário é o título visual do grupo, sem a frase “Refeição das…”;
 - cada grupo informa quantas refeições já foram registradas.
 
+
 As refeições de um mesmo horário aparecem como linhas compactas em acordeão:
+
 
 - ícone do animal;
 - nome do animal;
 - ícone de estado acompanhado por label;
 - controle de expandir ou recolher.
 
+
 Ao expandir, são exibidos alimentos, quantidades e ações de registro. Apenas uma refeição fica aberta por vez dentro de cada horário. Após registrar uma ação, o card se fecha automaticamente.
+
 
 O registro de uma refeição não deve desmontar a tela **Hoje**, exibir um carregamento global ou devolver o tutor ao topo. A interface deve atualizar o estado imediatamente, sincronizar os dados em segundo plano e preservar a posição visual do grupo de horário quando o card for recolhido.
 
+
 Quando a página tiver conteúdo longo, pode existir um controle flutuante discreto para voltar ao topo. Ele só deve aparecer depois de uma rolagem relevante e não pode cobrir ações, a navegação inferior ou as áreas seguras do aparelho.
 
+
 ---
+
 
 ## 💡 Navegação diária com menor deslocamento do ponteiro
 
+
 Em uma evolução futura do desktop, os controles de avançar e retroceder datas podem ser aproximados entre si, desde que a data continue visualmente clara e a navegação permaneça acessível. O objetivo é reduzir trajetos longos do ponteiro sem comprometer a leitura do card.
 
+
 ---
+
 
 ## ✅ Configurações não exibe seletor de animais sem função
 
+
 Os chips de animais são ocultados na tela Configurações. Um seletor não deve aparecer em uma tela na qual não altera nenhum conteúdo ou comportamento.
 
+
 ---
+
 
 ## ✅ Registros do dia medem informação preenchida
 
+
 Com a existência da opção **Não foi servida**, o progresso diário passa a contar refeições **registradas**, e não apenas refeições consumidas ou concluídas.
+
 
 Uma refeição está registrada quando o tutor informa qualquer resultado válido. Estados pendentes e atrasados ainda não entram no progresso.
 
+
 ---
+
 
 ## ✅ Compatibilidade móvel não deve impedir acessibilidade
 
+
 Para reduzir ocorrências de zoom ou corte indevido no PWA do iPhone:
+
 
 - a viewport usa a área segura do aparelho;
 - a aplicação impede overflow horizontal acidental;
 - campos de formulário mantêm fonte mínima de 16 px;
 - o ajuste automático do tamanho do texto é estabilizado.
 
+
 Não será desabilitado o zoom manual do usuário, pois isso prejudicaria acessibilidade.
+
 
 ---
 
+
 # 13. Estado de implementação do protótipo
+
 
 | Capacidade | Status |
 |---|---|
@@ -672,34 +932,49 @@ Não será desabilitado o zoom manual do usuário, pois isso prejudicaria acessi
 | Produto profissional para veterinários | 📅 Capacidade futura |
 
 
+
+
 ## Decisão de produto — registros antecipados (v0.6.1)
+
 
 O Rotina Pet mantém flexibilidade total: o tutor pode registrar uma refeição antes do horário programado. Para reduzir erros sem impor bloqueios, a interface mostra uma confirmação com o horário e o tempo restante.
 
+
 Notificações de refeição são enviadas apenas para ocorrências `pending`. A Edge Function revalida o status imediatamente antes do envio para cobrir alterações concorrentes.
+
 
 ## Decisão de produto — reconciliação de refeições ao alterar o plano (v0.6.2)
 
+
 Quando um plano alimentar é substituído, ou quando apenas seus horários são alterados, a data escolhida define o início da nova versão da rotina.
 
+
 A partir dessa data:
+
 
 - ocorrências ainda `pending` são removidas e recriadas conforme o plano vigente;
 - ocorrências `completed` e `skipped` permanecem intactas como histórico;
 - uma ocorrência já registrada para a mesma sequência da refeição impede a criação de uma nova ocorrência pendente equivalente;
 - a edição exclusiva de horários mantém alimentos, quantidades diárias e distribuição por refeição.
 
+
 Essa regra evita cards inválidos do plano anterior na tela Hoje sem apagar ações já registradas pelo tutor.
+
+
 
 
 ## ✅ Temas visuais de marca no MVP
 
+
 O MVP oferece duas variações cromáticas da mesma identidade visual:
+
 
 - **Clínica Serena** — tema padrão, com base porcelana, teal e damasco;
 - **Editorial Acolhedora** — alternativa com base creme, ameixa e pêssego.
 
+
 Regras:
+
 
 - os temas não representam modo claro e escuro;
 - não alteram funcionalidades, permissões ou o papel do usuário;
@@ -709,17 +984,24 @@ Regras:
 - a tipografia principal do produto passa a ser **Manrope**;
 - cores de estado preservam significado sem depender apenas da cor.
 
+
 A existência dos dois temas no MVP serve também como instrumento de aprendizado antes da definição final da identidade visual.
+
 
 ---
 
+
 # 14. Hipótese estratégica — adesão aos cuidados do pet
+
 
 ## 🧪 Problema e oportunidade
 
+
 Tutores precisam organizar não apenas a alimentação, mas também cuidados preventivos, tratamentos, consultas e hábitos de bem-estar. A concentração dessas rotinas em um único produto pode aumentar o valor para o tutor e ampliar o mercado profissional potencial.
 
+
 A expansão também cria riscos:
+
 
 - excesso de itens para registrar;
 - aumento da carga cognitiva;
@@ -728,17 +1010,24 @@ A expansão também cria riscos:
 - aumento de complexidade técnica, clínica e operacional;
 - tentativa prematura de atender profissionais com necessidades muito diferentes.
 
+
 A oportunidade deve ser perseguida como uma expansão da tese de **adesão**, e não como uma busca por oferecer a maior quantidade possível de funcionalidades.
+
 
 ## 🧪 Formulação estratégica em avaliação
 
+
 > O Rotina Pet conecta os cuidados recomendados pelos profissionais à rotina real de quem cuida do animal.
+
 
 Essa formulação permite crescer além da nutrição sem transformar o produto em uma agenda genérica. Ela ainda precisa ser validada antes de substituir a definição oficial do produto.
 
+
 ## 🧪 Hipóteses prioritárias para validação
 
+
 ### Saúde preventiva
+
 
 - vacinas;
 - vermífugos;
@@ -746,11 +1035,15 @@ Essa formulação permite crescer além da nutrição sem transformar o produto 
 - outros preventivos;
 - check-ups periódicos.
 
+
 Essas capacidades possuem ampla aplicabilidade, baixa frequência de registro e alto valor de lembrete e histórico. Constituem a primeira expansão recomendada para descoberta e prototipação.
+
 
 ### Consultas e exames
 
+
 Primeiro escopo possível:
+
 
 - registrar consulta ou exame;
 - criar lembrete;
@@ -758,13 +1051,18 @@ Primeiro escopo possível:
 - anexar comprovantes, pedidos ou resultados;
 - guardar observações.
 
+
 Não implica, nesta fase, criar prontuário completo, agenda operacional da clínica ou integração com sistemas veterinários.
+
 
 ### Medicamentos
 
+
 Possível segunda etapa, por possuir grande valor de adesão e maior sensibilidade clínica.
 
+
 Campos e estados a investigar:
+
 
 - medicamento, quantidade e unidade prescritas;
 - horários, início, duração ou uso contínuo;
@@ -774,11 +1072,15 @@ Campos e estados a investigar:
 - distinção entre prescrição profissional e cadastro do tutor;
 - histórico preservado e identificação do cuidador que registrou.
 
+
 O produto não deve sugerir doses ou substituir orientação profissional.
+
 
 ## 💡 Expansões opcionais de higiene e bem-estar
 
+
 Podem ser oferecidas apenas quando ativadas pelo usuário:
+
 
 - banho;
 - escovação de pelos;
@@ -787,32 +1089,45 @@ Podem ser oferecidas apenas quando ativadas pelo usuário:
 - limpeza de ouvidos;
 - tosa.
 
+
 Essas capacidades podem aumentar a utilidade para o tutor, mas lembretes isolados não constituem, por si só, um produto profissional completo para pet shops.
+
 
 ## 💡 Experimentos futuros
 
+
 ### Passeios
+
 
 Pode começar como uma rotina simples de realização e duração. Recursos como GPS, mapas, metas e integrações com dispositivos configuram outra categoria de produto e não fazem parte da hipótese inicial.
 
+
 ### Hidratação
+
 
 O registro manual de volume pode ser impreciso, especialmente com vários animais ou recipientes compartilhados. Deve ser investigado prioritariamente como protocolo clínico temporário, permitindo também registros qualitativos como normal, maior ou menor que o habitual.
 
+
 ### Treino e adestramento
+
 
 Pode formar uma vertical futura baseada em programas, exercícios, evolução e acompanhamento por adestradores. Não deve ser reduzido a um simples lembrete nem incorporado ao núcleo antes de descoberta específica.
 
+
 ### Protocolos especializados
+
 
 - recuperação pós-operatória;
 - acompanhamento de condições crônicas;
 - rotinas temporárias definidas por profissionais;
 - atividade física avançada.
 
+
 ## ✅ Estratégia para reduzir carga cognitiva
 
+
 Caso a hipótese avance, a experiência deve utilizar:
+
 
 - ativação de categorias pelo usuário ou profissional;
 - modelos prontos de recorrência;
@@ -823,9 +1138,12 @@ Caso a hipótese avance, a experiência deve utilizar:
 - navegação sem seções vazias ou ícones para áreas não utilizadas;
 - histórico e anexos acessíveis sem ocupar a tela principal.
 
+
 ## 🧪 Arquitetura conceitual a investigar
 
+
 O domínio pode compartilhar uma base genérica com:
+
 
 - plano de cuidado;
 - atividade de cuidado;
@@ -836,9 +1154,12 @@ O domínio pode compartilhar uma base genérica com:
 - profissional responsável;
 - anexos e observações.
 
+
 A generalização deve existir principalmente no modelo interno. A interface deve continuar específica para cada cuidado.
 
+
 ## 🧪 Sequência preliminar de descoberta e implementação
+
 
 1. Validar o problema e a disposição de uso com tutores.
 2. Validar valor profissional com veterinários nutricionistas e clínicos gerais.
@@ -848,9 +1169,12 @@ A generalização deve existir principalmente no modelo interno. A interface dev
 6. Testar higiene e bem-estar como categorias opcionais.
 7. Tratar passeios, hidratação e adestramento como experimentos separados.
 
+
 ## 🚫 Fora do escopo imediato
 
+
 A discussão desta hipótese não aprova a implementação de:
+
 
 - prontuário veterinário completo;
 - sistema de gestão de clínicas;
@@ -863,7 +1187,9 @@ A discussão desta hipótese não aprova a implementação de:
 - recomendações automáticas de medicamentos, doses ou tratamentos;
 - lançamento simultâneo de todas as categorias de cuidado.
 
+
 ## 🧪 Perguntas de validação
+
 
 - Quais cuidados os tutores realmente esquecem ou têm dificuldade de coordenar?
 - Quais registros eles manteriam após o entusiasmo inicial?
@@ -876,13 +1202,19 @@ A discussão desta hipótese não aprova a implementação de:
 - A nutrição deve permanecer como produto principal, plano específico ou primeira vertical de uma plataforma mais ampla?
 
 
+
+
 ---
+
 
 # 16. Professional Pilot — Veterinário + Tutor
 
+
 ## ✅ Objetivo do piloto
 
+
 Validar o Rotina Pet como ferramenta de trabalho para nutrição veterinária, conectando em um único fluxo:
+
 
 - prescrição nutricional;
 - documento entregue ao cliente;
@@ -892,41 +1224,58 @@ Validar o Rotina Pet como ferramenta de trabalho para nutrição veterinária, c
 - acompanhamento entre consultas;
 - atualização do tratamento.
 
+
 O piloto deve preservar integralmente o uso Tutor Solo e permitir que um mesmo tutor possua, no mesmo aplicativo, pets acompanhados profissionalmente e pets com planos pessoais.
+
 
 ## ✅ Prescrição profissional ≠ rotina
 
+
 A prescrição profissional é uma entidade clínica própria e não deve ser confundida com o `diet_plan` operacional usado hoje pelo tutor.
+
 
 - o veterinário controla alimentos, quantidades diárias, objetivos, orientações, opções de composição e revisão sugerida;
 - o tutor controla horários, número de refeições e organização da execução;
 - uma rotina pode ser gerada a partir de uma versão/opção da prescrição;
 - mudanças de prescrição preservam histórico e autoria.
 
+
 ## ✅ Paciente e vínculo profissional
+
 
 O pet pertence ao tutor. O vínculo com o veterinário é uma relação separada.
 
+
 O veterinário pode iniciar o cadastro de um paciente antes de o tutor aceitar o convite. Após o aceite, o caso profissional deve ser vinculado ao cadastro real do pet do tutor.
+
 
 O vínculo profissional não concede acesso geral à conta do tutor: o profissional acessa apenas os dados dos pets vinculados e somente enquanto o relacionamento estiver ativo.
 
+
 ## ✅ Peso no cadastro profissional
+
 
 Ao cadastrar um paciente, o veterinário pode informar peso opcionalmente.
 
+
 Esse peso pode ter origem em:
+
 
 - pesagem feita em consulta presencial;
 - informação fornecida pelo tutor durante consulta online.
 
+
 Quando o pet já estiver vinculado, o valor deve gerar um registro normal no histórico de peso, preservando data e autoria. Quando o vínculo ainda estiver pendente, o peso pode permanecer como dado inicial do caso e ser materializado no histórico após a vinculação.
+
 
 ## ✅ Versionamento da prescrição
 
+
 Alterações clínicas relevantes não sobrescrevem silenciosamente o tratamento anterior.
 
+
 Cada nova prescrição ou ajuste relevante gera uma versão, com:
+
 
 - autor;
 - data de criação;
@@ -934,25 +1283,35 @@ Cada nova prescrição ou ajuste relevante gera uma versão, com:
 - revisão sugerida opcional;
 - nota da alteração opcional.
 
+
 O histórico precisa permitir reconstruir qual prescrição estava vigente em cada período.
+
 
 ## ✅ Revisão sugerida
 
+
 Planos profissionais podem possuir uma data de **revisão sugerida**.
+
 
 Atingir essa data não encerra nem invalida automaticamente o plano. O objetivo é apoiar o acompanhamento profissional e a priorização de retornos.
 
+
 ## ✅ Múltiplas opções de composição
 
+
 Uma mesma versão da prescrição pode oferecer mais de uma composição válida, como:
+
 
 - 70/30;
 - 80/20;
 - 90/10.
 
+
 Essas proporções representam participação calórica entre alimentos quando assim definidas pelo profissional.
 
+
 Cada opção pode conter:
+
 
 - os alimentos utilizados;
 - as quantidades diárias de cada alimento;
@@ -960,21 +1319,30 @@ Cada opção pode conter:
 - kcal/dia por item quando disponível;
 - instruções específicas.
 
+
 A rotina do tutor utiliza uma opção ativa por vez. Trocar entre opções autorizadas não altera a prescrição e deve preservar a data de início da nova configuração.
+
 
 ## ✅ Meta calórica
 
+
 Uma versão da prescrição pode possuir meta energética diária opcional em kcal.
+
 
 Quando houver meta energética e proporções calóricas, o sistema pode calcular a parcela de kcal correspondente a cada alimento. A conversão automática para gramas só deve ocorrer quando existir informação confiável de densidade energética do alimento.
 
+
 No MVP, a gramatura prescrita pode continuar sendo informada diretamente pelo veterinário.
+
 
 ## ✅ Registro de consumo aproximado
 
+
 A experiência do tutor permanece simples e não exige pesagem de sobras.
 
+
 Escala inicial aprovada:
+
 
 - Comeu tudo = 100%;
 - Quase tudo = estimativa central de 80%, faixa conceitual 70–90%;
@@ -984,54 +1352,78 @@ Escala inicial aprovada:
 - Não foi servida = 0%;
 - Sem registro = ingestão desconhecida.
 
+
 `Nada` e `Não foi servida` têm o mesmo efeito quantitativo sobre ingestão, mas permanecem semanticamente distintos:
+
 
 - `Nada`: alimento oferecido e recusado;
 - `Não foi servida`: alimento não oferecido.
 
+
 `Sem registro` nunca deve ser convertido automaticamente em zero.
+
 
 A estimativa utilizada em cada ocorrência deve ser persistida para que mudanças futuras na escala não alterem retrospectivamente os dados históricos.
 
+
 ## ✅ Consolidado diário de ingestão
+
 
 O consolidado diário é uma informação prioritária para o profissional e deve apresentar principalmente a **porcentagem estimada ingerida em relação ao total diário prescrito**.
 
+
 Também deve apresentar a quantidade estimada na unidade prescrita quando aplicável, por exemplo:
+
 
 > ≈50% • ≈20 g de 40 g
 
+
 O percentual continua sendo exibido mesmo quando existem refeições sem registro.
 
+
 Exemplo:
+
 
 - prescrito: 40 g/dia;
 - 20 g registrados como consumidos;
 - 20 g sem registro.
 
+
 O produto deve mostrar:
+
 
 > **≈50% do total diário prescrito • ≈20 g de 40 g • 1 refeição sem registro**
 
+
 A ausência de registro não entra no numerador como ingestão e também não é tratada como zero conhecido. O dado deve ser sinalizado como parcial/incompleto, sem ocultar a porcentagem já confirmada ou estimada.
+
 
 Quando houver múltiplos alimentos/unidades, o consolidado deve preservar os valores por alimento. Uma porcentagem geral só deve ser apresentada quando sua interpretação for válida e não produzir falsa precisão.
 
+
 ## ✅ Observações e incidentes
+
 
 Devem coexistir:
 
+
 ### Observação por refeição
+
 
 Nota livre opcional vinculada à ocorrência específica.
 
+
 ### Registro diário
+
 
 Nota livre opcional por pet/data.
 
+
 ### Incidentes estruturados
 
+
 Lista de múltipla escolha para eventos recorrentes, inicialmente incluindo:
+
 
 - vômito;
 - regurgitação;
@@ -1041,13 +1433,18 @@ Lista de múltipla escolha para eventos recorrentes, inicialmente incluindo:
 - falta de apetite;
 - outro.
 
+
 Os incidentes devem ser armazenados de forma estruturada para permitir contagens e análise por período, sem depender da interpretação de texto livre.
+
 
 ## ✅ Documento/PDF do plano
 
+
 O plano criado no Rotina Pet deve poder gerar o documento profissional entregue ao tutor, evitando duplicação de trabalho pelo veterinário.
 
+
 O PDF deve suportar:
+
 
 - identificação do profissional;
 - CRMV/UF;
@@ -1066,13 +1463,18 @@ O PDF deve suportar:
 - data da prescrição;
 - revisão sugerida.
 
+
 O cabeçalho profissional deve ser configurado uma vez no perfil e reutilizado.
+
 
 A linguagem visual do documento deve derivar da identidade do Rotina Pet, combinando a clareza clínica do território **Clínica Serena** com o acolhimento do território **Editorial Acolhedora**. O MVP não inclui editor visual livre.
 
+
 ## ✅ Compatibilidade do piloto
 
+
 O Professional Pilot deve ser construído de forma aditiva e retrocompatível.
+
 
 - a versão estável atual permanece funcional;
 - tabelas existentes não devem ser renomeadas ou removidas para viabilizar o piloto;
@@ -1081,7 +1483,44 @@ O Professional Pilot deve ser construído de forma aditiva e retrocompatível.
 - a interface do piloto pode ser publicada em rota ou implantação separada;
 - novas permissões profissionais devem conceder somente o acesso estritamente necessário ao pet vinculado.
 
+
+## ✅ Estado do Professional Pilot — v0.8.1
+
+
+A primeira Wave do piloto profissional está implementada de forma aditiva.
+
+
+Capacidades já presentes:
+- perfil veterinário;
+- patient preliminar antes do vínculo com um pet real;
+- convite seguro com preview público mínimo;
+- autenticação/cadastro retornando ao mesmo convite;
+- matching e confirmação explícita do pet pelo tutor;
+- relacionamento profissional ativo;
+- materialização do peso inicial no happy path;
+- proteção contra conta errada e troca de conta preservando contexto;
+- idempotência do mesmo convite aceito;
+- resolução auditável de novo patient/novo convite quando o mesmo pet já possui acompanhamento ativo com o mesmo profissional.
+
+
+### ✅ Regra de canonicidade do acompanhamento
+
+
+Para o mesmo profissional + tutor + pet, quando já existe um acompanhamento ativo e estruturalmente íntegro:
+- o patient ativo existente permanece canônico;
+- `professional_relationships.professional_patient_id` aponta para o patient canônico daquele episódio;
+- um novo patient redundante é encerrado como `closed/duplicate` e referencia o canônico;
+- o novo convite termina como `resolved`, não `accepted`;
+- nenhum novo pet, relationship ou peso é criado nesse caminho;
+- um peso informado no cadastro redundante permanece como snapshot e só poderá entrar no histórico por ação clínica explícita posterior;
+- estados inconsistentes não são corrigidos silenciosamente pelo aceite.
+
+
+A deduplicação preventiva do lado profissional é uma camada de UX adicional e não substitui as garantias transacionais do backend.
+
+
 ## 🚫 Fora do escopo do Professional Pilot
+
 
 - prontuário veterinário completo;
 - agenda de consultas;
@@ -1093,4 +1532,3 @@ O Professional Pilot deve ser construído de forma aditiva e retrocompatível.
 - exames e receitas clínicas gerais;
 - equipes e múltiplas unidades complexas;
 - white label completo.
-

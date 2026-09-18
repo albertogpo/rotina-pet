@@ -1,35 +1,68 @@
-# Rotina Pet — Professional Pilot — Etapa 1
+﻿# Rotina Pet — Professional Pilot — Etapa 1
+
 
 ## Objetivo
 
+
 Criar a fundação técnica do modo profissional sem quebrar a experiência Tutor Solo atual.
 
+
+## Estado implementado — v0.8.1
+
+
+Em 2026-09-18, a fundação profissional e os Blocos 1–5 da Wave 1 estão implementados no código e no Supabase de produção.
+
+
+Estado atual:
+- fundação profissional aplicada;
+- paridade entre banco e migrations reconciliada para as RPCs de convite;
+- erros Supabase/PostgREST normalizados no frontend;
+- preview público protegido antes da autenticação;
+- troca de conta preservando o contexto do convite;
+- idempotência do mesmo convite aceito;
+- resolução transacional de novo patient/novo convite quando o pet já possui acompanhamento ativo com o mesmo profissional;
+- Tutor Solo preservado.
+
+
+O Bloco 5 possui smoke transacional de backend com `ROLLBACK` concluído; a validação do frontend publicado permanece registrada no runbook de smoke como etapa pós-deploy.
+
+
 Princípio estrutural:
+
 
 - **prescrição nutricional profissional** é uma entidade clínica;
 - **rotina** continua sendo a forma como o tutor executa a prescrição;
 - `diet_plans`, `meal_templates`, `meal_components` e `meal_occurrences` permanecem como núcleo da rotina atual;
 - novas tabelas profissionais são aditivas e se conectam ao núcleo existente por vínculos explícitos.
 
+
 ## Regra do consolidado de ingestão
+
 
 A ingestão estimada diária deve ser exibida mesmo quando existem refeições sem registro.
 
+
 Exemplo:
+
 
 - prescrito: 40 g/dia;
 - registrado: uma refeição de 20 g como `full`;
 - outra refeição de 20 g sem registro.
 
+
 Resultado exibido:
+
 
 - **≈50% do total diário prescrito**;
 - **≈20 g de 40 g**;
 - aviso: **1 refeição sem registro**.
 
+
 O percentual continua tendo como denominador o total diário prescrito. Refeições sem registro não são assumidas como zero: apenas não acrescentam ingestão ao numerador e tornam o dia incompleto.
 
+
 ### Mapeamento inicial
+
 
 | Estado | Estimativa | Interpretação |
 | --- | ---: | --- |
@@ -41,18 +74,24 @@ O percentual continua tendo como denominador o total diário prescrito. Refeiç�
 | Não foi servida | 0% | alimento não oferecido |
 | Sem registro | desconhecido | não inferir ingestão |
 
+
 `Nada` e `Não foi servida` têm o mesmo efeito quantitativo (0%), mas permanecem semanticamente diferentes.
 
+
 ## Entidades novas
+
 
 ### `user_roles`
 Permite que a mesma conta tenha um ou mais papéis (`tutor`, `veterinarian`).
 
+
 ### `professional_profiles`
 Perfil profissional do veterinário: nome de exibição, CRMV, UF, títulos, clínica, contato e futura identidade do PDF.
 
+
 ### `professional_patients`
 Caso/paciente no contexto profissional. Pode existir antes de o tutor aceitar o convite.
+
 
 Campos principais:
 - profissional;
@@ -60,21 +99,43 @@ Campos principais:
 - `tutor_user_id` opcional;
 - e-mail do tutor opcional para convite;
 - nome, espécie e raça do animal durante o estado preliminar;
-- status do caso.
+- peso inicial opcional;
+- status do caso;
+- `closed_reason` e `duplicate_of_patient_id` para preservar auditoria quando um cadastro redundante é encerrado.
 
-Quando o tutor aceita, o registro é ligado a um `pets.id` real. Depois disso, `pets` é a fonte principal dos dados compartilhados do animal.
+
+No aceite normal, o registro é ligado a um `pets.id` real e se torna o patient canônico daquele episódio de acompanhamento. Depois disso, `pets` é a fonte principal dos dados compartilhados do animal.
+
+
+Quando um novo patient preliminar encontra um pet que já possui acompanhamento ativo e estruturalmente íntegro com o mesmo profissional, o patient ativo existente permanece canônico. O novo patient é preservado como `closed` com `closed_reason = 'duplicate'` e referência explícita em `duplicate_of_patient_id`.
+
 
 ### `professional_relationships`
 Vínculo aceito entre profissional, tutor e pet.
 
+
 ### `professional_invitations`
-Convites com token, e-mail e status, separados do vínculo ativo.
+Convites com token hash, e-mail e status, separados do vínculo ativo.
+
+
+Estados relevantes:
+- `pending` — aguardando ação do tutor;
+- `accepted` — o convite criou/materializou um novo acompanhamento;
+- `resolved` — o tutor concluiu o fluxo, mas nenhum novo acompanhamento foi criado porque já existia um acompanhamento ativo equivalente;
+- `expired`;
+- `revoked`.
+
+
+Convites `resolved` preservam `resolved_by` e `resolved_at`; `accepted_by/accepted_at` permanecem nulos nesse caminho para não registrar uma nova autorização que não ocorreu.
+
 
 ### `nutrition_prescriptions`
 Tratamento nutricional profissional lógico de um paciente.
 
+
 ### `nutrition_prescription_versions`
 Versões imutáveis da prescrição. Alterações clínicas relevantes criam nova versão.
+
 
 Campos incluem:
 - início de vigência;
@@ -84,10 +145,13 @@ Campos incluem:
 - autoria;
 - nota da alteração.
 
+
 ### `nutrition_prescription_options`
 Alternativas autorizadas dentro da mesma versão (ex.: 70/30, 80/20, 90/10).
 
+
 A rotina usa uma opção ativa por vez.
+
 
 ### `nutrition_prescription_option_items`
 Alimentos e quantidades de cada opção. Suporta:
@@ -97,36 +161,50 @@ Alimentos e quantidades de cada opção. Suporta:
 - kcal/dia derivada/opcional;
 - instrução específica.
 
+
 ### `nutrition_prescription_sections`
 Blocos livres de orientação, por exemplo “Recomendações para perda de peso” e “Manejo hídrico”.
+
 
 ### `routine_prescription_bindings`
 Relaciona uma rotina (`diet_plans`) à versão/opção profissional que a originou.
 
+
 ### `daily_pet_logs`
 Nota livre por pet/data.
+
 
 ### `incident_types` e `daily_pet_incidents`
 Catálogo estruturado de incidentes e ocorrências diárias.
 
+
 ## Alterações aditivas em tabelas existentes
+
 
 ### `pets`
 Adicionar campos opcionais úteis ao fluxo profissional:
 - `breed`.
+
 
 ### `weight_entries`
 Adicionar:
 - `recorded_by` — usuário que efetivamente informou/registrou o peso;
 - `source` — `tutor`, `veterinarian`, `import`.
 
-Ao cadastrar um paciente, o peso é opcional. Se informado e o pet já estiver vinculado, deve gerar um `weight_entries` normal. Se o paciente ainda estiver aguardando aceite do tutor, o valor fica como peso inicial do caso e é materializado no histórico quando o pet for vinculado.
+
+Ao cadastrar um paciente, o peso é opcional. Se informado e o pet já estiver vinculado em um fluxo clínico explícito, pode gerar um `weight_entries` normal. Se o patient estiver aguardando aceite do tutor, o valor fica como snapshot de peso inicial do caso e é materializado no histórico no happy path de vínculo.
+
+
+Exceção do Bloco 5: se o novo patient for encerrado como duplicado porque o mesmo pet já possui acompanhamento ativo com o profissional, esse peso **não é materializado automaticamente** em `weight_entries`. Ele permanece apenas como snapshot do cadastro redundante até eventual ação clínica explícita posterior.
+
 
 ### `meal_occurrences`
 Adicionar:
 - `consumption_estimate_ratio numeric(4,3)`;
 
+
 O valor deve ser persistido no momento do registro para que mudanças futuras na escala não alterem retrospectivamente os consolidados históricos.
+
 
 Backfill inicial:
 - `full` = 1.000;
@@ -137,35 +215,75 @@ Backfill inicial:
 - `skipped` = 0.000;
 - `pending` = NULL.
 
+
 ## Compatibilidade
+
 
 1. Nenhuma tabela atual é removida ou renomeada.
 2. `pets.user_id` continua representando o proprietário da conta para a versão legada.
 3. Tutor Solo continua criando `diet_plans` exatamente como hoje.
 4. Planos profissionais não alteram diretamente registros históricos.
-5. A aplicação v0.7.7 pode ignorar completamente as novas tabelas.
+5. A experiência Tutor Solo pode ignorar completamente as tabelas profissionais e continuar operando sobre o núcleo legado.
 6. RLS existente dos tutores continua válida, com políticas adicionais somente onde o profissional precisa de acesso.
 
+
 ## Regra de autorização profissional
+
 
 O veterinário só pode acessar dados de um pet quando existir:
 - `professional_relationships.status = 'active'`, ou
 - um `professional_patients` criado por ele ainda em fluxo de convite, limitado aos dados daquele caso.
 
+
 O profissional não ganha acesso geral à conta do tutor.
+
+
+## Regra de duplicidade de acompanhamento — Bloco 5
+
+
+Quando o tutor escolhe um pet que já possui acompanhamento com o mesmo profissional, a RPC de aceite não transforma qualquer estado parecido em sucesso.
+
+
+A resolução automática só é permitida quando existe uma tríade íntegra:
+- `professional_patient.status = 'active'`;
+- mesmo profissional, tutor e pet;
+- exatamente um `professional_relationship.status = 'active'` apontando para esse patient.
+
+
+Nesse caso:
+- o patient ativo existente permanece canônico;
+- o patient preliminar do novo convite é encerrado como duplicado;
+- o novo convite termina como `resolved`;
+- o relationship existente não é alterado;
+- nenhum novo pet, relationship ou peso é criado;
+- retries retornam o mesmo patient efetivo e relationship histórico.
+
+
+Estados incoerentes — por exemplo patient ativo sem relationship correspondente, relationship ended com patient ainda active ou relationship apontando para outro patient — geram erro de integridade e exigem revisão explícita. O aceite não tenta reparar esses estados automaticamente.
+
 
 ## Próximo passo técnico
 
-Aplicar a migration de fundação e, em seguida, implementar os serviços TypeScript para:
-1. papéis/perfil profissional;
-2. pacientes e convites;
-3. criação/versionamento de prescrição;
-4. vínculo prescrição → rotina.
+
+A fundação, os serviços-base de perfil/paciente/convite e os fluxos de aceite da Wave 1 já estão implementados.
+
+
+Próximos passos do piloto:
+1. validar o Bloco 5 no frontend publicado conforme o smoke S16;
+2. implementar deduplicação preventiva na criação do patient do lado profissional;
+3. evoluir a tela **Pacientes**;
+4. implementar criação/versionamento de prescrição;
+5. conectar prescrição profissional à rotina do tutor;
+6. endurecer autorização e imutabilidade dos agregados clínicos antes da expansão do piloto.
+
+
 
 
 ## Decisão de UX — convite antes da autenticação
 
+
 No fluxo do tutor, o convite deve ser apresentado antes de exigir login ou criação de conta. A sequência da Etapa 1 é:
+
 
 1. abrir o link e consultar apenas o preview seguro do convite pelo token;
 2. mostrar profissional, clínica (quando houver) e dados mínimos do pet;
@@ -174,17 +292,24 @@ No fluxo do tutor, o convite deve ser apresentado antes de exigir login ou cria�
 5. após autenticar, o app resolve possível pet existente e pede confirmação do perfil a vincular;
 6. o aceite materializado no banco continua sendo feito exclusivamente pela RPC autenticada `accept_professional_invitation`.
 
+
 A intenção de aceite pode ser preservada no próprio deep link (`intent=accept`) para sobreviver ao retorno de confirmação de e-mail. O token bruto não deve ser persistido separadamente em `localStorage` ou `sessionStorage`.
+
 
 O RPC de preview pode ser executado por `anon` e `authenticated`, mas deve retornar somente os campos mínimos já previstos para o convite. Nenhuma leitura de pets, vínculos, rotina ou outros dados da conta fica disponível sem autenticação.
 
+
 ### Backlog de autenticação
+
 
 - **Passwordless / OTP ou magic link para convites profissionais**: avaliar após o piloto inicial para reduzir ainda mais a fricção de adoção. Não faz parte da implementação corrente da Etapa 1B; o fluxo atual continua usando e-mail + senha.
 
+
 ## Hardening pré-migration — 2026-09-16
 
+
 Antes da primeira aplicação da migration da Etapa 1B, a revisão final consolidou estes ajustes:
+
 
 - as RPCs de criação e aceite de convite continuam exclusivas de `authenticated`; o preview continua disponível a `anon` e `authenticated`; os grants são zerados explicitamente para `PUBLIC`, `anon` e `authenticated` antes de regrantar somente o mínimo necessário;
 - as RPCs que usam `pgcrypto` incluem `extensions` no `search_path`, compatível com a instalação padrão de extensões no Supabase;
@@ -194,14 +319,20 @@ Antes da primeira aplicação da migration da Etapa 1B, a revisão final consoli
 - `intent=accept` continua sendo persistido exclusivamente na URL. Não há cópia do token em `localStorage` ou `sessionStorage`;
 - o retorno de confirmação de e-mail depende de o Supabase manter a URL publicada na allowlist e de o template de confirmação respeitar `RedirectTo`/`ConfirmationURL`. Isso deve ser validado no smoke test de produção.
 
+
 ### Limite de confiança do piloto
+
 
 Na Etapa 1B, a ativação do papel `veterinarian` é self-service: uma conta autenticada pode habilitar sua própria área profissional. Isso é deliberado para o piloto controlado e **não equivale a verificação de identidade/CRMV**. Antes de abertura ampla do produto profissional, deve existir uma decisão explícita sobre aprovação ou verificação de profissionais.
 
+
 ### Itens que não bloqueiam o smoke test 1B
+
 
 As tabelas de prescrição já fazem parte da fundação, mas o criador completo de prescrição ainda não existe. Antes dessa camada ser liberada, revisar especificamente a regra de imutabilidade das versões publicadas e a autorização de leitura dos dados de rotina usados pelo consolidado profissional.
 
+
 ### Runbook de validação
+
 
 A aplicação, verificação pós-migration, smoke test ponta a ponta e cleanup da Etapa 1B estão documentados em [`PROFESSIONAL_PILOT_STAGE1_SMOKE_TEST.md`](./PROFESSIONAL_PILOT_STAGE1_SMOKE_TEST.md).
