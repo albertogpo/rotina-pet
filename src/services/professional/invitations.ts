@@ -1,3 +1,4 @@
+import { toAppError } from "../../lib/errors";
 import { supabase } from "../../lib/supabase";
 import type { Pet } from "../../types";
 import type {
@@ -109,7 +110,7 @@ export async function createProfessionalInvitation(
     p_expires_at: input.expiresAt ?? null,
   });
 
-  if (error) throw error;
+  if (error) throw toAppError(error, "Não foi possível criar o convite profissional.");
   const row = Array.isArray(data) ? data[0] : data;
   if (!row) throw new Error("Não foi possível criar o convite profissional.");
 
@@ -125,7 +126,7 @@ export async function getProfessionalInvitationPreview(token: string): Promise<P
     p_token: token.trim(),
   });
 
-  if (error) throw error;
+  if (error) throw toAppError(error, "Não foi possível consultar o convite profissional.");
   const row = Array.isArray(data) ? data[0] : data;
   if (!row) return null;
 
@@ -151,7 +152,7 @@ export async function acceptProfessionalInvitation(
     p_existing_pet_id: existingPetId ?? null,
   });
 
-  if (error) throw error;
+  if (error) throw toAppError(error, "Não foi possível aceitar o convite profissional.");
   const row = Array.isArray(data) ? data[0] : data;
   if (!row) throw new Error("O aceite do convite não retornou o vínculo criado.");
 

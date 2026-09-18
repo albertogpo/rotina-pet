@@ -17,7 +17,7 @@ import {PetForm} from "./components/PetForm";
 import {AppIcon,type AppIconName} from "./components/AppIcon";
 import {ProfessionalAreaPage} from "./components/ProfessionalAreaPage";
 import {ProfessionalInvitationPage} from "./components/ProfessionalInvitationPage";
-import {buildProfessionalInvitationUrl,clearProfessionalInvitationFromUrl,readProfessionalInvitationIntent,readProfessionalInvitationToken,setProfessionalInvitationIntentInUrl} from "./lib/professionalInvite";
+import {clearProfessionalInvitationFromUrl,hasProfessionalInvitationInUrl,readProfessionalInvitationIntent,readProfessionalInvitationToken,setProfessionalInvitationIntentInUrl} from "./lib/professionalInvite";
 
 
 type Tab="today"|"weight"|"foods"|"plan"|"pets"|"settings"|"professional";
@@ -64,9 +64,11 @@ function clearMealDeepLinkFromUrl(){
 function App(){
   const detectedTimezone=useMemo(()=>detectTimeZone(),[]);
   const initialDeepLink=useRef<MealDeepLink|null>(readMealDeepLink());
+  const initialProfessionalInviteRequested=useRef(hasProfessionalInvitationInUrl());
   const initialProfessionalInviteToken=useRef<string|null>(readProfessionalInvitationToken());
   const initialProfessionalInviteIntent=useRef(readProfessionalInvitationIntent());
   const[session,setSession]=useState<Session|null>(null);
+  const[professionalInviteRequested,setProfessionalInviteRequested]=useState(initialProfessionalInviteRequested.current);
   const[professionalInviteToken,setProfessionalInviteToken]=useState<string|null>(initialProfessionalInviteToken.current);
   const[professionalInviteIntent,setProfessionalInviteIntent]=useState(initialProfessionalInviteIntent.current);
   const[authLoading,setAuthLoading]=useState(true);
@@ -331,6 +333,7 @@ function App(){
     const handleNavigation=()=>{
       const next=readMealDeepLink();
       if(next)setDeepLinkTarget(next);
+      setProfessionalInviteRequested(hasProfessionalInvitationInUrl());
       setProfessionalInviteToken(readProfessionalInvitationToken());
       setProfessionalInviteIntent(readProfessionalInvitationIntent());
     };
@@ -468,8 +471,10 @@ function App(){
 
   async function finishProfessionalInvite(){
     clearProfessionalInvitationFromUrl();
+    initialProfessionalInviteRequested.current=false;
     initialProfessionalInviteToken.current=null;
     initialProfessionalInviteIntent.current=false;
+    setProfessionalInviteRequested(false);
     setProfessionalInviteToken(null);
     setProfessionalInviteIntent(false);
     setTab("today");
@@ -540,17 +545,13 @@ function App(){
   if(!hasSupabaseConfig)return <SetupScreen/>;
   if(authLoading)return <main className="center-page"><div className="spinner large"/></main>;
 
-  if(professionalInviteToken&&!session&&professionalInviteIntent)return <AuthScreen
-    context="professional-invite"
-    returnUrl={buildProfessionalInvitationUrl(professionalInviteToken,true)}
-  />;
-
-  if(professionalInviteToken){
+  if(professionalInviteRequested){
     return <ProfessionalInvitationPage
-      token={professionalInviteToken}
+      token={professionalInviteToken??""}
       pets={session?pets:[]}
       loadingPets={session?loadingBase:false}
       isAuthenticated={Boolean(session)}
+      accountEmail={session?.user.email??null}
       acceptedIntent={professionalInviteIntent}
       onAcceptIntent={()=>{
         initialProfessionalInviteIntent.current=true;

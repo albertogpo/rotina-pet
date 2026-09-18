@@ -1,3 +1,4 @@
+import { toAppError } from "../../lib/errors";
 import { supabase } from "../../lib/supabase";
 import type { ProfessionalRelationship } from "../../types/professional";
 
@@ -17,7 +18,7 @@ export async function listProfessionalRelationships(
   if (status !== "all") query = query.eq("status", status);
 
   const { data, error } = await query;
-  if (error) throw error;
+  if (error) throw toAppError(error, "Não foi possível listar os acompanhamentos profissionais.");
   return data as ProfessionalRelationship[];
 }
 
@@ -29,6 +30,6 @@ export async function getActiveRelationshipForPet(petId: string): Promise<Profes
     .eq("status", "active")
     .maybeSingle();
 
-  if (error) throw error;
+  if (error) throw toAppError(error, "Não foi possível consultar o acompanhamento profissional.");
   return data as ProfessionalRelationship | null;
 }

@@ -1,3 +1,4 @@
+import { toAppError } from "../../lib/errors";
 import { supabase } from "../../lib/supabase";
 import type { PreliminaryPatientInput, ProfessionalPatient } from "../../types/professional";
 
@@ -39,7 +40,7 @@ export async function listProfessionalPatients(): Promise<ProfessionalPatient[]>
     .select("*")
     .order("created_at", { ascending: false });
 
-  if (error) throw error;
+  if (error) throw toAppError(error, "Não foi possível listar os pacientes profissionais.");
   return data as ProfessionalPatient[];
 }
 
@@ -50,13 +51,13 @@ export async function getProfessionalPatient(id: string): Promise<ProfessionalPa
     .eq("id", id)
     .maybeSingle();
 
-  if (error) throw error;
+  if (error) throw toAppError(error, "Não foi possível consultar o paciente profissional.");
   return data as ProfessionalPatient | null;
 }
 
 export async function createPreliminaryPatient(input: PreliminaryPatientInput): Promise<ProfessionalPatient> {
   const { data: userData, error: userError } = await client().auth.getUser();
-  if (userError) throw userError;
+  if (userError) throw toAppError(userError, "Não foi possível identificar a conta atual.");
   if (!userData.user) throw new Error("Usuário não autenticado.");
 
   const { data, error } = await client()
@@ -69,7 +70,7 @@ export async function createPreliminaryPatient(input: PreliminaryPatientInput): 
     .select()
     .single();
 
-  if (error) throw error;
+  if (error) throw toAppError(error, "Não foi possível cadastrar o paciente profissional.");
   return data as ProfessionalPatient;
 }
 
@@ -87,11 +88,11 @@ export async function updatePreliminaryPatient(
     .select()
     .single();
 
-  if (error) throw error;
+  if (error) throw toAppError(error, "Não foi possível atualizar o paciente profissional.");
   return data as ProfessionalPatient;
 }
 
 export async function deletePreliminaryPatient(id: string): Promise<void> {
   const { error } = await client().from("professional_patients").delete().eq("id", id);
-  if (error) throw error;
+  if (error) throw toAppError(error, "Não foi possível remover o paciente profissional.");
 }

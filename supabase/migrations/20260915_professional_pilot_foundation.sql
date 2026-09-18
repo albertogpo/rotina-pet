@@ -367,23 +367,23 @@ begin
   end if;
 
   if not exists (
-    select 1 from public.user_roles
-    where user_id = v_user_id and role = 'veterinarian'
+    select 1 from public.user_roles ur
+    where ur.user_id = v_user_id and ur.role = 'veterinarian'
   ) then
     raise exception 'VETERINARIAN_ROLE_REQUIRED';
   end if;
 
   if not exists (
-    select 1 from public.professional_profiles
-    where user_id = v_user_id
+    select 1 from public.professional_profiles pp
+    where pp.user_id = v_user_id
   ) then
     raise exception 'PROFESSIONAL_PROFILE_REQUIRED';
   end if;
 
   select * into v_patient
-  from public.professional_patients
-  where id = p_professional_patient_id
-    and professional_user_id = v_user_id
+  from public.professional_patients pp
+  where pp.id = p_professional_patient_id
+    and pp.professional_user_id = v_user_id
   for update;
 
   if not found then
@@ -394,13 +394,13 @@ begin
     raise exception 'PROFESSIONAL_PATIENT_NOT_INVITABLE';
   end if;
 
-  update public.professional_invitations
+  update public.professional_invitations i
   set status = case
-    when expires_at is not null and expires_at <= now() then 'expired'
+    when i.expires_at is not null and i.expires_at <= now() then 'expired'
     else 'revoked'
   end
-  where professional_patient_id = v_patient.id
-    and status = 'pending';
+  where i.professional_patient_id = v_patient.id
+    and i.status = 'pending';
 
   v_token := encode(gen_random_bytes(32), 'hex');
   v_hash := encode(digest(v_token, 'sha256'), 'hex');
@@ -419,11 +419,11 @@ begin
     v_expires_at
   ) returning id into v_invitation_id;
 
-  update public.professional_patients
+  update public.professional_patients pp
   set tutor_email = v_email,
       status = 'invited',
       updated_at = now()
-  where id = v_patient.id;
+  where pp.id = v_patient.id;
 
   return query select v_invitation_id, v_token, v_expires_at;
 end;

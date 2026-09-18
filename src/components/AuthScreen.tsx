@@ -30,7 +30,7 @@ export function AuthScreen({
         const data=await signUp(email,password,returnUrl);
         if(!data.session){
           setMessage(isInvite
-            ?"Conta criada. Confirme seu e-mail e você voltará para este convite automaticamente."
+            ?"Conta criada. Confirme seu e-mail e você voltará para continuar este convite."
             :"Conta criada. Confira seu e-mail para confirmar o cadastro.");
         }
       }
@@ -52,7 +52,7 @@ export function AuthScreen({
     try{
       await sendPasswordReset(email.trim(),returnUrl);
       setMessage(isInvite
-        ?"Enviamos as instruções de recuperação para o seu e-mail. Este convite continuará no link de retorno."
+        ?"Enviamos as instruções de recuperação para o seu e-mail. Ao voltar por este link, você poderá continuar o convite."
         :"Enviamos as instruções de recuperação para o seu e-mail.");
     }catch(err){
       setError(err instanceof Error?err.message:"Não foi possível enviar o e-mail.");
@@ -65,13 +65,14 @@ export function AuthScreen({
     <section className="auth-card">
       <div className="brand-mark">🐾</div>
       <p className="eyebrow">Rotina Pet</p>
+      {isInvite&&<div className="invite-identity invite-auth-identity" aria-label="Estado da sessão"><span className="invite-identity-avatar is-visitor">?</span><span className="invite-identity-copy"><strong>Visitante</strong><small>não autenticado</small></span></div>}
       <h1>{isInvite?"Só falta identificar você":mode==="login"?"Entrar":"Criar conta"}</h1>
       <p className="muted">{isInvite
         ?mode==="login"
-          ?"Entre com o e-mail que recebeu o convite para concluir o vínculo."
-          :"Crie sua conta com o e-mail que recebeu o convite para concluir o vínculo."
+          ?"Entre com o e-mail que recebeu este convite para continuar."
+          :"Crie sua conta com o e-mail que recebeu este convite. Depois da confirmação, você volta para continuar."
         :"Acompanhe alimentação e peso de cada animal."}</p>
-      {isInvite&&<p className="invite-auth-note">Você já aceitou o convite. Ele fica preservado enquanto identificamos sua conta.</p>}
+      {isInvite&&<p className="invite-auth-note">O convite não vai se perder. Entre com a conta que o recebeu e você continua de onde parou.</p>}
       <form onSubmit={submit} className="stack-form">
         <label>E-mail<input type="email" required value={email} onChange={e=>setEmail(e.target.value)} autoComplete="email"/></label>
         <label>Senha<input type="password" required minLength={6} value={password} onChange={e=>setPassword(e.target.value)} autoComplete={mode==="login"?"current-password":"new-password"}/></label>

@@ -1,6 +1,7 @@
 import {useEffect,useMemo,useState} from "react";
 import type {Species} from "../types";
 import type {ProfessionalPatient,ProfessionalProfile,ProfessionalProfileInput} from "../types/professional";
+import {appErrorText} from "../lib/errors";
 import {buildProfessionalInvitationUrl} from "../lib/professionalInvite";
 import {createProfessionalInvitation} from "../services/professional/invitations";
 import {createPreliminaryPatient,listProfessionalPatients,updatePreliminaryPatient} from "../services/professional/patients";
@@ -28,7 +29,7 @@ function speciesLabel(species:Species){return species==="dog"?"Cachorro":"Gato";
 function speciesIcon(species:Species){return species==="dog"?"🐶":"🐈";}
 
 function professionalError(error:unknown,fallback:string){
-  const raw=error instanceof Error?error.message:String(error??"");
+  const raw=appErrorText(error,"");
   if(/user_roles|professional_profiles|professional_patients|create_professional_invitation/i.test(raw)&&/does not exist|schema cache|could not find/i.test(raw)){
     return "A infraestrutura profissional ainda não está disponível neste ambiente. A migration da Etapa 1B precisa ser aplicada antes do piloto.";
   }

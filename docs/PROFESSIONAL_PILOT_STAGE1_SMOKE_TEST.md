@@ -365,3 +365,107 @@ A Etapa 1B pode ser considerada suficientemente sólida para a próxima camada s
 - Tutor Solo existente continua funcional.
 
 Depois disso, o próximo passo natural é a tela mínima de **Pacientes** para o piloto e, em seguida, o primeiro fluxo de criação/versionamento de prescrição, antes de construir prontuário completo.
+
+## 10. Fechamento do smoke da v0.8.0 — 2026-09-18
+
+### S13 — Idempotência do mesmo aceite após sucesso
+
+**Resultado: PASS.**
+
+Foi criado um cenário artificial isolado (`S13 Idem`) com pet novo e peso inicial de `12,3 kg` em `2026-09-18`. Após o primeiro aceite, foram registrados IDs, contagens e timestamps do paciente, convite, pet, relacionamento e peso.
+
+A reabertura do link pela interface apresentou corretamente o estado terminal **“Convite já concluído”**, sem novo efeito no banco. Em seguida, a RPC `accept_professional_invitation` foi repetida explicitamente com o mesmo token bruto e o mesmo usuário autenticado.
+
+Resultado do retry:
+- retornou os mesmos IDs de convite, paciente, pet, relacionamento e peso inicial;
+- pet permaneceu único;
+- relacionamento permaneceu único e ativo;
+- peso permaneceu único;
+- convite permaneceu único e aceito;
+- timestamps relevantes permaneceram inalterados.
+
+Classificação do S13:
+- integridade/idempotência de dados: **PASS**;
+- semântica da RPC: **PASS**;
+- UX de reabertura: **PASS**;
+- segurança no cenário testado: **PASS**.
+
+O teste não utilizou nem alterou o convite da Nina.
+
+### S11 — diferido para v0.8.1
+
+O cenário **S11 — Logout/troca de conta preservando contexto** permanece deliberadamente adiado até a implementação dos fixes de troca de conta da v0.8.1. O convite da Nina deve permanecer intacto para esse reteste: não aceitar, revogar, regenerar ou alterar antes do S11.
+
+### Critério operacional de encerramento
+
+Embora a seção 9 descreva o critério ideal original incluindo S11, para o ciclo real da v0.8.0 o smoke é considerado **suficientemente fechado para avançar o desenvolvimento da v0.8.1**, porque:
+- os fluxos estruturais principais foram exercitados;
+- S13 confirmou idempotência sem duplicação ou regravação de estado;
+- não houve evidência de vazamento de dados ou corrupção parcial;
+- Tutor Solo permaneceu funcional;
+- os problemas restantes estão identificados e registrados no backlog da v0.8.1;
+- S11 depende justamente dos fixes que serão implementados na Wave 1 e será repetido depois deles.
+
+Este fechamento não reclassifica S11 como PASS; apenas registra que ele não bloqueia o início da v0.8.1.
+
+## 11. Acompanhamento da v0.8.1 — Wave 1
+
+### Blocos 1 e 2 — 2026-09-18
+
+- Bloco 1 concluído em produção e no repositório: RPC `create_professional_invitation` consolidada e migration corretiva registrada.
+- Bloco 2 concluído no código-fonte: normalização central de erros Supabase/PostgREST adicionada ao fluxo profissional.
+- O frontend ainda depende de push/deploy da mantenedora para validação em ambiente publicado.
+
+### S10 — fix implementado no Bloco 3
+
+**Status:** IMPLEMENTADO NO CÓDIGO; RETESTE PENDENTE APÓS DEPLOY.
+
+Alteração implementada em 2026-09-18:
+- `App.tsx` deixa de encaminhar `intent=accept` diretamente para autenticação antes de validar o convite;
+- `ProfessionalInvitationPage` consulta primeiro o preview público;
+- somente convite válido e pendente pode chegar ao `AuthScreen`;
+- token ausente, vazio ou não encontrado exibe apenas o estado neutro **“Convite não encontrado”**;
+- o CTA **“Ir para o Rotina Pet”** usa o fluxo de saída que remove `invite`, `token` e `intent` da URL;
+- o token bruto continua somente na URL e não é copiado para `localStorage` ou `sessionStorage`.
+
+Reteste pós-deploy:
+1. abrir convite válido sem `intent` e confirmar preview público;
+2. adicionar `intent=accept` e confirmar que convite válido chega à autenticação somente depois do preview;
+3. adulterar o token mantendo `intent=accept` e confirmar que **não** aparece login/cadastro;
+4. testar também `invite=professional&intent=accept` sem `token`;
+5. confirmar copy **“Convite não encontrado”** sem dados de pet/profissional/clínica;
+6. tocar **Ir para o Rotina Pet** e confirmar remoção de `invite`, `token` e `intent` da URL.
+
+Não marcar S10 como PASS até esse reteste ser executado no frontend publicado.
+
+
+
+### S7/S11 — fix implementado no Bloco 4
+
+**Status:** IMPLEMENTADO NO CÓDIGO; RETESTE PENDENTE APÓS DEPLOY.
+
+Alteração implementada em 2026-09-18:
+- `INVITATION_EMAIL_MISMATCH` é convertido em estado explícito **Este convite foi enviado para outra conta**;
+- a UI orienta entrar com o e-mail que recebeu o convite sem revelar o endereço convidado;
+- **Entrar com outra conta** executa logout sem limpar o deep link, preservando `invite`, `token` e `intent=accept`;
+- o fluxo profissional exibe identidade discreta: conta atual com inicial/e-mail ou **Visitante / não autenticado**;
+- `AuthScreen` passa a dizer **Entre com o e-mail que recebeu este convite para continuar** e não afirma aceite antes da RPC autenticada concluir;
+- não houve alteração de banco nem uso do convite da Nina.
+
+Reteste S7 pós-deploy:
+1. abrir convite pending com uma conta controlada cujo e-mail não corresponde ao convite;
+2. tentar autorizar e confirmar título **Este convite foi enviado para outra conta**;
+3. confirmar que não há CTA de retry/concluir na mesma conta;
+4. confirmar ausência de novo pet, relacionamento, peso e `accepted_at`;
+5. tocar **Entrar com outra conta** e confirmar logout com URL intacta.
+
+Reteste S11 pós-deploy, somente depois do S7:
+1. usar o convite preservado da Nina;
+2. iniciar o aceite com a conta errada até o estado de divergência;
+3. tocar **Entrar com outra conta**;
+4. confirmar `invite`, `token` e `intent=accept` ainda presentes;
+5. autenticar com a conta correta;
+6. confirmar retorno ao mesmo convite, identidade da conta correta e continuidade sem duplicações;
+7. só então registrar S11 como PASS/FAIL.
+
+Não marcar S7 UX nem S11 como PASS até esses cenários serem executados no frontend publicado.

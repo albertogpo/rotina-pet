@@ -7,6 +7,12 @@ function appBaseUrl(){
   return url;
 }
 
+
+export function hasProfessionalInvitationInUrl(){
+  const params=new URLSearchParams(window.location.search);
+  return params.get("invite")===INVITE_KIND;
+}
+
 export function readProfessionalInvitationToken(){
   const params=new URLSearchParams(window.location.search);
   if(params.get("invite")!==INVITE_KIND)return null;
