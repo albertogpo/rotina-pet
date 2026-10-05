@@ -15,7 +15,39 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Data de preparação: 2026-09-16
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -49,7 +81,39 @@ Este runbook cobre a validação da fundação profissional da Etapa 1B e dos re
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## 1. Baseline histórico e estado atual das migrations
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -69,10 +133,16 @@ Este runbook cobre a validação da fundação profissional da Etapa 1B e dos re
 A fundação original da Etapa 1B foi introduzida por:
 
 
+
+
 `supabase/migrations/20260915_professional_pilot_foundation.sql`
 
 
+
+
 Na v0.8.1, o histórico vigente inclui também:
+
+
 
 
 - `20260918161151_sync_professional_invitation_rpc.sql`;
@@ -80,10 +150,30 @@ Na v0.8.1, o histórico vigente inclui também:
 - `20260918192021_fix_professional_invitation_retry_relationship_lookup.sql`.
 
 
+
+
 As migrations acima já foram aplicadas ao Supabase de produção. As seções de pré-migration permanecem neste documento como referência histórica e para novas instalações/reprodução do ambiente.
 
 
+
+
 Revisão de segurança realizada antes da aplicação:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -128,7 +218,39 @@ Revisão de segurança realizada antes da aplicação:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Limites deliberados do piloto:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -163,7 +285,39 @@ Limites deliberados do piloto:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## 2. Pré-flight antes de aplicar
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -197,7 +351,39 @@ Limites deliberados do piloto:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Antes do smoke em produção, confirmar que o commit/deploy do GitHub Pages contém pelo menos:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -236,7 +422,39 @@ Antes do smoke em produção, confirmar que o commit/deploy do GitHub Pages cont
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Não executar o smoke contra um build anterior, porque ele não exercitará o fluxo revisado.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -270,7 +488,39 @@ Não executar o smoke contra um build anterior, porque ele não exercitará o fl
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Em **Authentication → URL Configuration**:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -307,7 +557,39 @@ Em **Authentication → URL Configuration**:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Em **Authentication → Email Templates → Confirm signup**, confirmar que o template respeita o redirect passado pelo app. O caminho mais simples é usar `{{ .ConfirmationURL }}`. Se o template foi customizado construindo a URL manualmente, ele não pode ignorar `{{ .RedirectTo }}` em favor de uma `SiteURL` fixa.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -341,7 +623,39 @@ O fluxo precisa devolver o navegador para uma URL deste formato:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 `https://albertogpo.github.io/rotina-pet/?invite=professional&token=...&intent=accept`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -375,6 +689,22 @@ O token bruto permanece somente na URL; não deve ser copiado para `localStorage
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### 2.3 Backup / ponto de retorno
 
 
@@ -392,7 +722,39 @@ O token bruto permanece somente na URL; não deve ser copiado para `localStorage
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Se o projeto tiver backup gerenciado recente no Supabase, confirmar a existência antes da mudança. Se for necessário um dump manual com CLI, a partir do repositório vinculado:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -432,7 +794,39 @@ supabase db dump --linked --data-only > backup-data-pre-professional-20260916.sq
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 O dump deve ser armazenado fora de repositório público e tratado como dado sensível.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -466,6 +860,22 @@ Nunca usar `supabase db reset --linked` neste projeto de produção: o comando �
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## 3. Aplicação da migration
 
 
@@ -483,7 +893,39 @@ Nunca usar `supabase db reset --linked` neste projeto de produção: o comando �
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### Caminho preferencial quando o histórico de migrations está consistente
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -523,7 +965,39 @@ supabase db push
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Só executar `db push` se o dry-run listar exatamente migrations que se pretende aplicar. Se migrations antigas executadas manualmente aparecerem como pendentes, interromper e reconciliar o histórico antes de prosseguir.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -557,7 +1031,39 @@ Só executar `db push` se o dry-run listar exatamente migrations que se pretende
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Se o projeto continua usando migrations aplicadas manualmente pelo Dashboard, abrir **SQL Editor**, copiar a versão vigente de `20260915_professional_pilot_foundation.sql` e executar somente esse arquivo. Não misturar com cleanup nem com dados do smoke na mesma execução.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -591,7 +1097,27 @@ Depois, registrar/reconciliar o histórico de migration antes de adotar `db push
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### Estado das migrations da Wave 1
+
+
+
+
 
 
 
@@ -606,7 +1132,27 @@ Em 2026-09-18:
 
 
 
+
+
+
+
 ## 4. Verificação pós-migration
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -640,7 +1186,39 @@ Executar no SQL Editor após a aplicação.
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### 4.1 Tabelas e colunas principais
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -666,6 +1244,22 @@ select
   to_regclass('public.professional_relationships') as professional_relationships,
   to_regclass('public.nutrition_prescriptions') as nutrition_prescriptions,
   to_regclass('public.daily_pet_logs') as daily_pet_logs;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -708,6 +1302,22 @@ order by table_name, column_name;
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Esperado: todos os `to_regclass` não nulos e todas as colunas acima presentes.
 
 
@@ -725,7 +1335,39 @@ Esperado: todos os `to_regclass` não nulos e todas as colunas acima presentes.
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### 4.2 RPCs e `SECURITY DEFINER`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -775,6 +1417,22 @@ order by p.proname;
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Esperado: as três RPCs de convite e `has_active_professional_relationship` com o modo previsto na migration; `get_daily_intake_summary` permanece invoker.
 
 
@@ -792,7 +1450,39 @@ Esperado: as três RPCs de convite e `has_active_professional_relationship` com 
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### 4.3 Grants essenciais
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -834,7 +1524,39 @@ select
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Esperado:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -873,7 +1595,39 @@ Esperado:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### 4.4 RLS e policies
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -925,6 +1679,22 @@ order by c.relname;
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 select tablename, policyname, cmd, roles
 from pg_policies
 where schemaname = 'public'
@@ -938,6 +1708,22 @@ where schemaname = 'public'
   )
 order by tablename, policyname;
 ```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -971,7 +1757,39 @@ Esperado: RLS habilitado nas novas tabelas e políticas legadas de ownership ain
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### 4.5 Estrutura do token
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1011,7 +1829,39 @@ order by ordinal_position;
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Esperado: existe `token_hash`; não existe coluna de token bruto.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1045,7 +1895,39 @@ Esperado: existe `token_hash`; não existe coluna de token bruto.
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Preferir duas contas separadas da conta principal existente. Se o provedor de e-mail aceitar plus addressing e entregar os e-mails corretamente, usar o padrão:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1080,6 +1962,22 @@ Preferir duas contas separadas da conta principal existente. Se o provedor de e-
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Antes do teste, enviar uma mensagem simples para cada alias ou criar as contas e confirmar que ambos os e-mails chegam. Confirmar no Supabase Auth que foram criados dois `user_id` diferentes. Se o provedor não suportar aliases com `+`, usar duas caixas de teste reais.
 
 
@@ -1097,7 +1995,39 @@ Antes do teste, enviar uma mensagem simples para cada alias ou criar as contas e
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Dados profissionais recomendados:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1134,7 +2064,39 @@ Dados profissionais recomendados:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Não usar nome, CRMV, e-mail ou clínica da veterinária real.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1168,7 +2130,39 @@ Não usar nome, CRMV, e-mail ou clínica da veterinária real.
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Registrar para cada cenário: `PASS`, `FAIL`, evidência e observação.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1219,7 +2213,39 @@ Registrar para cada cenário: `PASS`, `FAIL`, evidência e observação.
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## 7. Consultas de confirmação durante o smoke
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1253,6 +2279,22 @@ Substituir apenas pelos e-mails artificiais usados no teste.
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ```sql
 -- IDs das contas de teste
 select id, email, email_confirmed_at
@@ -1261,6 +2303,22 @@ where lower(email) in (
   lower('<ALIAS_VET>'),
   lower('<ALIAS_TUTOR>')
 );
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1314,6 +2372,22 @@ order by p.created_at desc, i.created_at desc;
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 -- Peso inicial materializado
 select w.id, w.pet_id, w.recorded_at, w.weight_kg, w.recorded_by, w.source, w.notes
 from public.weight_entries w
@@ -1326,6 +2400,22 @@ where w.id in (
   and initial_weight_entry_id is not null
 );
 ```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1359,6 +2449,22 @@ Para idempotência, registrar as contagens de `pets`, `professional_relationship
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## 8. Cleanup — executar somente depois de encerrar a validação
 
 
@@ -1376,7 +2482,39 @@ Para idempotência, registrar as contagens de `pets`, `professional_relationship
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Usar apenas IDs/e-mails das contas artificiais. Primeiro identificar os IDs; depois apagar dados em ordem controlada.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1413,8 +2551,40 @@ where lower(email) in (lower('<ALIAS_VET>'), lower('<ALIAS_TUTOR>'));
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 -- 2. Em uma transação, remover apenas dados profissionais/artificiais conhecidos.
 begin;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1451,6 +2621,22 @@ where professional_user_id = '<VET_USER_ID>'::uuid
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 delete from public.professional_invitations
 where professional_user_id = '<VET_USER_ID>'::uuid
    or accepted_by = '<TUTOR_USER_ID>'::uuid;
@@ -1470,9 +2656,41 @@ where professional_user_id = '<VET_USER_ID>'::uuid
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 -- Pacientes do profissional de teste. A FK do peso é SET NULL quando necessário.
 delete from public.professional_patients
 where professional_user_id = '<VET_USER_ID>'::uuid;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1512,9 +2730,41 @@ where id in (
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 -- Perfil/papel profissional de teste.
 delete from public.professional_profiles where user_id = '<VET_USER_ID>'::uuid;
 delete from public.user_roles where user_id = '<VET_USER_ID>'::uuid and role = 'veterinarian';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1549,7 +2799,39 @@ commit;
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Depois, em **Authentication → Users**, excluir manualmente os dois usuários Auth artificiais, se não houver razão para preservá-los. Não inserir/delete diretamente em `auth.users` como procedimento normal de cleanup; preferir o Dashboard/Admin API.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1583,7 +2865,39 @@ Depois, em **Authentication → Users**, excluir manualmente os dois usuários A
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 A Etapa 1B pode ser considerada suficientemente sólida para a próxima camada somente quando:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1623,7 +2937,39 @@ A Etapa 1B pode ser considerada suficientemente sólida para a próxima camada s
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Depois disso, o próximo passo natural é a tela mínima de **Pacientes** para o piloto e, em seguida, o primeiro fluxo de criação/versionamento de prescrição, antes de construir prontuário completo.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1657,7 +3003,39 @@ Depois disso, o próximo passo natural é a tela mínima de **Pacientes** para o
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### S13 — Idempotência do mesmo aceite após sucesso
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1691,6 +3069,22 @@ Depois disso, o próximo passo natural é a tela mínima de **Pacientes** para o
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Foi criado um cenário artificial isolado (`S13 Idem`) com pet novo e peso inicial de `12,3 kg` em `2026-09-18`. Após o primeiro aceite, foram registrados IDs, contagens e timestamps do paciente, convite, pet, relacionamento e peso.
 
 
@@ -1708,7 +3102,39 @@ Foi criado um cenário artificial isolado (`S13 Idem`) com pet novo e peso inici
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 A reabertura do link pela interface apresentou corretamente o estado terminal **“Convite já concluído”**, sem novo efeito no banco. Em seguida, a RPC `accept_professional_invitation` foi repetida explicitamente com o mesmo token bruto e o mesmo usuário autenticado.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1748,11 +3174,43 @@ Resultado do retry:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Classificação do S13:
 - integridade/idempotência de dados: **PASS**;
 - semântica da RPC: **PASS**;
 - UX de reabertura: **PASS**;
 - segurança no cenário testado: **PASS**.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1786,7 +3244,39 @@ O teste não utilizou nem alterou o convite da Nina.
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### S11 — diferido para v0.8.1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1820,7 +3310,39 @@ O cenário **S11 — Logout/troca de conta preservando contexto** permanece deli
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### Critério operacional de encerramento
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1860,7 +3382,39 @@ Embora a seção 9 descreva o critério ideal original incluindo S11, para o cic
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Este fechamento não reclassifica S11 como PASS; apenas registra que ele não bloqueia o início da v0.8.1.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1894,7 +3448,39 @@ Este fechamento não reclassifica S11 como PASS; apenas registra que ele não bl
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### Blocos 1 e 2 — 2026-09-18
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1930,6 +3516,22 @@ Este fechamento não reclassifica S11 como PASS; apenas registra que ele não bl
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### S10 — fix implementado no Bloco 3
 
 
@@ -1947,7 +3549,39 @@ Este fechamento não reclassifica S11 como PASS; apenas registra que ele não bl
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 **Status:** PASS PÓS-DEPLOY NA v0.8.1.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1987,6 +3621,22 @@ Alteração implementada em 2026-09-18:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Reteste pós-deploy:
 1. abrir convite válido sem `intent` e confirmar preview público;
 2. adicionar `intent=accept` e confirmar que convite válido chega à autenticação somente depois do preview;
@@ -1994,6 +3644,22 @@ Reteste pós-deploy:
 4. testar também `invite=professional&intent=accept` sem `token`;
 5. confirmar copy **“Convite não encontrado”** sem dados de pet/profissional/clínica;
 6. tocar **Ir para o Rotina Pet** e confirmar remoção de `invite`, `token` e `intent` da URL.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -2059,6 +3725,54 @@ Reteste executado no frontend publicado em 2026-09-18: **S10 PASS na v0.8.1**.
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### S7/S11 — fix implementado no Bloco 4
 
 
@@ -2076,7 +3790,39 @@ Reteste executado no frontend publicado em 2026-09-18: **S10 PASS na v0.8.1**.
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 **Status:** S7 PASS + S11 PASS PÓS-DEPLOY NA v0.8.1.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -2116,12 +3862,44 @@ Alteração implementada em 2026-09-18:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Reteste S7 pós-deploy:
 1. abrir convite pending com uma conta controlada cujo e-mail não corresponde ao convite;
 2. tentar autorizar e confirmar título **Este convite foi enviado para outra conta**;
 3. confirmar que não há CTA de retry/concluir na mesma conta;
 4. confirmar ausência de novo pet, relacionamento, peso e `accepted_at`;
 5. tocar **Entrar com outra conta** e confirmar logout com URL intacta.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -2146,6 +3924,22 @@ Reteste S11 pós-deploy, somente depois do S7:
 5. autenticar com a conta correta;
 6. confirmar retorno ao mesmo convite, identidade da conta correta e continuidade sem duplicações;
 7. concluir o aceite e verificar o estado final no banco.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -2195,7 +3989,55 @@ Execução real em 2026-09-18: o cenário `Smoke S7 S10` foi reutilizado deliber
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### Fechamento do reteste pós-deploy — 2026-09-18
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -2229,7 +4071,39 @@ Execução real em 2026-09-18: o cenário `Smoke S7 S10` foi reutilizado deliber
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 **Resultado: PASS na v0.8.1.**
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -2269,7 +4143,39 @@ Validado no frontend publicado:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #### S7 — conta/e-mail errado
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -2303,7 +4209,39 @@ Validado no frontend publicado:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Cenário artificial: `Smoke S7 S10`, cachorro SRD, peso inicial `8,7 kg`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -2343,7 +4281,39 @@ Com conta controlada errada:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Isso substitui o resultado histórico da v0.8.0 apenas para a v0.8.1: o histórico de **PASS funcional/segurança + FAIL de UX** da versão anterior permanece documentado acima.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -2377,6 +4347,22 @@ Isso substitui o resultado histórico da v0.8.0 apenas para a v0.8.1: o históri
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 **Resultado: PASS na v0.8.1.**
 
 
@@ -2394,7 +4380,39 @@ Isso substitui o resultado histórico da v0.8.0 apenas para a v0.8.1: o históri
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 O reteste foi executado com o mesmo cenário artificial `Smoke S7 S10`, em vez de consumir o convite preservado da Nina. Razão operacional: o cenário artificial já estava isolado, `pending` e adequado para testar a transição completa com menor risco.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -2435,7 +4453,39 @@ Fluxo validado:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 O convite da Nina permaneceu intacto e não foi necessário para este reteste.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -2469,7 +4519,39 @@ O convite da Nina permaneceu intacto e não foi necessário para este reteste.
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 **Resultado: PASS.**
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -2507,7 +4589,39 @@ O convite da Nina permaneceu intacto e não foi necessário para este reteste.
 
 
 
-Conclusão operacional: os fixes dos Blocos 3 e 4 estão **validados em produção**. O Bloco 5 já foi aprovado, implementado no código e no banco e possui smoke transacional de backend com `ROLLBACK` aprovado. A etapa restante para encerrá-lo é o **S16 no frontend publicado**, seguida das regressões indicadas abaixo.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Conclusão operacional: os fixes dos Blocos 3 e 4 estão **validados em produção**. O Bloco 5 também foi **validado ponta a ponta em produção** pelo S16. Para o fechamento formal da Wave 1/v0.8.1, restam apenas as regressões obrigatórias indicadas abaixo e a revisão documental final.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -2541,6 +4655,22 @@ Conclusão operacional: os fixes dos Blocos 3 e 4 estão **validados em produç�
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### S16 — Bloco 5
 
 
@@ -2558,7 +4688,31 @@ Conclusão operacional: os fixes dos Blocos 3 e 4 estão **validados em produç�
 
 
 
-Status atual: **BACKEND TRANSACIONAL PASS / FRONTEND PUBLICADO AINDA NÃO VALIDADO**.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Status atual: **PASS — BACKEND + FRONTEND PUBLICADO VALIDADOS EM PRODUÇÃO**.
+
+
+
+
+
+
+
+
 
 
 
@@ -2568,6 +4722,28 @@ Status atual: **BACKEND TRANSACIONAL PASS / FRONTEND PUBLICADO AINDA NÃO VALIDA
 
 
 Em 2026-09-18 foi executado um smoke transacional com `ROLLBACK` contra o cenário ativo da Mel. Foram validados `already_active`, fechamento `closed/duplicate`, `resolved`, retry idempotente e ausência de novos `weight_entries`/relationships. Nenhum dado artificial do ensaio foi persistido.
+
+
+**Validação ponta a ponta em produção — S16: PASS.** No cenário real de regressão, já existia um paciente canônico `Pingo S8` ativo. Foi criado um segundo cadastro preliminar `Pingo S8` com peso inicial de `7,3 kg`; o tutor escolheu o pet já existente. O backend preservou o patient/relationship canônicos, encerrou o novo `professional_patient` como `closed/duplicate`, marcou o convite como `resolved` com `resolved_by/resolved_at`, manteve `accepted_by/accepted_at` nulos e não criou novo pet, relacionamento ou `weight_entry`.
+
+
+Na primeira abertura visual após o aceite apareceu a tela antiga **“Pingo S8 foi conectado”**. O código vigente já tratava `resolution === "already_active"` corretamente; ao reabrir o convite em sessão sem cache antigo, a interface exibiu **“Acompanhamento já identificado”** e a mensagem de acompanhamento previamente ativo. O achado é compatível com bundle antigo em cache/PWA e fica registrado como observação de validação, não como bug persistente do código vigente.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -2601,6 +4777,22 @@ Verificar no smoke:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 1. partir de um pet que já possua patient `active` e exatamente um relationship `active` com o mesmo profissional;
 2. criar um novo patient preliminar para o mesmo tutor/pet e gerar novo convite;
 3. no tutor, confirmar o pet existente;
@@ -2611,6 +4803,22 @@ Verificar no smoke:
 8. nenhum novo pet, relationship ou `weight_entry` deve ser criado pelo caminho de duplicata, inclusive quando o patient novo possui `initial_weight_kg`;
 9. retry da mesma resolução deve devolver o mesmo patient efetivo/relationship sem novas escritas;
 10. estados incoerentes (patient ativo sem relationship correspondente, relationship apontando para outro patient etc.) devem falhar sem autocorreção.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

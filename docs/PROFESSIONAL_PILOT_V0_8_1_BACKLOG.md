@@ -31,9 +31,73 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 **Criado em:** 2026-09-16  
 **Atualizado em:** 2026-09-18  
 **Origem:** smoke test da primeira implementação do Professional Pilot — Etapa 1B
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -100,7 +164,71 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ---
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -166,8 +294,72 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### Baseline em teste
 A versão atualmente publicada e submetida a este smoke deve ser tratada como **v0.8.0**, ainda que o rodapé tenha permanecido incorretamente em `v0.7.7`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -243,8 +435,72 @@ A v0.8.0 introduziu a fundação do modo profissional:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### Próxima versão
 Todos os fixes e refinamentos listados neste documento compõem a **v0.8.1**.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -312,7 +568,103 @@ Todos os fixes e refinamentos listados neste documento compõem a **v0.8.1**.
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ---
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -394,7 +746,39 @@ Todos os fixes e refinamentos listados neste documento compõem a **v0.8.1**.
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Status em **2026-09-18**:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -415,7 +799,23 @@ Status em **2026-09-18**:
 - **Bloco 2 — normalização central de erros:** concluído no código-fonte e validado no frontend publicado durante o reteste pós-deploy. `src/lib/errors.ts` centraliza erros Supabase/PostgREST e os serviços profissionais convertem erros estruturados antes de entregá-los à UI.
 - **Bloco 3 — guarda pública do convite:** concluído e **validado em produção**. O preview público é validado antes de qualquer tela de autenticação; convite profissional com token ausente, vazio ou não encontrado termina em estado neutro **“Convite não encontrado”**; o CTA **“Ir para o Rotina Pet”** limpa `invite`, `token` e `intent` da URL. **S10 PASS na v0.8.1.**
 - **Bloco 4 — identidade/troca de conta e copy de auth:** concluído e **validado em produção**. `INVITATION_EMAIL_MISMATCH` recebe estado próprio e CTA **Entrar com outra conta**; logout preserva o deep link do convite; a copy de autenticação não afirma mais aceite inexistente; o fluxo mostra identidade discreta da sessão/visitante. **S7 PASS e S11 PASS na v0.8.1.** O reteste de S11 reutilizou o cenário artificial `Smoke S7 S10`; o convite da Nina permaneceu intacto.
-- **Bloco 5 — novo convite encontrando acompanhamento já ativo:** **implementado em código e banco em 2026-09-18; aguardando validação pós-deploy.** O patient ativo e íntegro permanece canônico; o novo patient redundante é encerrado como `closed/duplicate` com referência explícita ao canônico; o convite termina como `resolved`, sem novo relationship, pet ou peso. Não confundir com S13, que cobre retry do mesmo convite aceito.
+- **Bloco 5 — novo convite encontrando acompanhamento já ativo:** **implementado e validado ponta a ponta em produção; S16 PASS.** O patient ativo e íntegro permanece canônico; o novo patient redundante é encerrado como `closed/duplicate` com referência explícita ao canônico; o convite termina como `resolved`, sem novo relationship, pet ou peso. Não confundir com S13, que cobre retry do mesmo convite aceito. Durante a primeira validação visual do S16 foi observada uma tela antiga compatível com bundle anterior em cache/PWA; em sessão sem cache antigo, o estado correto de acompanhamento já identificado foi exibido. O achado fica registrado como observação de cache/PWA, não como bug persistente do código vigente.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -433,6 +833,22 @@ Status em **2026-09-18**:
 
 
 Regra de documentação: **“implementado” não equivale a “validado em produção”**. O backlog registra a implementação; o runbook/smoke registra PASS somente depois do deploy e do cenário executado.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -483,12 +899,76 @@ Regra de documentação: **“implementado” não equivale a “validado em pro
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## 1.1. Ritmo visual do cabeçalho
 - aumentar levemente o espaço entre eyebrow e título;
 - aumentar levemente o espaço entre título e linha de clínica;
 - aumentar levemente o espaço entre clínica e divisor;
 - aumentar levemente a entrelinha do título;
 - permitir que o título use mais da largura útil do card em telas médias/grandes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -560,12 +1040,76 @@ Criar um token/estilo reutilizável para:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## 1.3. Card explicativo
 Padronizar os dois parágrafos explicativos:
 - mesmo tamanho;
 - mesma cor;
 - mesma entrelinha;
 - negrito apenas quando semanticamente necessário.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -634,6 +1178,38 @@ Padronizar os dois parágrafos explicativos:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ---
 
 
@@ -667,7 +1243,71 @@ Padronizar os dois parágrafos explicativos:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # 2. Autenticação no contexto do convite
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -738,12 +1378,76 @@ Padronizar os dois parágrafos explicativos:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### Já validado no smoke
 - signup no contexto do convite;
 - confirmação de e-mail;
 - retorno ao mesmo convite;
 - preservação do intent/contexto;
 - conta zero-pets não cai no onboarding depois que o primeiro pet nasce do convite.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -809,7 +1513,71 @@ Padronizar os dois parágrafos explicativos:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # 3. Cadastro preliminar de paciente — área profissional
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -878,10 +1646,74 @@ Padronizar os dois parágrafos explicativos:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## 3.2. Falha parcial paciente → convite
 Separar:
 1. falha ao salvar paciente;
 2. paciente salvo, convite não gerado.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -947,7 +1779,71 @@ Copy sugerida:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 > **Paciente cadastrado, mas não foi possível gerar o convite. Você pode tentar novamente.**
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1013,7 +1909,71 @@ Copy sugerida:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # 4. Backend / migrations descobertos no smoke
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1083,10 +2043,74 @@ As correções abaixo já estão sincronizadas também no repositório:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## 4.2. Sincronização — concluída no Bloco 1
 - Supabase de produção e migrations do repositório representam a mesma definição final de `create_professional_invitation`;
 - a migration corretiva consolidada `20260918161151_sync_professional_invitation_rpc.sql` está aplicada em produção e registrada no repositório;
 - a migration de fundação foi atualizada para novas instalações, sem reaplicação destrutiva em produção.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1152,6 +2176,38 @@ As correções abaixo já estão sincronizadas também no repositório:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # 5. Deduplicação preventiva no lado profissional
 
 
@@ -1185,7 +2241,71 @@ As correções abaixo já estão sincronizadas também no repositório:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 O smoke comprovou que o vet pode criar um segundo paciente preliminar correspondente a um pet que ele já acompanha.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1258,7 +2378,71 @@ Comparar apenas com os `professional_patients` do próprio profissional:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Não consultar/expor pets privados do tutor que ainda não façam parte da relação profissional.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1325,8 +2509,72 @@ Copy sugerida:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 > **Você já acompanha uma Mel deste tutor.**  
 > Este acompanhamento já está ativo.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1394,6 +2642,38 @@ Ações:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## 5.3. Se já houver draft/invited
 Copy sugerida:
 
@@ -1428,8 +2708,72 @@ Copy sugerida:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 > **Já existe um cadastro de Mel para este tutor.**  
 > Você pode continuar o convite existente em vez de criar outro.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1497,6 +2841,38 @@ Ações:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## 5.4. Banco
 Não criar `UNIQUE CONSTRAINT` rígida por tutor + nome + espécie.
 
@@ -1531,7 +2907,71 @@ Não criar `UNIQUE CONSTRAINT` rígida por tutor + nome + espécie.
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ---
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1573,7 +3013,23 @@ Não criar `UNIQUE CONSTRAINT` rígida por tutor + nome + espécie.
 
 
 
+
+
+
+
+
+
+
+
 ## 6.1. Mesmo convite já aceito — S13
+
+
+
+
+
+
+
+
 
 
 
@@ -1595,7 +3051,23 @@ O retry do **mesmo convite**, pelo mesmo tutor, permanece idempotente:
 
 
 
+
+
+
+
+
+
+
+
 Na v0.8.1, o lookup do retry foi endurecido para resolver o relationship pelo `professional_patient_id` histórico do convite, evitando devolver por engano um episódio posterior de acompanhamento.
+
+
+
+
+
+
+
+
 
 
 
@@ -1613,7 +3085,23 @@ Na v0.8.1, o lookup do retry foi endurecido para resolver o relationship pelo `p
 
 
 
+
+
+
+
+
+
+
+
 **Implementado em 2026-09-18.**
+
+
+
+
+
+
+
+
 
 
 
@@ -1641,6 +3129,14 @@ Semântica final:
 
 
 
+
+
+
+
+
+
+
+
 UX do tutor no caminho resolvido:
 > **Este acompanhamento já estava ativo**
 
@@ -1651,8 +3147,24 @@ UX do tutor no caminho resolvido:
 
 
 
+
+
+
+
+
+
+
+
 CTA:
 - **Continuar no Rotina Pet**
+
+
+
+
+
+
+
+
 
 
 
@@ -1672,9 +3184,25 @@ Migrations:
 
 
 
+
+
+
+
+
+
+
+
 Validação:
 - backend transacional com `ROLLBACK`: **PASS**;
-- frontend publicado / S16: **pendente pós-deploy**.
+- frontend publicado / S16: **PASS em produção**.
+
+
+
+
+
+
+
+
 
 
 
@@ -1684,6 +3212,14 @@ Validação:
 
 
 ---
+
+
+
+
+
+
+
+
 
 
 
@@ -1725,7 +3261,71 @@ Validação:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 “Convite enviado” não deve ser estado fixo.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1799,7 +3399,71 @@ Validação:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Preferir “Aguardando tutor” a “Pendente”.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1869,6 +3533,38 @@ Preferir “Aguardando tutor” a “Pendente”.
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### Pacientes
 - acompanhamento ativo.
 
@@ -1903,7 +3599,71 @@ Preferir “Aguardando tutor” a “Pendente”.
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Pacientes aceitos devem sair da lista de preliminares.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1972,6 +3732,38 @@ Rever para:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ---
 
 
@@ -2005,7 +3797,71 @@ Rever para:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # 8. Matching no lado do tutor
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -2072,8 +3928,72 @@ Nunca vincular automaticamente. O tutor sempre confirma identidade.
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## 8.2. Linguagem da confirmação
 Evitar **“Usar Luna”**.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -2139,7 +4059,71 @@ Preferência definida:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 > **Sim, é a Luna**
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -2207,6 +4191,38 @@ Estado não selecionado:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Estado selecionado:
 - preenchido em verde.
 
@@ -2241,8 +4257,72 @@ Estado selecionado:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## 8.3. Copy “Agora confirme qual perfil…”
 Remover/reformular.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -2310,8 +4390,72 @@ Remover/reformular.
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### Sugestão antes da decisão
 > **Sua autorização vale somente para Mel. Escolha acima se este é o mesmo animal que você já cadastrou no Rotina Pet.**
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -2378,6 +4522,38 @@ Remover/reformular.
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ---
 
 
@@ -2411,7 +4587,71 @@ Remover/reformular.
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # 9. Matching em três níveis
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -2478,8 +4718,72 @@ Mostrar candidato diretamente.
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## 9.2. Match provável único
 Mostrar candidato diretamente, com linguagem de incerteza.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -2547,8 +4851,72 @@ Exemplo validado:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## 9.3. Múltiplos candidatos plausíveis — shortlist
 Se dois ou mais nomes tiverem similaridade relevante e scores próximos, mostrar automaticamente apenas os plausíveis.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -2616,7 +4984,71 @@ Exemplo:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 UI:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -2683,9 +5115,73 @@ UI:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Shortlist:
 - Mia
 - Mila
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -2754,7 +5250,71 @@ Ações:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Não mostrar Luna nessa shortlist se a similaridade for claramente menor.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -2821,6 +5381,38 @@ Próximo ao CTA principal:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 > **Escolher pet já cadastrado**
 
 
@@ -2854,7 +5446,71 @@ Próximo ao CTA principal:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Ao tocar, listar os compatíveis da mesma espécie.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -2922,9 +5578,73 @@ Desktop/tablet:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Mobile:
 - empilhado;
 - secondary acima do CTA principal.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -2991,7 +5711,71 @@ Fluxo direto de criação.
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ---
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -3057,7 +5841,71 @@ Fluxo direto de criação.
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Evitar “criar/concluir vínculo” na interface.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -3123,7 +5971,71 @@ Padrão definido:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 > **Autorizar acompanhamento**
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -3189,7 +6101,71 @@ Quando um novo pet será criado:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 > **Criar Mina e autorizar acompanhamento**
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -3255,7 +6231,71 @@ Quando pet existente já foi escolhido:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 > **Autorizar acompanhamento**
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -3321,7 +6361,71 @@ Quando pet existente já foi escolhido:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ---
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -3387,6 +6491,38 @@ Quando pet existente já foi escolhido:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Copy definida:
 
 
@@ -3420,7 +6556,71 @@ Copy definida:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 > **Luna agora está sendo acompanhada por Profissional de Teste — NÃO REAL.**
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -3488,7 +6688,71 @@ Copy definida:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ---
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -3554,9 +6818,73 @@ Copy definida:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Caso validado:
 - vet informou `Lunna`;
 - tutor confirmou `Luna`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -3625,8 +6953,72 @@ Depois de `pet_id` existir:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## 12.2. Histórico
 Preservar `professional_patients.pet_name` como snapshot/auditoria, sem usá-lo como nome canônico após o vínculo.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -3693,8 +7085,72 @@ Exemplo contextual, uma vez:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 > **Nome atualizado pelo tutor**  
 > Lunna foi vinculada ao perfil **Luna** do tutor. Passaremos a usar o nome cadastrado por ele.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -3761,7 +7217,71 @@ Não estender automaticamente a regra a raça, sexo, nascimento etc. sem regra p
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ---
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -3827,6 +7347,38 @@ Não estender automaticamente a regra a raça, sexo, nascimento etc. sem regra p
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Mostrar discretamente quando houver acompanhamento ativo.
 
 
@@ -3860,7 +7412,71 @@ Mostrar discretamente quando houver acompanhamento ativo.
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Exemplo:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -3928,7 +7544,71 @@ Gato
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Para múltiplos profissionais:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -3994,7 +7674,71 @@ Para múltiplos profissionais:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Não listar todos no card.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -4060,6 +7804,38 @@ Não listar todos no card.
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # 14. Tutor — visualizar e encerrar acompanhamento
 
 
@@ -4093,7 +7869,71 @@ Não listar todos no card.
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 **Obrigatório para v0.8.1.**
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -4165,6 +8005,38 @@ Mostrar:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## 14.2. Confirmação
 Explicar que:
 - o profissional perde acesso ativo;
@@ -4202,8 +8074,72 @@ Explicar que:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## 14.3. Banco
 Não deletar `professional_relationships`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -4272,6 +8208,38 @@ Ao encerrar:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## 14.4. Profissional também pode encerrar
 Pode encerrar acompanhamento, mas não apagar a relação histórica.
 
@@ -4306,8 +8274,72 @@ Pode encerrar acompanhamento, mas não apagar a relação histórica.
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## 14.5. Arquivar pet ≠ revogar acesso
 Tratar como conceitos diferentes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -4378,6 +8410,38 @@ Tratar como conceitos diferentes.
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ---
 
 
@@ -4411,7 +8475,71 @@ Tratar como conceitos diferentes.
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # 15. Processo / preflight / deploy
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -4480,6 +8608,38 @@ Tratar como conceitos diferentes.
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ---
 
 
@@ -4513,7 +8673,71 @@ Tratar como conceitos diferentes.
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # 16. Cenários já validados na v0.8.0
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -4594,7 +8818,71 @@ Tratar como conceitos diferentes.
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ---
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -4660,7 +8948,71 @@ Tratar como conceitos diferentes.
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## 17.0. Cenários concluídos / estado atual
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -4739,11 +9091,75 @@ Tratar como conceitos diferentes.
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Também já validados no smoke:
 - [x] rejeitar candidatos sugeridos e criar novo pet;
 - [x] seleção manual de candidato quando não houve match automático;
 - [x] ausência de duplicação indevida nos fluxos já exercitados;
 - [x] integridade atômica em tentativas inválidas.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -4793,7 +9209,39 @@ Também já validados no smoke:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 O histórico da v0.8.0 permanece: S11 havia sido diferido e os achados de S7/S10 exigiam correções de UX/roteamento.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -4827,6 +9275,22 @@ O histórico da v0.8.0 permanece: S11 havia sido diferido e os achados de S7/S10
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### Leitura do estado do smoke
 
 
@@ -4844,7 +9308,55 @@ O histórico da v0.8.0 permanece: S11 havia sido diferido e os achados de S7/S10
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 A fundação v0.8.0 segue registrada como base histórica. Para a Wave 1 da v0.8.1, os problemas de roteamento/UX encontrados em S7/S10 e a pendência de S11 estão fechados por reteste real no frontend publicado. O próximo item estrutural é o Bloco 5.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -4910,6 +9422,38 @@ A fundação v0.8.0 segue registrada como base histórica. Para a Wave 1 da v0.8
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## 17.1. S7 — conta errada / e-mail errado
 
 
@@ -4943,7 +9487,71 @@ A fundação v0.8.0 segue registrada como base histórica. Para a Wave 1 da v0.8
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 **Resultado:** PASS funcional/segurança + FAIL de UX.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -5016,8 +9624,72 @@ Cenário validado:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### Falha de UX observada
 A UI exibiu o fallback genérico:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -5083,7 +9755,71 @@ A UI exibiu o fallback genérico:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Isso é inadequado porque retry na mesma conta nunca resolverá a causa.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -5149,7 +9885,71 @@ Isso é inadequado porque retry na mesma conta nunca resolverá a causa.
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Título:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -5215,7 +10015,71 @@ Título:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Texto:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -5281,6 +10145,38 @@ Texto:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 CTA:
 
 
@@ -5314,7 +10210,71 @@ CTA:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 > **Entrar com outra conta**
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -5386,8 +10346,72 @@ Ao trocar de conta:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### Causa técnica provável identificada no código atual
 `acceptProfessionalInvitation()` relança diretamente o erro retornado por `supabase.rpc`. Já `inviteError()` extrai a mensagem com `error instanceof Error ? error.message : String(error)`. Como erros do PostgREST/Supabase podem ser objetos estruturados que não são instâncias nativas de `Error`, o valor pode virar `"[object Object]"`, impedindo a detecção de `INVITATION_EMAIL_MISMATCH` e levando ao fallback genérico.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -5457,11 +10481,75 @@ Fix recomendado:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Classificação:
 - **bug funcional:** não;
 - **bug de segurança:** não;
 - **problema de UX:** sim, bloqueador para v0.8.1;
 - **hardening técnico:** sim, normalização de erros RPC.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -5527,7 +10615,71 @@ Classificação:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Resultado: **PASS funcional**.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -5597,8 +10749,72 @@ Validado no smoke:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### Observação de UX — identidade da sessão
 Durante o fluxo de autorização, não fica claro qual conta está autenticada. Isso ficou especialmente evidente no cenário de conta errada e continua relevante após refresh.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -5669,11 +10885,75 @@ Decisão para v0.8.1:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Racional:
 - reduz risco de consentimento pela conta errada;
 - torna o estado de sessão observável durante um fluxo sensível;
 - ajuda testes e suporte;
 - custo de implementação é baixo/moderado se restrito ao contexto do convite.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -5775,6 +11055,70 @@ Classificação:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## 17.5. S13 — idempotência do mesmo aceite após sucesso
 
 
@@ -5808,7 +11152,71 @@ Classificação:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 **Resultado:** PASS funcional + PASS de integridade + PASS de semântica da RPC + PASS de segurança no cenário testado.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -5880,6 +11288,38 @@ Cenário artificial isolado validado em 2026-09-18:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### Baseline após o primeiro aceite
 - 1 pet `S13 Idem` para o tutor;
 - 1 relacionamento profissional, ativo;
@@ -5887,6 +11327,38 @@ Cenário artificial isolado validado em 2026-09-18:
 - 1 `initial_weight_entry_id`;
 - 1 convite para o paciente;
 - 1 convite aceito.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -5952,8 +11424,72 @@ Também foram registrados os IDs e timestamps de paciente, pet, convite, relacio
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### Reabertura pela interface
 Ao reabrir o link já aceito, o frontend apresentou o estado terminal **“Convite já concluído”** e não tentou materializar um novo aceite. A leitura posterior do banco confirmou ausência de efeitos colaterais.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -6024,7 +11560,71 @@ Foi repetida `accept_professional_invitation` com:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 A RPC retornou exatamente os mesmos IDs de `invitation`, `professional_patient`, `pet`, `professional_relationship` e `initial_weight_entry`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -6098,6 +11698,38 @@ Após o retry:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### Conclusão
 A implementação instalada em produção é semanticamente idempotente para **o mesmo convite já aceito pelo mesmo tutor**. A repetição retorna o estado já materializado e não duplica pet, vínculo ou peso.
 
@@ -6132,7 +11764,71 @@ A implementação instalada em produção é semanticamente idempotente para **o
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Importante: este PASS não encerra o item da seção 6 sobre **novo convite/paciente que encontra um acompanhamento ativo já existente**. Esse é um caso semanticamente diferente e continua no backlog da v0.8.1.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -6203,7 +11899,71 @@ Classificação:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ---
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -6269,7 +12029,71 @@ Classificação:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 **Resultado:** PASS funcional; sem regressão estrutural observada.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -6341,11 +12165,75 @@ Validado em conta Tutor Solo existente:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Classificação:
 - **bug funcional:** não;
 - **bug de segurança:** não;
 - **regressão Tutor Solo:** não observada;
 - **novo item para v0.8.1 decorrente deste cenário:** nenhum.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -6411,7 +12299,71 @@ Classificação:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Achado durante a preparação do S10: ao abrir um link de convite válido em uma nova aba e cair na autenticação, a tela exibiu:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -6477,7 +12429,71 @@ Achado durante a preparação do S10: ao abrir um link de convite válido em uma
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 O código atual de `AuthScreen.tsx` mostra essa nota sempre que `context === "professional-invite"`; ela não consulta nem deriva o status real do convite. Portanto, `intent=accept` (intenção de continuar o fluxo) está sendo descrito como se fosse aceite já materializado no backend.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -6547,7 +12563,71 @@ Resultado da análise:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### Copy definida para v0.8.1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -6613,7 +12693,71 @@ Subtítulo de login no contexto do convite:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 > **Entre com o e-mail que recebeu este convite para continuar.**
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -6679,6 +12823,38 @@ Nota contextual:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 > **O convite não vai se perder. Entre com a conta que o recebeu e você continua de onde parou.**
 
 
@@ -6712,7 +12888,71 @@ Nota contextual:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Para cadastro, manter a mesma linguagem humana e evitar “concluir vínculo”. A mensagem deve explicar apenas que a conta precisa usar o e-mail que recebeu o convite e que, após a confirmação, o fluxo continua de onde parou.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -6813,7 +13053,103 @@ Princípio de linguagem:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ---
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -6879,9 +13215,41 @@ Princípio de linguagem:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## Críticos funcionais
 - [x] Migration corretiva das RPCs no repositório.
-- [ ] Idempotência para acompanhamento já ativo.
+- [x] Idempotência para acompanhamento já ativo — S16 PASS em produção; novo patient encerrado como `closed/duplicate`, convite `resolved`, sem duplicar pet, relationship ou peso.
 - [ ] Deduplicação preventiva no cadastro profissional.
 - [ ] Status real de convite/acompanhamento.
 - [ ] Separar preliminares de pacientes ativos.
@@ -6889,6 +13257,38 @@ Princípio de linguagem:
 - [ ] Tutor pode encerrar acompanhamento.
 - [ ] Histórico do relacionamento é preservado.
 - [ ] Nome canônico do tutor é exibido ao vet após matching.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -6929,6 +13329,38 @@ Princípio de linguagem:
 - [ ] CTA `Criar {pet} e autorizar acompanhamento`.
 - [ ] Remover/reformular “Agora confirme qual perfil...”.
 - [ ] Success copy com nome canônico e profissional.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -7006,9 +13438,73 @@ Princípio de linguagem:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## Cadastro profissional
 - [ ] Data do peso = hoje.
 - [ ] Mensagem correta para paciente salvo + convite falhou.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -7080,6 +13576,38 @@ Princípio de linguagem:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ---
 
 
@@ -7113,7 +13641,71 @@ Princípio de linguagem:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # 19. Fora do escopo imediato
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -7185,6 +13777,38 @@ Continuam fora deste pacote, salvo decisão posterior:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 A v0.8.1 deve corrigir e tornar coerente a fundação profissional já introduzida, sem transformar esta rodada em uma nova etapa de produto.
 
 
@@ -7218,7 +13842,71 @@ A v0.8.1 deve corrigir e tornar coerente a fundação profissional já introduzi
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## 2.y. Token inválido — saída segura para o produto
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -7285,7 +13973,71 @@ Classificação: **PASS de segurança + FAIL funcional de roteamento/UX**.
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Com token adulterado e `invite=professional&intent=accept` preservados, nenhum dado do convite foi revelado. Porém, o app abriu a autenticação antes de validar a existência do convite.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -7354,8 +14106,72 @@ Comportamento obrigatório na v0.8.1:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 > **Convite não encontrado**  
 > Este link pode estar incompleto ou não ser mais válido.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -7423,7 +14239,55 @@ Comportamento obrigatório na v0.8.1:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Decisão de wording: preferir **Ir para o Rotina Pet** a “Voltar ao Rotina Pet”, pois o visitante pode ter chegado diretamente pelo convite e nunca ter navegado pelo app antes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -7457,7 +14321,39 @@ Decisão de wording: preferir **Ir para o Rotina Pet** a “Voltar ao Rotina Pet
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 **Status:** IMPLEMENTADO E VALIDADO EM PRODUÇÃO; S7 PASS E S11 PASS NA v0.8.1.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -7500,6 +14396,22 @@ Alterações:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Retestes obrigatórios após deploy:
 1. repetir S7 com conta controlada errada e confirmar o estado específico, sem efeitos parciais no banco;
 2. confirmar que **Entrar com outra conta** faz logout e mantém `invite`, `token` e `intent=accept`;
@@ -7508,6 +14420,22 @@ Retestes obrigatórios após deploy:
 5. confirmar que a identidade exibida acompanha corretamente visitante → conta errada → visitante → conta correta;
 6. confirmar aceite final e integridade no banco;
 7. executar regressões rápidas de refresh/reabertura, Tutor Solo, logout comum e storage.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -7557,6 +14485,38 @@ Reteste concluído em 2026-09-18 com `Smoke S7 S10`: todos os itens acima passar
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## 21. Wave 1 — fechamento dos retestes pós-deploy — 2026-09-18
 
 
@@ -7574,7 +14534,39 @@ Reteste concluído em 2026-09-18 com `Smoke S7 S10`: todos os itens acima passar
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### S10 — PASS na v0.8.1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -7612,7 +14604,39 @@ Reteste concluído em 2026-09-18 com `Smoke S7 S10`: todos os itens acima passar
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### S7 — PASS na v0.8.1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -7651,6 +14675,22 @@ Cenário `Smoke S7 S10`, com conta controlada errada:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 O resultado histórico da v0.8.0 (**PASS funcional/segurança + FAIL de UX**) permanece válido apenas como histórico da versão anterior.
 
 
@@ -7668,7 +14708,39 @@ O resultado histórico da v0.8.0 (**PASS funcional/segurança + FAIL de UX**) pe
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### S11 — PASS na v0.8.1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -7709,7 +14781,39 @@ Foi reutilizado `Smoke S7 S10`, evitando consumir o convite preservado da Nina:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### Regressões pós-S11 — PASS
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -7747,12 +14851,32 @@ Foi reutilizado `Smoke S7 S10`, evitando consumir o convite preservado da Nina:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### Próximo passo
 
 
 
 
-O Bloco 5 já está implementado no código e no banco e possui validação transacional de backend. O próximo passo da Wave 1 é:
-1. publicar o frontend v0.8.1;
-2. executar o S16 e as regressões previstas no runbook;
+
+
+
+
+O Bloco 5 está implementado e validado ponta a ponta em produção; o S16 passou no frontend publicado. O próximo passo da Wave 1 é:
+1. executar as regressões obrigatórias previstas no runbook: S7, S9, S10, S11, S13 e S15;
+2. encerrar formalmente a Wave 1 após a revisão documental final;
 3. depois avançar para a deduplicação preventiva do lado profissional e para a evolução da tela **Pacientes**.

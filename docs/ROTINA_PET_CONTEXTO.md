@@ -1,14 +1,22 @@
 ﻿# ROTINA_PET_CONTEXTO.md
 
 
+
+
 > Contexto operacional do projeto.
+
+
 
 
 Versão do documento: 1.8
 
 
+
+
 ## Objetivo
 Registrar o estado atual do Rotina Pet para continuidade entre conversas.
+
+
 
 
 ## Estado atual
@@ -23,7 +31,7 @@ Registrar o estado atual do Rotina Pet para continuidade entre conversas.
   - Bloco 3 — guarda pública do convite: concluído; S10 PASS;
   - Bloco 4 — identidade/troca de conta: concluído; S7 e S11 PASS;
   - Bloco 4.5 — versionamento centralizado em `package.json`: implementado; validação visual pós-deploy pendente;
-  - Bloco 5 — novo patient/convite encontrando acompanhamento já ativo: implementado no frontend e no Supabase; backend transacional PASS; S16 no frontend publicado pendente.
+  - Bloco 5 — novo patient/convite encontrando acompanhamento já ativo: implementado e validado ponta a ponta em produção; S16 PASS. O patient redundante é encerrado como `closed/duplicate`, o convite fica `resolved` e não há duplicação de pet, relationship ou peso. A primeira validação visual exibiu bundle antigo em cache/PWA; em sessão limpa, a UI vigente exibiu corretamente o estado de acompanhamento já identificado.
 - No Bloco 5, o patient ativo e íntegro permanece canônico; o patient redundante fica `closed/duplicate` com referência ao canônico; o convite fica `resolved`; relationship, pet e peso não são duplicados.
 - O convite bruto continua somente na URL controlada; o banco persiste `token_hash`.
 - O frontend protege o preview público antes da autenticação e permite troca de conta preservando o deep link do convite.
@@ -40,11 +48,15 @@ Registrar o estado atual do Rotina Pet para continuidade entre conversas.
 - A Product Foundation mantém a nutrição como vertical inicial e registra como hipótese futura a expansão para adesão a outros cuidados do pet.
 
 
+
+
 ## Validação pendente imediata
 1. Publicar o frontend v0.8.1.
 2. Confirmar visualmente o rodapé em **v0.8.1**.
 3. Executar S16 no frontend publicado usando cenário artificial/controlado.
 4. Executar regressões S7, S9, S10, S11, S13 e S15 após o deploy.
+
+
 
 
 ## Próximas frentes do Professional Pilot
@@ -53,6 +65,8 @@ Registrar o estado atual do Rotina Pet para continuidade entre conversas.
 3. Criador/versionamento de prescrição nutricional.
 4. Vínculo prescrição → rotina do tutor.
 5. Hardening de autorização/imutabilidade dos agregados clínicos antes de ampliar o piloto.
+
+
 
 
 ## Outras pendências
@@ -64,9 +78,13 @@ Registrar o estado atual do Rotina Pet para continuidade entre conversas.
 - Validar com tutores e profissionais a hipótese de expansão para saúde preventiva, consultas, exames e medicamentos antes de alterar o posicionamento público ou comprometer novo roadmap.
 
 
+
+
 ## Limitações atuais
 - Alimentos arquivados permanecem no banco, mas não podem ser restaurados pela interface.
 - O Professional Pilot ainda não inclui tela completa de Pacientes, prontuário completo, criador completo de prescrição nem monitoramento clínico completo.
+
+
 
 
 Consulte `DECISOES_ARQUITETURAIS.md` para regras permanentes.
